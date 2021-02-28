@@ -1,0 +1,144 @@
+<template>
+	<view class="midBtnPage">
+		<view class="decoration animated zoomIn fast">
+			<image src="/static/images/mid2.png" mode="aspectFit"></image>
+		</view>
+		<view class="mid-close" @click="back">
+			<image src="/static/icon/tabBar/close.png" mode="aspectFit"></image>
+		</view>
+		<view class="menu-list">
+			<view class="menu-item-box animated bounceInUp menu-item-box-1">
+				<view class="menu-item menu-item-1" hover-class="active-hover" hover-stay-time="100">
+					<image src="/static/icon/page/midButtomMenu/Uploadtocloud.png" mode="aspectFit"></image>
+				</view>
+				<text class="menu-item-font">文件上传</text>
+			</view>
+			<view class="menu-item-box animated bounceInUp menu-item-box-2">
+				<view class="menu-item  menu-item-2" hover-class="active-hover" hover-stay-time="100">
+					<image src="/static/icon/page/midButtomMenu/Add-Folder.png" mode="aspectFit"></image>
+				</view>
+				<text class="menu-item-font">新建文件夹</text>
+			</view>
+			<view class="menu-item-box animated bounceInUp menu-item-box-3">
+				<view class="menu-item  menu-item-3" hover-class="active-hover" hover-stay-time="100">
+					<image src="/static/icon/page/midButtomMenu/check.png" mode="aspectFit"></image>
+				</view>
+				<text class="menu-item-font">扫一扫</text>
+			</view>
+			<view class="menu-item-box animated bounceInUp menu-item-box-4">
+				<view class="menu-item menu-item-4 " hover-class="active-hover" hover-stay-time="100">
+					<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit"></image>
+				</view>
+				<text class="menu-item-font">拍照上传</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		methods: {
+			back() {
+				uni.navigateBack()
+			}
+		},
+		data() {
+			return {
+
+			};
+		}
+	}
+</script>
+
+<style lang="scss">
+	.active-hover {
+		opacity: .5;
+	}
+
+	.midBtnPage {
+		position: fixed;
+		top: 60%;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		@extend %f-ct;
+
+		.decoration {
+			position: fixed;
+			top: 0;
+			bottom: 25%;
+			left: 0;
+			right: 0;
+			@extend %f-ct;
+
+			image {
+				width: 80%;
+				height: 80%;
+			}
+		}
+
+		.mid-close {
+			position: absolute;
+			width: 100%;
+			height: 40px;
+			bottom: 0px;
+			text-align: center;
+			@extend %f-ct;
+
+			image {
+				width: 60px;
+				height: 47px;
+			}
+		}
+
+		.menu-list {
+			$menu-item-color: #336699, #6666CC, #33CC99, #555555;
+
+			@for $i from 1 through 4 {
+				.menu-item-#{$i} {
+					background-color: nth($menu-item-color, $i);
+				}
+				.menu-item-box-#{$i} {
+					-webkit-animation-delay: 0.15s * $i;
+					animation-delay: 0.15s * $i;
+				}
+			}
+
+			display: flex;
+			width: 100%;
+			height: 100%;
+			flex-wrap: wrap;
+			justify-content: space-around;
+			align-content: center;
+
+			.menu-item {
+				// text-align: center;
+				width: 120rpx;
+				height: 120rpx;
+				@extend %f-cl;
+				justify-content: center;
+				align-items: center;
+				border-radius: 50%;
+				font-size: 11px;
+				color: white;
+
+				image {
+					width: 75rpx;
+					height: 75rpx;
+				}
+
+				&+.menu-item-font {
+					padding-top: 5px;
+					font-size: $uni-font-size-sm;
+					display: block;
+					text-align: center;
+					color: #8F8F94;
+				}
+			}
+
+			.menu-item-box {
+				margin-bottom: 30rpx;
+			}
+		}
+	}
+</style>

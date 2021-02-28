@@ -1,0 +1,206 @@
+<template>
+	<view class="search" :render-whole='true'>
+		<picker @change="bindPickerChange" :value="index" :range="array" range-key="name">
+			<view class="filter">
+				<text class="filter-text">搜索{{array[index].name}}</text><text class="filter-text-alpha" style="transform: scale(.3);">▼</text>
+			</view>
+		</picker>
+		<custom-list ref='list' :filter="filter" :list="list" @clean='cleanList' @scrolltolower='scrollHandler' @refresh='refresh' :downStatus='downStatus'
+		 :status='status'></custom-list>
+		<custom-null v-if='!list.length'></custom-null>
+		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
+	</view>
+</template>
+
+<script>
+	import popups from '@/common/js/mixins/popups.js'
+	import customList from '@/common/js/mixins/custom-list.js'
+	// import {
+	// 	setTitleNViewRedDot
+	// } from '@/util/page.js'
+	export default {
+		mixins: [customList, popups],
+		onNavigationBarSearchInputConfirmed() {
+			return this.search()
+
+		},
+		onNavigationBarButtonTap(e) {
+			if (!e.index) {
+				this.openMenu = !this.openMenu
+			} else if (e.index === 1) {
+				this.search()
+			}
+		},
+		onNavigationBarSearchInputChanged(e) {
+			if (this.timer) clearTimeout(this.timer)
+			this.timer = setTimeout(() => this.query = e.text, 50)
+		},
+		data() {
+			return {
+				query: '',
+				array: [{
+					name: '全部'
+				}, {
+					name: '图片'
+				}, {
+					name: '视频'
+				}],
+				index: 0
+			}
+		},
+		methods: {
+			bindPickerChange: function(e) {
+				// 发生改变重新请求
+				this.index = e.detail.value
+			},
+			refresh() {
+				this.downStatus = 'loading'
+				setTimeout(() => {
+					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
+					this.downStatus = "noMore"
+					if (this.$refs['list'].action) this.$refs['list'].exitAction()
+					setTimeout(() => {
+						this.downStatus = "more"
+					}, 1000)
+				}, 1000)
+			},
+			scrollHandler() {
+				if (this.status === 'loading' || this.status === 'noMore') return
+				this.status = 'loading'
+				setTimeout(() => {
+					this.list.push({
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					})
+					if (this.list.length > 15) return this.status = 'noMore'
+					else this.status = 'more'
+				}, 1000)
+			},
+			async search() {
+				if (!this.query) return
+
+				this.list = [{
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+					{
+						fileName: 'uni-app教学图片',
+						type: 1,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
+					},
+				]
+
+			}
+		}
+	}
+</script>
+
+<style lang='scss' scoped>
+	.search {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.filter {
+		flex: 1;
+		height: 60rpx;
+		padding: 0 20px;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.filter-text {
+		font-size: $uni-font-size-sm;
+		line-height: 60rpx;
+		color: $uni-text-color-placeholder;
+	}
+
+	.filter-text-alpha {
+		color: $uni-text-color-placeholder;
+	}
+</style>

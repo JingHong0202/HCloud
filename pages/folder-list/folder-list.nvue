@@ -1,0 +1,132 @@
+<template>
+	<view class="folder-list">
+		<custom-list :openBreadCrumb="true" :closeLongPress='true' @selectTask='select' :closeLoad="true" :path='path' :openActionSheet="false" @changeList='changeFileList'
+		 :list="list"></custom-list>
+		<view class="folder-footer">
+			<view class="btnBox-left"  @click="mkdir"><text class="left-text">新建文件夹</text></view>
+			<view class="btnBox-right" @click="confirm"><text class="right-text">确定</text></view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		selectIcon
+	} from '@/util/file.js'
+	export default {
+		onLoad(args) {
+			if (args.from === 'move') {
+				uni.setNavigationBarTitle({
+					title: "选择移动位置"
+				})
+			}
+			//request
+			this.list = [...new Array(20)].map(item => {
+				return {
+					fileName: 'uni-app教学视频',
+					type: 0,
+					date: '2020-12-04',
+					uuid: 233
+				}
+			})
+		},
+		onUnload() {
+			uni.$off('returnData')
+		},
+		onNavigationBarButtonTap(e) {
+			this.isClose = true
+			uni.navigateBack({
+				delta: 1
+			})
+		},
+		methods: {
+			// selectThumb(current) {
+			// 	if (current.type === 1 || current.type === 3) return current.thumb;
+			// 	return selectIcon(current.type);
+			// },
+			changeFileList(res) {
+				this.list = res.list
+				this.path = res.path
+			},
+			select(item) {
+				if (item.type === 25 || !item) return
+				this.selectItem = item
+			},
+			mkdir() {
+				uni.$off('mkdir-success')
+				let page = uni.getSubNVueById('mkdir')
+				uni.$once('mkdir-success', () => {
+					console.log('reset')
+				})
+				page.show('zoom-fade-out',100,() => {
+					uni.$emit('initPrompt', {title: '新建文件夹', placeholder: '请输入文件名'})
+				})
+			},
+			confirm() {
+				uni.$emit('returnData', this.selectItem)
+				this.isClose = true
+				uni.navigateBack({
+					delta: 1
+				})
+			}
+		},
+		onBackPress() {
+			if (this.isClose) {
+				return
+			}
+			if (this.path.length > 1) {
+				// this.list[0].parentId
+				return true
+			}
+		},
+		data() {
+			return {
+				list: [],
+				path: [{
+					title: "全部文件",
+					uuid: 1
+				}],
+				// 强制返回
+				isClose: false
+			};
+		}
+	}
+</script>
+
+<style lang="scss">
+	%common-btnBox {
+		flex: 1;
+		@extend %f-ct;
+	}
+
+	.folder-list {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.folder-footer {
+		height: 50px;
+
+		.left-text,
+		.right-text {
+			font-size: $uni-font-size-lg;
+			color: white;
+		}
+
+		.btnBox-left {
+			@extend %common-btnBox;
+			background-color: #fff;
+
+			.left-text {
+				color: $uni-color-primary;
+			}
+
+		}
+
+		.btnBox-right {
+			@extend %common-btnBox;
+			background-color: $uni-color-primary;
+
+		}
+	}
+</style>

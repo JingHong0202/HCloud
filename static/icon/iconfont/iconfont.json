@@ -1,0 +1,65 @@
+{
+  "id": "2382025",
+  "name": "HCloud-iconfont",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "HCloud - 字体图标",
+  "glyphs": [
+    {
+      "icon_id": "128736",
+      "name": "search",
+      "font_class": "search",
+      "unicode": "e6ce",
+      "unicode_decimal": 59086
+    },
+    {
+      "icon_id": "1623720",
+      "name": "排序",
+      "font_class": "paixu",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "2148773",
+      "name": "show",
+      "font_class": "show",
+      "unicode": "e79f",
+      "unicode_decimal": 59295
+    },
+    {
+      "icon_id": "4133301",
+      "name": "user",
+      "font_class": "user",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
+      "icon_id": "6268126",
+      "name": "hide",
+      "font_class": "hide",
+      "unicode": "e64b",
+      "unicode_decimal": 58955
+    },
+    {
+      "icon_id": "8222171",
+      "name": "play",
+      "font_class": "play",
+      "unicode": "e637",
+      "unicode_decimal": 58935
+    },
+    {
+      "icon_id": "10428733",
+      "name": "上下箭头",
+      "font_class": "shangxiajiantou",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "15680538",
+      "name": "视图",
+      "font_class": "portal-shitu",
+      "unicode": "eab6",
+      "unicode_decimal": 60086
+    }
+  ]
+}

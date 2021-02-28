@@ -1,0 +1,155 @@
+<template>
+	<view class="wrapper"   @click.stop="clickMask">
+		<view class="wrapper-content" @click.stop="() => {}">
+			<view class="nav">
+				<text class="iconfont c-iconfont">&#xeab6;</text>
+				<text class="nav-text">视图</text>
+			</view>
+			<view class="item-box sort-items">
+				<view class="item-header">
+					<uni-section title="升降序" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' :current="sortAction" :labels="sortActionLabels" @change='sortActionChange'></custom-selection>
+				</view>
+				<view class="item-header">
+					<uni-section title="按什么排序" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' :current="sortMode" :labels="sortModeLabels" @change='sortModeChange'></custom-selection>
+				</view>
+				<view class="item-header">
+					<uni-section title="过滤" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' current="all" :labels="filterLabels" @change='filterChange'></custom-selection>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		mapMutations,
+		mapState
+	} from 'vuex'
+	export default {
+		methods: {
+			...mapMutations('views', ['CHANGE_SORTACTION', 'CHANGE_SORTMODE' ]),
+			sortActionChange({
+				value
+			}) {
+				return this.CHANGE_SORTACTION(value)
+			},
+			sortModeChange({
+				value
+			}) {
+				return this.CHANGE_SORTMODE(value)
+			},
+			filterChange({
+				value
+			}) {
+				return uni.$emit('filter-list', value)
+			},
+			clickMask() {
+				const subNVue = uni.getCurrentSubNVue();
+				subNVue.hide('slide-out-left', 200)
+				uni.$off('filter-list')
+			}
+		},
+		computed: {
+			...mapState('views', ['sortAction', 'sortMode'])
+		},
+		data() {
+			return {
+				title: '',
+				filterLabels: [{
+						name: '全部',
+						value: 'all'
+					},
+					{
+						name: '图片',
+						value: 'img'
+					},
+					{
+						name: '视频',
+						value: 'video'
+					},
+					{
+						name: '音乐',
+						value: 'music'
+					},
+					{
+						name: '办公文档',
+						value: 'office'
+					}
+				],
+				sortActionLabels: [{
+						name: '升序',
+						value: 'up'
+					},
+					{
+						name: '降序',
+						value: 'down'
+					},
+				],
+				sortModeLabels: [{
+						name: '按文件大小排序',
+						value: 'filesize'
+					},
+					{
+						name: '按时间排序',
+						value: 'time'
+					},
+					{
+						name: '按首字母排序',
+						value: 'initials'
+					}
+				]
+			}
+		}
+
+	}
+</script>
+
+<style lang="scss" scoped>
+	.wrapper {
+		flex-direction: column;
+		flex: 1;
+		.c-iconfont {
+			font-size: 70rpx;
+			margin-right: 10rpx;
+			margin-left: 10rpx;
+		}
+
+		.wrapper-content {
+			padding: 60rpx 0rpx 0rpx 0rpx;
+			flex-direction: column;
+			width: 550rpx;
+			background-color: white;
+
+			.item-box {
+				flex: 1;
+				flex-direction: column;
+
+				.item-header {
+					height: 40px;
+				}
+
+				.item {
+					// @extend  %f-ct;
+					margin-bottom: 15px;
+				}
+			}
+		}
+	}
+
+	.nav-text {
+		// margin-bottom: 40rpx;
+		// padding-left: 15rpx;
+		line-height: 70rpx;
+	}
+
+	.nav {}
+</style>

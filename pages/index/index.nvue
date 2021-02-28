@@ -1,0 +1,458 @@
+<template>
+	<list class="index" ref='index' id="index" :bounce="false" show-scrollbar="false"  :scrollable='listSwitch' >
+		<uni-refresh >
+			<uni-load-more  />
+		</uni-refresh>
+		<cell style="height: 390px;" ref='top'>
+			<view class="pic">
+				<image class="pic-img" src="../../static/images/pic.jpg" mode="aspectFill"></image>
+			</view>
+			<view class="index-ctx">
+				<view class="index-ctx-box">
+					<view class="index-ctx-top hover" elevation="5px" @click="toPage(1)"  >
+						<image class='index-ctx-img' src="/static/icon/page/index/chuanshu.png" mode="aspectFit"></image>
+						<text class="index-ctx-title">传输列表</text>
+						<view class="redDot" v-if="RUNTIME">
+							<uni-badge :text="RUNTIME" type="error" size="small"></uni-badge>
+						</view>
+					</view>
+					<view class="index-ctx-bottom ">
+						<view class="index-ctx-bottom-left hover" elevation="5px" @click="toPage(2)">
+							<image class='index-ctx-img' src="/static/icon/page/index/shangchuan.png" mode="aspectFit"></image>
+							<text class="index-ctx-title">上传文件</text>
+						</view>
+						<view class="index-ctx-bottom-right hover" elevation="5px" @click="toPage(3)">
+							<image class='index-ctx-img' src="/static/icon/page/index/search-a.png" mode="aspectFit"></image>
+							<text class="index-ctx-title">搜索文件</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</cell>
+		<cell :style="{height: `${wHeight}`}">
+			<view class="dynamic">
+				<view class="dynamic-title" @click="toggleHandle">
+					<text class="dynamic-title-left">最近动态</text>
+					<text class="dynamic-title-right iconfont">{{listSwitch ? '&#xe79f;' : '&#xe64b;'}}</text>
+				</view>
+				<view class="index-list" style="width: 750rpx;flex: 1;" >
+					<custom-list  :isSort="false" :isShow="listSwitch" @loadmore='ReachBottom' isPageScroll ref='list' :list="list" @clean='cleanList' @all='selectAll' :status="status" :loadText='loadText'></custom-list>
+				</view>
+			</view>
+		</cell>
+	</list>
+</template>
+
+<script>
+	const dom = uni.requireNativePlugin('dom')
+	import customList from '@/common/js/mixins/custom-list.js'
+	import {
+		getMedia,
+		getOneAnyFile
+	} from '@/util/file.js'
+	import {
+		mapGetters
+	} from 'vuex'
+	export default {
+		mixins: [customList],
+		data() {
+			return {
+				listSwitch: false || uni.getStorageSync('index-switch'),
+				scrollTop: 0,
+				loadText: {
+					contentdown: '上拉显示更多',
+					contentrefresh: '正在加载...',
+					contentnomore: '已经到底了,只能显示30天内上传的文件'
+				},
+				pageId: 'page',
+				wHeight: 0
+			};
+		},
+		computed: {
+			...mapGetters('file', ['RUNTIME'])
+		},
+		watch: {
+			listSwitch () {
+				dom.scrollToElement(this.$refs['top'], {
+					animated: false,
+					offset: 0
+				})
+			}
+		},
+		created() {
+			this.wHeight = uni.getSystemInfoSync().windowHeight
+		},
+		methods: {
+			ReachBottom() {
+				if (this.status === 'loading' || this.status === 'noMore') return
+				this.status = 'loading'
+				setTimeout(() => {
+					this.list.push({
+						fileName: 'office',
+						type: 26,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+						uuid: 141
+					})
+					this.status = "noMore"
+				}, 2000)
+			},
+			toggleHandle() {
+				uni.setStorage({
+					key: 'index-switch',
+					data: !this.listSwitch,
+					success: () => {
+						this.listSwitch = !this.listSwitch;
+						this.cleanList()
+					}
+				})
+			},
+			toPage(index) {
+				switch (index) {
+					case 1:
+						uni.navigateTo({
+							url: '/pages/status/status'
+						})
+						break;
+					case 2:
+						uni.showActionSheet({
+							itemList: ['从相册选择图片或视频', '从手机SD卡选择', '从系统其他软件中选择(只能选择单项)'],
+							success({
+								tapIndex
+							}) {
+								switch (tapIndex) {
+									case 0:
+										getMedia().then(res => {
+											uni.navigateTo({
+												url: '/pages/folder-list/folder-list',
+												success() {
+													uni.$on('returnData', (res2) => {
+														console.log(res2)
+													})
+												}
+											})
+										})
+										break;
+									case 1:
+										// uni.preloadPage({
+										// 	url: '/pages/upload/upload?dir=root'
+										// })
+										uni.navigateTo({
+											url: '/pages/upload/upload?dir=root'
+										})
+										break;
+									case 2:
+										getOneAnyFile().then(res => {
+											uni.navigateTo({
+												url: '/pages/folder-list/folder-list',
+												success() {
+													uni.$on('returnData', (res2) => {
+														console.log(res2)
+													})
+												}
+											})
+										})
+								}
+							}
+						})
+						break;
+					case 3:
+						uni.navigateTo({
+							url: '/pages/search/search',
+							animationType: 'slide-in-right'
+						})
+						break;
+				}
+			}
+		},
+		onNavigationBarSearchInputClicked() {
+			uni.navigateTo({
+				url: '/pages/search/search'
+			})
+		},
+		onNavigationBarButtonTap(e) {
+			if (!e.index) {
+
+			} else {
+				uni.navigateTo({
+					url: '/pages/status/status'
+				})
+			}
+		},
+		onReady() {
+			// request
+			this.list = [{
+					date: '2020-12-04',
+					type: 20,
+					list: [{
+							fileName: 'uni-app教学视频',
+							type: 3,
+							url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+							date: '2020-12-04',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							uuid: 134
+						},
+						{
+							fileName: 'uni-app教学图片',
+							type: 1,
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							date: '2020-12-04',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							uuid: 135
+						},
+
+						{
+							fileName: 'uni-app教学图片',
+							type: 1,
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							date: '2020-12-04',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							uuid: 136
+						}
+					]
+				},
+
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 137
+				},
+				{
+					fileName: 'uni-app教学图片',
+					type: 1,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 138
+				},
+				{
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 139
+				},
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 137
+				},
+				{
+					fileName: 'uni-app教学图片',
+					type: 1,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 138
+				},
+				{
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 139
+				},
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 137
+				},
+				{
+					fileName: 'uni-app教学图片',
+					type: 1,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 138
+				},
+				{
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 139
+				},
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 137
+				},
+				{
+					fileName: 'uni-app教学图片',
+					type: 1,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 138
+				},
+				{
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 139
+				},
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 137
+				},
+				{
+					fileName: 'uni-app教学图片',
+					type: 1,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 138
+				},
+				{
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 139
+				}
+			];
+			this.$nextTick(function() {
+				uni.$emit('setScrollRef', {
+					id: 'index'
+				})
+			})
+		}
+	};
+</script>
+
+<style lang="scss" scoped>
+	.index {
+		flex-direction: column;
+		flex: 1;
+		.hover:active {
+			background-color: $uni-bg-color-hover;
+		}
+		.null {
+			flex: 1;
+			width: 750rpx;
+			height: 200px;
+		}
+
+		.active {
+			background-color: red;
+		}
+
+		.pic-img {
+			width: 750rpx;
+			height: 350px;
+		}
+
+		.index-ctx {
+			left: 0;
+			right: 0;
+			height: 200px;
+			position: absolute;
+			top: 215px;
+			@extend %f-ct;
+
+			.index-ctx-title {
+				font-size: $uni-font-size-sm
+			}
+
+			.index-ctx-img {
+				width: 30px;
+				height: 40px;
+				margin-bottom: 3px;
+			}
+
+			.index-ctx-box {
+				flex-direction: column;
+				padding-bottom: 10px;
+
+				.index-ctx-top {
+					background-color: white;
+					width: 450rpx;
+					height: 80px;
+					margin-bottom: 20rpx;
+					border-radius: 10px;
+					@extend %f-ct;
+					flex-direction: column;
+					position: relative;
+					
+					.redDot {
+						position: absolute;
+						right: 0;
+						top: 0;
+					}
+				}
+
+				.index-ctx-bottom {
+					width: 450rpx;
+					height: 80px;
+					flex-direction: row;
+					justify-content: space-between;
+					padding-bottom: 10px;
+
+					.index-ctx-bottom-left {
+						margin-right: 10px;
+						flex: 1;
+						background-color: white;
+						border-radius: 10px;
+						@extend %f-ct;
+						flex-direction: column;
+					}
+
+					.index-ctx-bottom-right {
+						flex: 1;
+						background-color: white;
+						border-radius: 10px;
+						@extend %f-ct;
+						flex-direction: column;
+					}
+				}
+			}
+		}
+
+		.dynamic {
+			flex-direction: column;
+			.index-list {
+				flex-direction: column;
+				flex: 1;
+			}
+
+			.dynamic-title {
+				padding: 25px 10px 5px;
+				justify-content: space-between;
+				align-items: center;
+				position: sticky;
+				background-color: white;
+
+				.dynamic-title-left {
+					font-size: 20px;
+				}
+
+				.dynamic-title-right {
+					color: #000;
+				}
+			}
+		}
+	}
+</style>

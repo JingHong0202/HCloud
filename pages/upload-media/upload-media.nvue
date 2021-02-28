@@ -1,0 +1,130 @@
+<template>
+	<view class="upload-media">
+		<view class="img-box">
+			<uni-section title="图片" type="line"></uni-section>
+			<uni-grid :column="4" :highlight="true" :showBorder='true' @change="change_img">
+				<uni-grid-item>
+					<view class="add-box">
+						<text class="add-text">+</text>
+					</view>
+				</uni-grid-item>
+				<template v-for="(item, index) in imgList">
+					<uni-grid-item mode="photo" :data='item' :index="index" :key="item">
+					</uni-grid-item>
+				</template>
+			</uni-grid>
+		</view>
+		<view class="video-box">
+			<uni-section title="视频" type="line"></uni-section>
+			<uni-grid :column="4" :highlight="true" :showBorder='true' @change="change_video">
+				<uni-grid-item>
+					<view class="add-box">
+						<text class="add-text">+</text>
+					</view>
+				</uni-grid-item>
+				<template v-for="(item, index) in videoList">
+					<uni-grid-item mode="photo" :data='item' :index="index" :key="item">
+					</uni-grid-item>
+				</template>
+			</uni-grid>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		getMedia
+	} from '@/util/file.js'
+	function compress (item) {
+		return new Promise((resolve, reject) => {
+			console.log(item)
+			uni.compressImage({
+				src: item,
+				width:'50%',
+				height:'50%',
+				success(res) {
+					console.log(res)
+					resolve(res.tempFilePath)
+				},
+				complete(r) {
+					console.log(r)
+				}
+			})
+		})
+	}
+	export default {
+		async onLoad() {
+
+		},
+		data() {
+			return {
+				imgList: [],
+				videoList: []
+			}
+		},
+		methods: {
+			async change_img({
+				detail
+			}) {
+				if (!detail.index) {
+					let selectlist = await getMedia('image'),
+					reslist = []
+					for (let i in selectlist) {
+						var res = await compress(selectlist[i])
+					 	reslist.push(res)
+					}
+					console.log(reslist)
+					this.imgList = reslist.map(item => {
+						return {
+							thumb: item,
+						}
+					})
+				} else {
+
+				}
+			},
+			async change_video({
+				detail
+			}) {
+				if (!detail.index) {
+					let selectlist = await getMedia('video')
+					this.videoList = selectlist.map(item => {
+						return {
+							thumb: item,
+						}
+					})
+				} else {
+
+				}
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.upload-media {
+		flex-direction: column;
+
+		.img-box {
+			flex-direction: column;
+		}
+
+		.video-box {
+			flex-direction: column;
+		}
+
+		.add-box {
+			background-color: #999;
+			opacity: .7;
+			width: 30px;
+			height: 30px;
+			border-radius: 50px;
+			@extend %f-ct;
+
+			.add-text {
+				color: white;
+				font-size: 20px;
+			}
+		}
+	}
+</style>

@@ -1,0 +1,44 @@
+<template>
+	<view class="preview" v-if="fileInfo">
+		<custom-video v-if="fileInfo.type === 3" :width='screenW' :height='screenH' :src='fileInfo.url' autoplay></custom-video>
+	</view>
+</template>
+
+<script>
+	import {
+		getSystemInfo
+	} from '@/util/equipment.js';
+	export default {
+		data() {
+			const Screen = getSystemInfo('wh');
+			return { ...Screen,
+				fileInfo: null
+			};
+		},
+		onLoad(option) {
+			uni.$once('preview-video', ({
+				data
+			}) => {
+				this.fileInfo = data
+				uni.setNavigationBarTitle({
+					title: data.fileName
+				})
+			})
+		},
+		methods: {
+
+		}
+	};
+</script>
+
+<style>
+	.preview {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		align-items: center;
+		justify-content: center;
+	}
+</style>

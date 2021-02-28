@@ -1,0 +1,281 @@
+<template>
+	<view class="upload" :render-whole='true'>
+		<custom-breadCrumb :path="path"></custom-breadCrumb>
+		<uni-list :border="false" :scrollY="true">
+			<uni-list-item v-if='isPath' :ellipsis="2" clickable :title="'返回上一级'" @click="select({type: 25})" :thumb="selectThumb({type: 25})">
+			</uni-list-item>
+			<uni-list-item v-for=" (item,i) in list" :key='item' :title="item.fileName" :ellipsis="1" clickable :thumb="selectThumb(item)"
+			 @click="select(item)">
+				<template slot='footer' v-if='item.type'>
+					<view class="item-right">
+						<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''" :checked="item.checked">
+						</radio>
+					</view>
+				</template>
+			</uni-list-item>
+		</uni-list>
+		<view class="upload-footer">
+			<view class="used-progress">
+				<progress percent="60" stroke-width="10" backgroundColor="#999" />
+				<view class="used-text">
+					<text class="used-text-ctx">
+						可用空间100g
+					</text>
+				</view>
+			</view>
+			<view class="upload-footer-btn">
+				<view class="upload-footer-btn-left" @click="toUploadTarget">
+					<text class="btn-left-label">上传至: </text>
+					<text class="btn-left-target">我的文件</text>
+				</view>
+				<view class="upload-footer-btn-right" :class="{'upload-footer-btn-right-active': selectlist.length}" @click="upload">
+					<text class="submit">上传{{selectlist.length ? `(${selectlist.length})` : ''}}</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		selectIcon
+	} from '@/util/file.js'
+
+	import {
+		mapState,
+		mapMutations
+	} from 'vuex'
+	import files from '@/util/files.js'
+	// var fileSelect = uni.requireNativePlugin("Aq-fileSelect");
+	export default {
+		onNavigationBarButtonTap(e) {
+			if (!e.index) {
+				this.isClose = true
+				uni.navigateBack({
+					delta: 1
+				})
+			} else {
+				this.selectAll()
+			}
+		},
+		onLoad(option) {
+			files.getRootDir().then(res => {
+				this.path = res.path
+				this.list = res.list
+			})
+		},
+		onShow() {
+			uni.$off('select-all')
+			uni.$off('cancel-all')
+			uni.$on('select-all', () => {
+				this.selectAll()
+			})
+			uni.$on('cancel-all', () => {
+				this.cleanList()
+			})
+		},
+		data() {
+			return {
+				list: [],
+				path: [],
+				// labels: [
+				// 	{
+				// 		text: '',
+				// 		method: ''
+				// 	}
+				// ]
+			};
+		},
+		computed: {
+			...mapState('file', ['action', 'selectlist']),
+			isPath() {
+				return this.path && this.path.length > 1
+			}
+		},
+		methods: {
+			...mapMutations('file', ['CHANGE_SELECT_LIST']),
+			upload() {
+				let selectlist = [...this.selectlist]
+			},
+			toUploadTarget() {
+				uni.navigateTo({
+					url: '/pages/folder-list/folder-list',
+					success() {
+						uni.$once('returnData', (res) => {
+							console.log(res)
+						})
+					}
+				})
+			},
+			cleanList() {
+				this.list.forEach(item => {
+					if (item.type !== 25 && item.type !== 0) this.$set(item, 'checked', false)
+				})
+				this.CHANGE_SELECT_LIST([])
+			},
+			selectAll() {
+				let selectlist = []
+				this.list.forEach((item) => {
+					if (item.type !== 25 && item.type !== 0) {
+						this.$set(item, 'checked', true)
+						selectlist.push(item)
+					}
+				})
+				this.CHANGE_SELECT_LIST(selectlist)
+			},
+			selectThumb(current) {
+				if (current.type === 1 || current.type === 3) return current.thumb;
+				return selectIcon(current.type);
+			},
+			addSelectList(item) {
+				if (this.selectlist.indexOf(item) >= 0) {
+					this.$set(item, 'checked', false)
+					let newArr = [...this.selectlist]
+					newArr.splice(this.selectlist.findIndex(item2 => item2 === item), 1)
+					this.CHANGE_SELECT_LIST(newArr)
+				} else {
+					this.$set(item, 'checked', true)
+					this.CHANGE_SELECT_LIST([...this.selectlist, item])
+				}
+				this.$forceUpdate()
+			},
+			select(item) {
+				switch (item.type) {
+					case 0:
+						if (this.action) return
+						if (this.path[this.path.length - 1].path === item.path) return
+						this.path.push({
+							title: item.fileName,
+							path: item.path
+						})
+						files.getSubDir(item.path).then(res => {
+							this.list = res.list
+						})
+						break;
+					case 25:
+						if (this.action) return
+						uni.navigateBack({
+							delta: 1
+						})
+						break;
+					default:
+						return this.addSelectList(item)
+						// uni.getFileInfo({
+						// 	filePath: "file:///" + item.path.toString(),
+						// 	success(r) {
+						// 		console.log(item.path.toString(), r.size)
+						// 	},
+						// 	fail(err) {
+						// 		console.log("err:", err);
+						// 	}
+						// })
+				}
+			},
+		},
+		onBackPress() {
+			// if (this.timer) clearInterval(this.timer)
+			// setTimeout(() => {})
+			if (this.isClose) return
+			if (this.action) {
+				this.cleanList()
+				return true
+			}
+			let index = this.path.length - 1
+			if (index >= 1) {
+				if (index > 1) {
+					files.getSubDir(this.path[index - 1].path).then(res => {
+						this.list = res.list
+						this.path.splice(index, 1)
+						this.$forceUpdate()
+					})
+				} else {
+					files.getRootDir().then(res => {
+						this.path = res.path
+						this.list = res.list
+						this.$forceUpdate()
+					})
+				}
+				return true
+			}
+
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.upload {
+		flex: 1;
+		flex-direction: column
+	}
+
+	.item-right {
+		/* #ifndef APP-NVUE  */
+		height: 100%;
+		@extend %f-ct;
+		/* #endif  */
+
+		/* #ifdef APP-NVUE */
+		@extend %f-ct;
+		/* #endif  */
+	}
+
+	.upload-footer {
+		height: 70px;
+		flex-direction: column;
+
+		.used-progress {
+			height: 25px;
+		}
+
+		.used-text {
+			@extend %f-ct;
+		}
+
+		.used-text-ctx {
+			font-size: 10px;
+			text-align: center;
+			margin-right: 15px;
+			width: 140px;
+			color: $uni-color-primary;
+		}
+
+		.upload-footer-btn {
+			height: 35px;
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+
+		.upload-footer-btn-left {
+			@extend %f-ct;
+			flex: 2;
+			margin-right: 15px;
+
+			.btn-left-label {
+				font-size: $uni-font-size-base;
+			}
+
+			.btn-left-target {
+				font-size: $uni-font-size-base;
+				color: $uni-color-primary;
+				lines: 1;
+				width: 170px;
+			}
+		}
+
+		.upload-footer-btn-right-active {
+			background-color: $uni-color-primary !important;
+		}
+
+		.upload-footer-btn-right {
+			border-radius: 15px;
+			background-color: $btn-disabled-status;
+			@extend %f-ct;
+			flex: 1;
+
+			.submit {
+				color: white;
+				font-size: $uni-font-size-base;
+			}
+		}
+	}
+</style>

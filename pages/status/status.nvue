@@ -1,0 +1,171 @@
+<template>
+	<view class="status" :render-whole='true'>
+		<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
+		<swiper  :current="tabIndex" class="status-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
+			<swiper-item class="status-swiper-item up-list">
+				<custom-statusList v-if="uplist.length" :list="uplist"></custom-statusList>
+			</swiper-item>
+			<swiper-item class="status-swiper-item down-list" >
+				<custom-statusList v-if="downlist.length" :list="downlist"></custom-statusList>
+			</swiper-item>
+		</swiper>
+		<custom-actionSheet :labels="labels" @continue='continues' @del='del' @pause='pause'></custom-actionSheet>
+	</view>
+</template>
+
+<script>
+	import {
+		mapState,
+		mapMutations,
+		mapGetters
+	} from 'vuex'
+	export default {
+		onBackPress() {
+			if (getApp().globalData.modal) {
+				uni.$hide()
+				return true
+			}
+			if (this.action) {
+				this.cleanList()
+				return true
+			}
+		},
+		onShow() {
+			uni.$off('select-all')
+			uni.$off('cancel-all')
+			uni.$on('select-all', () => {
+				this.selectAll()
+			})
+			uni.$on('cancel-all', () => {
+				this.cleanList()
+			})
+		},
+		data() {
+			return {
+				tabIndex: 0,
+				once: false,
+				downlist: [],
+				uplist: [],
+				TabLables: ['上传', '下载'],
+				labels: [{
+						text: '继续',
+						method: 'continue',
+						icon: '/static/icon/actionsheet/play.png'
+					},
+					{
+						text: '暂停',
+						method: 'pause',
+						icon: '/static/icon/actionsheet/pause.png'
+					},
+					{
+						text: '删除',
+						method: 'del',
+						icon: '/static/icon/actionsheet/del.png'
+					}
+				]
+			};
+		},
+		onNavigationBarButtonTap(e) {
+
+		},
+		watch: {
+			tabIndex: {
+				handler(newVal) {
+					if (newVal) {
+						if (!this.downlist.length) return this.downlist = this.StatusDownList
+					} else {
+						if (!this.uplist.length) return this.uplist = this.StatusUpList
+					}
+				},
+				immediate: true
+			}
+		},
+		methods: {
+			...mapMutations('file', ['CHANGE_SELECT_LIST', 'CHANGE_DOWN_LIST']),
+			del() {
+				uni.$showModal({
+					concent: '确定要删除吗?',
+					align: 'center'
+				}).then(res => {
+					let newList = [...this.currentList],
+						selectlist = this.selectlist.map(item => item.uuid)
+					newList = newList.filter(item => !selectlist.some(item2 => item2 === item.uuid))
+					this.CHANGE_DOWN_LIST(newList)
+					this.downlist = newList
+					this.cleanList()
+					this.$hide()
+				}).catch((res) => {
+					this.$hide()
+				})
+			},
+			continues() {
+				this.selectlist.forEach((item) => {
+					let target = this.currentList.find((item2) => item.uuid === item2.uuid)
+					this.$set(target, 'status', 'LOADING')
+				})
+				this.cleanList()
+			},
+			pause() {
+				this.selectlist.forEach((item) => {
+					let target = this.currentList.find((item2) => item.uuid === item2.uuid)
+					this.$set(target, 'status', 'STOP')
+				})
+				this.cleanList()
+			},
+
+			cleanList() {
+				this.currentList.forEach(item => this.$set(item, 'checked', false))
+				this.CHANGE_SELECT_LIST([])
+			},
+			selectAll() {
+				let current = this.currentList
+				current.forEach((item) => {
+					this.$set(item, 'checked', true)
+				})
+				this.CHANGE_SELECT_LIST([...current])
+			},
+
+			tabIndexChange(index) {
+				this.cleanList()
+				this.tabIndex = index
+			},
+			SwiperChange({
+				detail: {
+					current
+				}
+			}) {
+				this.cleanList()
+				this.tabIndex = current
+			},
+
+
+		},
+		computed: {
+			...mapState('file', ['action', 'selectlist']),
+			...mapState('file', {
+				StatusDownList: 'downlist',
+				StatusUpList: 'uplist'
+			}),
+			currentList() {
+				return this[this.tabIndex ? 'downlist' : 'uplist']
+			},
+
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.status {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.status-box {
+		flex: 1;
+	}
+
+	.status-swiper-item {
+		flex: 1;
+		flex-direction: column;
+	}
+</style>

@@ -1,0 +1,42 @@
+<template>
+	<uni-list :border="false">
+		<uni-list-item to="/pages/account/account" showArrow title="账号与安全">
+			<template slot="footer">
+				<image class="lock" src="/static/icon/page/setting/lock.png" mode="aspectFit"></image>
+			</template>
+		</uni-list-item>
+		<uni-list-item title="清理缓存" :rightText="cache">
+		</uni-list-item>
+		<uni-list-item showArrow title="默认下载位置">
+		</uni-list-item>
+		<uni-list-item title="相册备份设置" showArrow>
+		</uni-list-item>
+		<uni-list-item title="隐私设置" showArrow>
+		</uni-list-item>
+	</uni-list>
+</template>
+
+<script>
+	import {
+		formatBytes
+	} from '@/util/file.js'
+	export default {
+		data() {
+			return {
+
+			};
+		},
+		computed: {
+			cache() {
+				return formatBytes(2555555555)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.lock {
+		width: 20px;
+		height: 20px;
+	}
+</style>

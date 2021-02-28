@@ -1,0 +1,284 @@
+<template>
+	<view class="index">
+		<view class="pic">
+			<image src="../../static/images/pic.jpg" mode="aspectFill"></image>
+		</view>
+		<view class="index-ctx">
+			<view class="option-box">
+				<view class="box-left" @tap='toFile(0)' hover-class="active-hover" hover-stay-time="100">
+					<view>
+						<image src="../../static/icon/page/index/files.png"></image>
+						<text>文件</text>
+					</view>
+				</view>
+				<view class="box-right">
+					<view class="right-top" @tap='toFile(1)' hover-class="active-hover" hover-stay-time="100">
+						<view>
+							<image src="../../static/icon/page/index/gallery.png"></image>
+							<text>相册</text>
+						</view>
+					</view>
+					<view class="right-bottom" @tap='toFile(2)' hover-class="active-hover" hover-stay-time="100">
+						<view>
+							<image src="../../static/icon/page/index/media-music.png"></image>
+							<text>媒体</text>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="dynamic">
+				<view class="dynamic-title">
+					<view class="dynamic-title-left">最近动态</view>
+					<view class="dynamic-title-right iconfont" :class="listSwitch ? 'icon-show' : 'icon-hide'" @tap="toggleHandle"></view>
+				</view>
+				<view v-if="listSwitch">
+					<custom-list :list="list" @clean='cleanList' @all='selectAll' :status="status" :loadText='loadText'></custom-list>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import customList from '@/common/js/mixins/custom-list.js'
+	export default {
+		mixins: [customList],
+		data() {
+			return {
+				listSwitch: true,
+				loadText: {
+					contentdown: '上拉显示更多',
+					contentrefresh: '正在加载...',
+					contentnomore: '已经到底了,只能显示30天内上传的文件'
+				},
+			};
+		},
+		onPullDownRefresh() {
+			uni.stopPullDownRefresh()
+		},
+		onReachBottom() {
+			if (this.status === 'loading' || this.status === 'noMore') return
+			this.status = 'loading'
+			setTimeout(() => {
+				this.list.push({
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid:141
+				})
+				this.status = "noMore"
+			}, 2000)
+		},
+		methods: {
+			toggleHandle() {
+				this.listSwitch = !this.listSwitch;
+			},
+			toFile(index) {
+				uni.switchTab({
+					url: '/pages/file/file',
+					success() {
+						uni.$emit('toFilePage', {
+							index
+						});
+					}
+				})
+			}
+		},
+		onNavigationBarSearchInputClicked() {
+			uni.navigateTo({
+				url: '/pages/search/search'
+			})
+		},
+		onNavigationBarButtonTap(e) {
+			if (!e.index) {
+				
+			} else {
+				uni.navigateTo({
+					url: '/pages/status/status'
+				})
+			}
+		},
+		onReady() {
+			// request
+			this.list = [{
+					date: '2020-12-04',
+					type: 20,
+					list: [{
+							fileName: 'uni-app教学视频',
+							type: 3,
+							url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+							date: '2020-12-04',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							uuid:134
+						},
+						{
+							fileName: 'uni-app教学图片',
+							type: 1,
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							date: '2020-12-04',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							uuid:135
+						},
+
+						{
+							fileName: 'uni-app教学图片',
+							type: 1,
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							date: '2020-12-04',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							uuid:136
+						}
+					]
+				},
+
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid:137
+				},
+				{
+					fileName: 'uni-app教学图片',
+					type: 1,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid:138
+				},
+				{
+					fileName: 'office',
+					type: 26,
+					url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid:139
+				}
+			];
+		}
+	};
+</script>
+
+<style lang="scss">
+	.active-hover {
+		@extend %active-hover;
+	}
+
+	@mixin option-ctx {
+		box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+		background-color: white;
+
+		view {
+			@extend %f-cl;
+		}
+
+		text {
+			text-align: center;
+			color: $uni-color-subtitle;
+			font-size: $uni-font-size-sm;
+		}
+	}
+
+	@mixin dynamic-list-item {
+		width: 45px;
+		height: 100%;
+		margin-right: $uni-spacing-row-base;
+
+		.item-icon {
+			width: $uni-img-size-lg;
+			height: $uni-img-size-lg;
+		}
+	}
+
+	.index {
+		overflow: hidden;
+		background-color: white;
+		@extend %f-cl;
+
+		.pic {
+			width: inherit;
+			flex: 0 0 auto;
+
+			image {
+				width: 100%;
+				height: 300px;
+			}
+		}
+
+		.index-ctx {
+			position: relative;
+			height: 100%;
+			top: -100px;
+			@extend %f-cl;
+
+			.option-box {
+				width: inherit;
+				@extend %f-ct;
+				height: 270px;
+
+				image {
+					width: 70px;
+					height: 70px;
+				}
+
+				.box-left {
+					@extend %f-ct;
+					width: 40%;
+					height: 80%;
+					border-radius: 10px;
+					margin-right: 15px;
+					@include option-ctx;
+				}
+
+				.box-right {
+					@extend %f-cl;
+					width: 40%;
+					height: 80%;
+
+					.right-top {
+						@extend %f-ct;
+						flex: 1;
+						border-radius: 10px;
+						@include option-ctx;
+					}
+
+					.right-bottom {
+						@extend %f-ct;
+						flex: 1;
+						margin-top: 15px;
+						border-radius: 10px;
+						@include option-ctx;
+					}
+				}
+			}
+
+			.dynamic {
+				@extend %f-cl;
+
+				.end-notice {
+					flex: 1;
+					@extend %f-ct;
+					height: 70rpx;
+					color: $uni-text-color-grey;
+					font-size: $uni-font-size-sm;
+				}
+
+				.dynamic-title {
+					display: flex;
+					justify-content: space-between;
+					height: 40px;
+					padding: 0 15px;
+					font-size: $uni-font-size-lg;
+					margin-bottom: $uni-spacing-row-base;
+
+					.dynamic-title-right {
+						font-size: inherit;
+					}
+				}
+			}
+		}
+	}
+</style>

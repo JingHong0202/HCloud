@@ -1,0 +1,56 @@
+<template>
+	<uni-list :border="false">
+		<uni-list-item title='头像' showArrow>
+			<template slot="footer">
+				<image class="avatar" :src="avatar" mode="aspectFit"></image>
+			</template>
+		</uni-list-item>
+		<uni-list-item :rightText="name" title="昵称"></uni-list-item>
+		<uni-list-item :rightText="phone" title="手机号"></uni-list-item>
+		<uni-list-item :rightText="wx" title="微信号"></uni-list-item>
+		<uni-list-item showArrow title="二维码">
+			<template slot="footer">
+				<image class="qs" src="../../static/icon/page/account/qs.png" mode="aspectFit"></image>
+			</template>
+		</uni-list-item>
+		<cell>
+			<uni-section title="账号登录设置"></uni-section>
+		</cell>
+		<uni-list-item :show-switch="true" @switchChange="fingerprint" title="指纹密码"></uni-list-item>
+		<uni-list-item :show-switch="true" @switchChange="equipment" title="设备锁"></uni-list-item>
+	</uni-list>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				avatar: '../../static/images/pic.jpg',
+				name: 'username',
+				phone: '未绑定手机号',
+				wx: '未绑定微信号'
+			};
+		},
+		methods: {
+			equipment() {
+
+			},
+			fingerprint() {
+
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.avatar {
+		width: 30px;
+		height: 30px;
+		border-radius: 30px;
+	}
+
+	.qs {
+		width: 30px;
+		height: 30px;
+	}
+</style>
