@@ -1,0 +1,103 @@
+<template>
+	<view class="share-list" :render-whole='true'>
+		<custom-list closeClick customEvent @click='toDetail' :actionSheetLabels='actionSheetLabels' :filter="filter" ref='list'
+		 @refresh='refresh' :downStatus='downStatus' :status='status' @scrolltolower='scrollHandler' :list="list" @clean='cleanList'
+		 @all='selectAll'></custom-list>
+		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
+	</view>
+</template>
+
+<script>
+	import customList from '@/common/js/mixins/custom-list.js'
+	import popups from '@/common/js/mixins/popups.js'
+	export default {
+		mixins: [customList, popups],
+		data() {
+			return {
+				actionSheetLabels: [{
+						text: '取消分享',
+						method: 'cancelShare',
+						icon: '/static/icon/actionsheet/cancel.png'
+					},
+					{
+						text: '复制链接',
+						method: 'copyLink',
+						icon: '/static/icon/actionsheet/link.png'
+					}
+				]
+			};
+		},
+		methods: {
+			refresh() {
+				console.log(2)
+				this.downStatus = 'loading'
+				setTimeout(() => {
+					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
+					this.downStatus = "noMore"
+					if (this.$refs['list'].action) this.$refs['list'].exitAction()
+					setTimeout(() => {
+						this.downStatus = "more"
+					}, 1000)
+				}, 1000)
+			},
+			scrollHandler() {
+				console.log(1)
+				if (this.status === 'loading' || this.status === 'noMore') return
+				this.status = 'loading'
+				setTimeout(() => {
+					this.list.push({
+						fileName: 'office',
+						type: 26,
+						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+						uuid: 142
+					})
+					this.status = "noMore"
+				}, 2000)
+			},
+			toDetail(item) {
+				if (this.$refs['list'].action) return this.$refs['list'].addSelectList(item)
+				return uni.navigateTo({
+					url: '/pages/share-detail/share-detail?id=' + item.uuid,
+					success: () => {
+						uni.$emit('share-detail', item)
+					}
+				})
+			}
+		},
+		onNavigationBarButtonTap(e) {
+			if (!e.index) {
+				this.openMenu = !this.openMenu
+			} else {
+				// clean
+				console.log('clean')
+			}
+		},
+		onReady() {
+			this.list = [{
+					fileName: 'uni-app教学视频',
+					type: 0,
+					date: '2020-12-01',
+					uuid: 233,
+					fileSize: 1000333
+				},
+				{
+					fileName: '教ani-app学图片',
+					type: 1,
+					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					date: '2020-12-04',
+					thumb: 'https://ss.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					uuid: 2334,
+					fileSize: 100033
+				}
+			]
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.share-list {
+		flex: 1;
+	}
+</style>

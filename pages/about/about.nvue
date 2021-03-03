@@ -1,0 +1,45 @@
+<template>
+	<view class="about">
+		<view class="header">
+			<image class="logo" src="../../static/icon/type/like.png" mode="aspectFit"></image>
+			<text class="version">v1.0.0</text>
+		</view>
+		<uni-list :border='false'>
+			<uni-list-item showArrow title="新版本检测"></uni-list-item>
+			<uni-list-item showArrow title="用户协议"></uni-list-item>
+		</uni-list>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+
+			};
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.about {
+		flex-direction: column;
+
+		.header {
+			@extend %f-ct;
+			flex-direction: column;
+			width: 750rpx;
+			height: 250px;
+
+			.logo {
+				width: 100px;
+				height: 100px;
+			}
+
+			.version {
+				font-size: $uni-font-size-base;
+				color: $btn-disabled-status;
+			}
+		}
+	}
+</style>

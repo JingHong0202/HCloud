@@ -1,0 +1,120 @@
+<template>
+	<view class="share-detail">
+		<view class="header">
+			<image class="icon" src="../../static/icon/type/cloud.png" mode="aspectFit"></image>
+			<text class="filename">{{item.fileName}}</text>
+			<text class="link" @click="toPage" >查看分享详情> </text>
+		</view>
+		<scroll-view class="content" scroll-y>
+			<view class="box">
+				<uni-section subTitle="分享时间"></uni-section><text class="share-time m-text">2020-12-11</text>
+			</view>
+			<view class="box">
+				<uni-section subTitle="有效期"></uni-section><text class="validity-time m-text">2020-12-11</text>
+			</view>
+			<view class="box">
+				<uni-section subTitle="浏览"></uni-section><text class="preview-num m-text">0</text>
+			</view>
+			<view class="box">
+				<uni-section subTitle="保存"></uni-section><text class="save-num m-text">0</text>
+			</view>
+			<view class="box">
+				<uni-section subTitle="下载"></uni-section><text class="down-num m-text">0</text>
+			</view>
+		</scroll-view>
+		<view class="footer">
+			<button type="warn" class="l-btn">取消分享</button>
+			<button type="primary" class="r-btn">复制私密链接</button>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		selectIcon,
+	} from '@/util/file.js';
+	export default {
+		data() {
+			return {
+				item: {}
+			};
+		},
+		methods: {
+			toPage () {
+				
+			}
+		},
+		onLoad(params) {
+			uni.$once('share-detail', (item) => {
+				console.log(item)
+				this.item = item
+			})
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	%common-btn {
+		flex: 1;
+		border-radius: 0;
+	}
+	.share-detail {
+		flex-direction: column;
+		flex: 1;
+
+		.header {
+			@extend %f-ct;
+			flex-direction: column;
+			height: 200px;
+
+			.filename {
+				font-size: $uni-font-size-base;
+				line-height: 25px;
+				font-weight: bold;
+			}
+
+			.link {
+				font-size: $uni-font-size-sm;
+				line-height: 25px;
+				color: $uni-color-primary;
+			}
+
+			.icon {
+				width: 80px;
+				height: 80px;
+				border-radius: 5px;
+			}
+		}
+
+		.content {
+			flex-direction: column;
+			flex: 1;
+
+			.box {
+				height: 50px;
+				flex-direction: column;
+				justify-content: flex-start;
+				margin-top: 5px;
+			}
+
+			.m-text {
+				font-size: $uni-font-size-sm;
+				margin-top: 5px;
+				padding-left: 10px;
+			}
+		}
+
+		.footer {
+			flex-direction: row;
+			height: 50px;
+
+			.l-btn {
+				@extend %common-btn;
+			}
+
+			.r-btn {
+				@extend %common-btn;
+			}
+		}
+	}
+</style>

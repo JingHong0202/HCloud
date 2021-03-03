@@ -11,17 +11,23 @@
 		</view>
 		<view class="setting-list">
 			<uni-list :border='false'>
-				<uni-list-item :border='true' link title="分享" thumb="/static/icon/page/personal/share-line.png" thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true' link to="/pages/recycle/recycle" title="回收站" thumb="/static/icon/page/personal/recycle.png" thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true'  to="/pages/setting/setting" link title="设置" thumb="/static/icon/page/personal/shezhi.png" thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true' link title="关于" thumb="/static/icon/page/personal/info.png" thumbSize="sm"></uni-list-item>
+				<uni-list-item :border='true' link to="/pages/share-list/share-list" title="分享" thumb="/static/icon/page/personal/share-line.png"
+				 thumbSize="sm"></uni-list-item>
+				<uni-list-item :border='true' link to="/pages/recycle/recycle" title="回收站" thumb="/static/icon/page/personal/recycle.png"
+				 thumbSize="sm"></uni-list-item>
+				<uni-list-item :border='true' to="/pages/setting/setting" link title="设置" thumb="/static/icon/page/personal/shezhi.png"
+				 thumbSize="sm"></uni-list-item>
+				<uni-list-item :border='true' to="/pages/about/about" link title="关于" thumb="/static/icon/page/personal/info.png"
+				 thumbSize="sm"></uni-list-item>
 				<uni-list-item :border='true' link title="退出登录" thumb="/static/icon/page/personal/user-exit.png" thumbSize="sm"
 				 @click="exit"></uni-list-item>
+
 				<!-- <cell style="width: 750rpx;height: 200px;">
-					<ad adpid="1111111111"></ad>
+					
 				</cell> -->
 			</uni-list>
 		</view>
+		<!-- <ad adpid="1111111111"></ad> -->
 	</view>
 </template>
 
@@ -72,14 +78,13 @@
 <style scoped lang='scss'>
 	.personal {
 		flex-direction: column;
-		background-image: linear-gradient(to right, #ecca61, #ffed20);
+		background-image: linear-gradient(to right, #ecaf59, #ffed20);
 		padding-top: 30px;
 	}
 
 	.setting-list {
 		background-color: white;
-		padding-top: 60px;
-		transform: scale(1.01);
+		padding: 60px 0px 0 0px;
 	}
 
 	.user-box {

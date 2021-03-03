@@ -57,7 +57,7 @@
 		mixins: [customList],
 		data() {
 			return {
-				listSwitch: false || uni.getStorageSync('index-switch'),
+				listSwitch: uni.getStorageSync('index-switch') || false,
 				scrollTop: 0,
 				loadText: {
 					contentdown: '上拉显示更多',
