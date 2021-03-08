@@ -1,11 +1,16 @@
 <template>
-	<view class="file" :render-whole='true'>
-		<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
-		<swiper :current="tabIndex" :render-whole="true" class="file-content-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
-			<swiper-item class="file-swiper">
-				<custom-list :filter="filter" :openBreadCrumb="true" :path='path' :openActionSheet="false" @changeList='changeFileList' :list="filelist"
-				 @scrolltolower='FilePageScrollHandler' @refresh='fRefresh' :downStatus="FilePageDownStatus" :status='FilePageStatus'></custom-list>
-			</swiper-item>
+	<view class="images" :render-whole='true'>
+		<uni-status-bar />
+		<uni-nav-bar :border='false' @clickLeft='toAccount'>
+			<view slot="left">
+				<image src="/static/images/pic.jpg" mode="aspectFit" class="user-avatars">
+
+				</image>
+			</view>
+			<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
+		</uni-nav-bar>
+
+		<swiper :current="tabIndex" class="content-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
 			<swiper-item class="photo-swiper">
 				<!-- @scroll='PScroll' -->
 				<custom-floatPanel :list="photoList" @end='pDropEnd'>
@@ -20,6 +25,9 @@
 					 @scrolltolower='VideoPageScrollHandler' :list='videoList'>
 					</custom-media>
 				</custom-floatPanel>
+			</swiper-item>
+			<swiper-item class="category-swiper">
+
 			</swiper-item>
 		</swiper>
 
@@ -36,16 +44,17 @@
 	} from 'vuex'
 	import popups from '@/common/js/mixins/popups.js'
 	import actionsheet from '@/common/js/mixins/actionsheet.js'
+	import nav from '@/common/js/mixins/nav.js'
 	// import {
 	// 	setTitleNViewRedDot
 	// } from '@/util/page.js'
 	export default {
-		mixins: [popups, actionsheet],
-		onNavigationBarButtonTap(e) {
-			if (!e.index) {} else {
-				this.openMenu = !this.openMenu
-			}
-		},
+		mixins: [popups, actionsheet, nav],
+		// onNavigationBarButtonTap(e) {
+		// 	if (!e.index) {} else {
+		// 		this.openMenu = !this.openMenu
+		// 	}
+		// },
 		onNavigationBarSearchInputClicked() {
 			uni.navigateTo({
 				url: '/pages/search/search'
@@ -57,20 +66,13 @@
 		data() {
 			return {
 				TabLables: [
-					'文件', '相册', '视频'
+					'照片', '视频', '相册'
 				],
 				tabIndex: 0,
-				FilePageStatus: 'more',
-				FilePageDownStatus: 'more',
 				PhotoPageStatus: 'more',
 				PhotoPageDownStatus: 'more',
 				VideoPageStatus: 'more',
 				VideoPageDownStatus: 'more',
-				path: [{
-					title: "全部文件",
-					uuid: 1
-				}],
-				filelist: [],
 				photoList: [],
 				videoList: [],
 			}
@@ -87,42 +89,140 @@
 		},
 		onReady() {
 
-			// request
-			this.filelist = [{
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-01',
-					uuid: 233,
-					fileSize: 1000333
-				},
-				{
-					fileName: '教ani-app学图片',
-					type: 1,
-					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					date: '2020-12-04',
-					thumb: 'https://ss.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-					uuid: 2334,
-					fileSize: 100033
-				},
-				{
-					fileName: 'bni-app教学图片',
-					type: 1,
-					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					date: '2010-12-04',
-					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					uuid: 234.,
-					fileSize: 10002
-				},
-				{
-					fileName: 'uni-app教学视频',
-					type: 3,
-					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
-					date: '2020-12-04',
-					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					uuid: 230,
-					fileSize: 1003
-				}
-			]
+			// request 
+			this.photoList = [{
+						date: '2020-10-05',
+						list: [{
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							fileName: 'test',
+							thumb: 'https://ig-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							type: 1
+						}]
+					},
+					{
+						date: '2020-10-07',
+						list: [{
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							fileName: 'test',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							type: 1
+						}]
+					},
+					{
+						date: '2020-10-11',
+						list: [{
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							fileName: 'test',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							type: 1
+						}]
+					},
+					{
+						date: '2018-10-11',
+						list: [{
+							url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							fileName: 'test',
+							thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+							type: 1
+						}]
+					},
+					{
+						date: '2020-12-05',
+						list: [{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+						]
+					},
+					{
+						date: '2020-12-15',
+						list: [{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+							{
+								url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								fileName: 'test',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								type: 1
+							},
+						]
+					}
+				]
+				// 排序
+				.sort(function(a, b) {
+					return Date.parse(b.date) - Date.parse(a.date)
+				})
 			// uni.setStorage({
 			// 	key:
 			// })
@@ -136,17 +236,6 @@
 			tabIndexChange(index) {
 				if (this.action) this.exitAction()
 				this.tabIndex = index
-			},
-			fRefresh() {
-				this.FilePageDownStatus = 'loading'
-				setTimeout(() => {
-					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
-					this.FilePageDownStatus = "noMore"
-					if (this.action) this.exitAction()
-					setTimeout(() => {
-						this.FilePageDownStatus = "more"
-					}, 1000)
-				}, 1000)
 			},
 			pRefresh() {
 				this.PhotoPageDownStatus = 'loading'
@@ -262,27 +351,6 @@
 					this.PhotoPageStatus = 'more'
 				}, 2000)
 			},
-			FilePageScrollHandler() {
-				this.FilePageStatus = 'loading'
-				if (this.filelist.length > 50) {
-					this.FilePageStatus = 'noMore'
-				} else {
-					setTimeout(() => {
-						for (let i = 0; i < 30; i++) {
-							this.filelist.push({
-								fileName: 'office',
-								type: 26,
-								url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-								date: '2020-12-04',
-								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-								uuid: 157
-							})
-						}
-						this.FilePageStatus = 'more'
-					}, 2000)
-				}
-
-			},
 			SwiperChange({
 				detail: {
 					current
@@ -295,154 +363,8 @@
 				this.tabIndex = index
 				this.$nextTick(function() {
 					switch (index) {
+
 						case 1:
-							if (this.photoList.length) return
-							uni.showLoading({
-								mask: true,
-								title: '加载中...'
-							})
-							// request 
-							this.photoList = [{
-										date: '2020-10-05',
-										list: [{
-											url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											fileName: 'test',
-											thumb: 'https://ig-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											type: 1
-										}]
-									},
-									{
-										date: '2020-10-07',
-										list: [{
-											url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											fileName: 'test',
-											thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											type: 1
-										}]
-									},
-									{
-										date: '2020-10-11',
-										list: [{
-											url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											fileName: 'test',
-											thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											type: 1
-										}]
-									},
-									{
-										date: '2018-10-11',
-										list: [{
-											url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											fileName: 'test',
-											thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-											type: 1
-										}]
-									},
-									{
-										date: '2020-12-05',
-										list: [{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-										]
-									},
-									{
-										date: '2020-12-15',
-										list: [{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-											{
-												url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												fileName: 'test',
-												thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-												type: 1
-											},
-										]
-									}
-								]
-								// 排序
-								.sort(function(a, b) {
-									return Date.parse(b.date) - Date.parse(a.date)
-								})
-
-							// 该定时器解决初始化下拉刷新冲突问题
-							setTimeout(() => {
-								uni.hideLoading()
-							}, 300)
-
-							break;
-						case 2:
 							if (this.videoList.length) return
 							uni.showLoading({
 								mask: true,
@@ -612,11 +534,6 @@
 					}
 				})
 			},
-			cleanFileList() {
-				this.filelist.forEach(item => {
-					this.$delete(item, 'checked')
-				})
-			},
 			cleanPhotoList() {
 				this.photoList.forEach((item) => {
 					this.$set(item, 'selectBlock', false)
@@ -633,16 +550,9 @@
 					})
 				})
 			},
-			changeFileList(res) {
-				this.filelist = res.list
-				this.path = res.path
-			},
 			exitAction() {
 				switch (this.tabIndex) {
 					case 0:
-						this.cleanFileList()
-						break;
-					case 1:
 						this.cleanPhotoList()
 						break;
 					default:
@@ -654,12 +564,6 @@
 			selectAll() {
 				switch (this.tabIndex) {
 					case 0:
-						this.filelist.forEach(item => {
-							this.$set(item, 'checked', true)
-						})
-						this.CHANGE_SELECT_LIST([...this.filelist])
-						break;
-					case 1:
 						let selectPhoto = []
 						this.photoList.forEach((item) => {
 							item.list && item.list.forEach((item2) => {
@@ -688,41 +592,25 @@
 				this.exitAction()
 				return true
 			}
-			if (this.tabIndex) return
-			if (this.path.length > 1) {
-				// this.list[0].parentId
-				return true
-			}
+			// if (this.tabIndex) return
+
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.file {
+	.images {
 		flex: 1;
 		flex-direction: column;
 	}
 
-	.file-swiper {
-		flex-direction: column;
-	}
-
-	.photo-swiper {
-		flex-direction: column;
-		flex: 1;
-	}
-
+	.photo-swiper,
+	.category-swiper,
 	.video-swiper {
 		flex-direction: column;
 		flex: 1;
 	}
-
-
-	.file-content-box {
-		flex: 1;
-	}
-
-	.swiper-item {
+	.content-box {
 		flex: 1;
 	}
 </style>

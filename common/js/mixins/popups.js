@@ -1,5 +1,8 @@
 export default {
 	data () {
+		uni.preloadPage({
+			url: "/pages/global/views-drawer/views-drawer"
+		})
 		return {
 			openMenu: false,
 			filter: 'all',
@@ -7,11 +10,13 @@ export default {
 				labelText: '视图',
 				iconEncode: "\ueab6",
 				handleClick: () => {
-					const drawer = uni.getSubNVueById('drawer')
-					drawer.show('slide-in-left', 200, () => {
-						uni.$on('filter-list', (val) => {
-							this.filter = val
-						})
+					uni.navigateTo({
+						url: "/pages/global/views-drawer/views-drawer",
+						success: () => {
+							uni.$on('filter-list', (val) => {
+								this.filter = val
+							})
+						}
 					})
 				}
 			}, ]

@@ -1,13 +1,13 @@
 <template>
 	<view class="personal">
 		<view class="user-box" elevation="4px">
-			<image class="avatars" src="../../static/images/pic.jpg" mode="aspectFit" @click="toPage('account')"></image>
+			<image class="avatars" src="/static/images/pic.jpg" mode="aspectFit" @click="toPage('account')"></image>
 			<view class="info">
 				<text class="name">未登录</text>
 				<progress class="percent" active border-radius='15' stroke-width="5" :percent="percent" activeColor="#f2cf6d" />
 				<text class="used">空间使用情况: {{`${formatBytes(usedSize)}/${formatBytes(totalSize)}`}}</text>
 			</view>
-			<image class="qs" src="../../static/icon/common/check.png" mode="aspectFit" @click="scanCode"></image>
+			<image class="qs" src="/static/icon/common/check.png" mode="aspectFit" @click="scanCode"></image>
 		</view>
 		<view class="setting-list">
 			<uni-list :border='false'>

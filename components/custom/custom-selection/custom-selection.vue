@@ -1,7 +1,7 @@
 <template>
 	<view class="custom-selection">
 		<radio-group @change='change' class="item-group" v-if="mode === 'radio'">
-			<label class="item-label" v-for="(item,i) in labels" :key='item.value'>
+			<label class="item-label" v-for="(item,i) in labels" :key='item.value' @click.stop="(e) => e.stopPropagation()">
 				<radio :value="item.value" class="item-label-box"  :checked="item.value === current" />
 				<text class="item-label-text">{{item.name}}</text>
 			</label>

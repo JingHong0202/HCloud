@@ -35,9 +35,7 @@
 		},
 		onNavigationBarButtonTap(e) {
 			this.isClose = true
-			uni.navigateBack({
-				delta: 1
-			})
+			uni.navigateBack()
 		},
 		methods: {
 			// selectThumb(current) {
@@ -53,13 +51,12 @@
 				this.selectItem = item
 			},
 			mkdir() {
-				uni.$off('mkdir-success')
-				let page = uni.getSubNVueById('mkdir')
-				uni.$once('mkdir-success', () => {
+				uni.$off('inputModal-success')
+				uni.$once('inputModal-success', () => {
 					console.log('reset')
 				})
-				page.show('zoom-fade-out',100,() => {
-					uni.$emit('initPrompt', {title: '新建文件夹', placeholder: '请输入文件名'})
+				uni.navigateTo({
+					url: "/pages/global/input-modal/input-modal?params="+ encodeURIComponent(JSON.stringify({title: '新建文件夹', placeholder: '请输入文件名'}))
 				})
 			},
 			confirm() {

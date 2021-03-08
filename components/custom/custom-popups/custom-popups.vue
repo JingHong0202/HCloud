@@ -1,7 +1,7 @@
 <template>
 	<view class="popups-mask" @click="$emit('exit')" @touchmove.stop.prevent="() => {}">
-		<view class="custom-popups-after"></view>
-		<view class="custom-popups">
+		<view class="custom-popups-after" :style="{top: afterTop}"></view>
+		<view class="custom-popups" :style="{top: afterTop + 5}">
 			<view class="popups-item " v-for="(item,index) in CoccentLabel" :class="{'popups-item-last': index === CoccentLabel.length - 1}"
 			 @click.stop='handleClick($event,item)'>
 				<text class="iconfont c-iconfont" :class="{'redDot-offset' : item.redDot}">{{item.iconEncode}}</text>
@@ -34,6 +34,10 @@
 			labels: {
 				type: Array,
 				default: () => [DefaultLable]
+			},
+			afterTop: {
+				type: [Number, String],
+				default: 10
 			}
 		},
 		computed: {
@@ -53,7 +57,9 @@
 		},
 
 		data() {
-			return {}
+			return {
+				afterTop:0
+			}
 		},
 		created() {
 			// 传输列表
@@ -89,7 +95,7 @@
 		width: 15px;
 		height: 15px;
 		position: absolute;
-		right: 13px;
+		right: 23px;
 		top: 5px;
 		background-color: white;
 		transform: rotate(45deg);

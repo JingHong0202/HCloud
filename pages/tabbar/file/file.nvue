@@ -1,0 +1,153 @@
+<template>
+	<view class="file" :render-whole='true'>
+		<uni-status-bar />
+		<uni-nav-bar :border='false' color="#333333" background-color="#FFFFFF" rightIcon="more-filled" @clickLeft='toAccount'
+		 @clickRight='openMenu = !openMenu'>
+			<view class="input-view" @click="toSearch">
+				<uni-icons class="input-uni-icon" type="search" size="24rpx" color="#333" />
+				<text class="input-placeholder">点击搜索</text>
+			</view>
+			<view slot="left">
+				<image src="/static/images/pic.jpg" mode="aspectFit" class="user-avatars" />
+			</view>
+		</uni-nav-bar>
+		<custom-list ref='list' :filter="filter" :openBreadCrumb="true" :path='path' @changeList='changeFileList' :list="list"
+		 @scrolltolower='scrolltolower' @refresh='refresh' :downStatus='downStatus' @clean='cleanList' @all='selectAll'
+		 :status='status'></custom-list>
+		<custom-popups :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
+	</view>
+</template>
+
+<script>
+	import popups from '@/common/js/mixins/popups.js'
+	import nav from '@/common/js/mixins/nav.js'
+	import customList from '@/common/js/mixins/custom-list.js'
+	export default {
+		mixins: [popups, nav, customList],
+		data() {
+			return {
+				path: [{
+					title: "全部文件",
+					uuid: 1
+				}],
+				afterTop: 0
+			}
+		},
+		onReady() {
+			// request
+			this.list = [{
+					fileName: 'uni-app教学视频',
+					type: 0,
+					date: '2020-12-01',
+					uuid: 233,
+					fileSize: 1000333
+				},
+				{
+					fileName: '教ani-app学图片',
+					type: 1,
+					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					date: '2020-12-04',
+					thumb: 'https://ss.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+					uuid: 2334,
+					fileSize: 100033
+				},
+				{
+					fileName: 'bni-app教学图片',
+					type: 1,
+					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					date: '2010-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 234.,
+					fileSize: 10002
+				},
+				{
+					fileName: 'uni-app教学视频',
+					type: 3,
+					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+					date: '2020-12-04',
+					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+					uuid: 230,
+					fileSize: 1003
+				}
+			]
+			// uni.setStorage({
+			// 	key:
+			// })
+			let {
+				statusBarHeight
+			} = uni.getSystemInfoSync()
+			this.afterTop = statusBarHeight + 50
+		},
+		methods: {
+			refresh() {
+				this.downStatus = 'loading'
+				setTimeout(() => {
+					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
+					this.downStatus = "noMore"
+					if (this.action) this.exitAction()
+					setTimeout(() => {
+						this.downStatus = "more"
+					}, 1000)
+				}, 1000)
+			},
+			scrolltolower() {
+				this.status = 'loading'
+				if (this.list.length > 50) {
+					this.status = 'noMore'
+				} else {
+					setTimeout(() => {
+						for (let i = 0; i < 30; i++) {
+							this.list.push({
+								fileName: 'office',
+								type: 26,
+								url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+								date: '2020-12-04',
+								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+								uuid: 157
+							})
+						}
+						this.status = 'more'
+					}, 2000)
+				}
+			},
+			changeFileList(res) {
+				this.list = res.list
+				this.path = res.path
+			}
+		},
+		// onBackPress() {
+		// 	// 返回时，如果在选择模式时则退出，解决相册视频页面返回键失效，当有路径时则返回上一层
+		// 	if (this.action) {
+		// 		this.exitAction()
+		// 		return true
+		// 	}
+		// 	if (this.tabIndex) return
+		// 	if (this.path.length > 1) {
+		// 		// this.list[0].parentId
+		// 		return true
+		// 	}
+		// }
+	}
+</script>
+
+<style lang="scss" scoped>
+	.file {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.input-view {
+		flex: 1;
+		background-color: #F7F7F7;
+		flex-direction: row;
+		border-radius: 20px;
+		height: 30px;
+		@extend %f-ct;
+
+		.input-placeholder {
+			font-size: $uni-font-size-sm;
+			margin-left: 5px;
+			color: #868686;
+		}
+	}
+</style>

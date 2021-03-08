@@ -72,7 +72,6 @@
 				}
 			}
 		},
-
 		onLaunch: function() {
 			console.log('App Launch')
 			// #ifdef  APP-PLUS
@@ -98,13 +97,14 @@
 
 			uni.onTabBarMidButtonTap(function() {
 				uni.navigateTo({
-					url: "/pages/midButtomMenu/midButtomMenu",
+					url: "/pages/tabbar/midButtomMenu/midButtomMenu",
 					animationType: "fade-in"
 				})
 				return
 			})
 			this.nav = createSelectNav()
-
+			// 锁定竖屏
+			plus.screen.lockOrientation("portrait-primary")
 
 			// if (this.downlist.length && this.downlist.filter(item => item.status === 'RUNTIME').length) this.startDownloads()
 

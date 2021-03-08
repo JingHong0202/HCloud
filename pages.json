@@ -1,10 +1,13 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+
+		// tabbar page
 		{
-			"path": "pages/index/index",
+			"path": "pages/tabbar/index/index",
 			"style": {
 				"enablePullDownRefresh": false,
 				"navigationBarTextStyle": "black",
+				"disableScroll": true,
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
@@ -16,14 +19,15 @@
 						"style": {
 							"background": "transparent",
 							"width": "100%",
-							"height": "100%"
+							"height": "100%",
+							"mask": "rgba(0,0,0,0)"
 						}
 					}]
 				}
 			}
 		},
 		{
-			"path": "pages/file/file",
+			"path": "pages/tabbar/file/file",
 			"style": {
 				"navigationBarTitleText": "我的文件",
 				"enablePullDownRefresh": false,
@@ -31,54 +35,43 @@
 					"bounce": "none",
 					"scrollIndicator": "none",
 					"subNVues": [{
-							"id": "rename",
-							"path": "pages/subNVue/mkdir",
-							"type": "popup",
-							"style": {
-								"background": "transparent",
-								"width": "100%",
-								"height": "100%"
-							}
-						},
-						{
-							"id": "drawer",
-							"path": "pages/subNVue/drawer",
-							"type": "popup",
-							"style": {
-								"background": "transparent"
-							}
+						"id": "drawer",
+						"path": "pages/subNVue/drawer",
+						"type": "popup",
+						"style": {
+							"background": "transparent",
+							"mask": "rgba(0,0,0,0)"
 						}
-					],
-					"titleNView": {
-						"searchInput": {
-							"disabled": true,
-							"borderRadius": "50px",
-							"placeholder": "搜索文件",
-							"backgroundColor": "#F7F7F7",
-							"placeholderColor": "#CCCCCC"
-						},
-						"blurEffect": "extralight",
-						"buttons": [{
-								"float": "left",
-								"fontSrc": "/static/icon/iconfont/iconfont.ttf",
-								"text": "\ue634",
-								"fontSize": "16px",
-								"colorPressed": "rgba(255,255,255,.4)"
-							},
-							{
-								"type": "menu",
-								"float": "right"
-							}
-						],
-						"titleOverflow": "ellipsis",
-						"backgroundColor": "white"
-					}
+					}],
+					"titleNView": false
+					// {
+					// 	"searchInput": {
+					// 		"disabled": true,
+					// 		"borderRadius": "50px",
+					// 		"placeholder": "搜索文件",
+					// 		"backgroundColor": "#F7F7F7",
+					// 		"placeholderColor": "#CCCCCC"
+					// 	},
+					// 	"buttons": [{
+					// 			"float": "left",
+					// 			"fontSrc": "/static/icon/iconfont/iconfont.ttf",
+					// 			"text": "\ue634",
+					// 			"fontSize": "16px",
+					// 			"colorPressed": "rgba(255,255,255,.4)"
+					// 		},
+					// 		{
+					// 			"type": "menu",
+					// 			"float": "right"
+					// 		}
+					// 	],
+					// 	"titleOverflow": "ellipsis",
+					// 	"backgroundColor": "white"
+					// }
 				}
 			}
-
 		},
 		{
-			"path": "pages/personal/personal",
+			"path": "pages/tabbar/personal/personal",
 			"style": {
 				"navigationBarTitleText": "个人中心",
 				"enablePullDownRefresh": false,
@@ -91,41 +84,32 @@
 
 		},
 		{
-			"path": "pages/chat/chat",
+			"path": "pages/tabbar/images/images",
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
-					"titleNView": {
-						"searchInput": {
-							"disabled": true,
-							"borderRadius": "50px",
-							"placeholder": "搜索文件",
-							"backgroundColor": "#F7F7F7",
-							"placeholderColor": "#CCCCCC"
-						},
-						"blurEffect": "extralight",
-						"buttons": [{
-								"float": "left",
-								"fontSrc": "/static/icon/iconfont/iconfont.ttf",
-								"text": "\ue634",
-								"fontSize": "16px",
-								"colorPressed": "rgba(255,255,255,.4)"
-							},
-							{
-								"type": "menu",
-								"float": "right"
-							}
-						],
-						"titleOverflow": "ellipsis",
-						"backgroundColor": "#e4c774"
-					}
+					"titleNView": false
 				}
 			}
-
 		},
+		{
+			"path": "pages/tabbar/midButtomMenu/midButtomMenu",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"backgroundColor": "rgba(255,255,255,.1)",
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none"
+				}
+			}
+		},
+
+
 		{
 			"path": "pages/preview/preview",
 			"style": {
@@ -221,26 +205,13 @@
 
 		},
 		{
-			"path": "pages/midButtomMenu/midButtomMenu",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false,
-				"navigationStyle": "custom",
-				"backgroundColor": "rgba(255,255,255,.1)",
-				"app-plus": {
-					"bounce": "none",
-					"scrollIndicator": "none"
-				}
-			}
-		},
-		{
 			"path": "pages/upload/upload",
 			"style": {
 				"enablePullDownRefresh": false,
 				"app-plus": {
 					"titleNView": {
 						"autoBackButton": false,
-						"backgroundColor":"white",
+						"backgroundColor": "white",
 						"titleText": "选择文件",
 						"bounce": "none",
 						"scrollIndicator": "none",
@@ -266,7 +237,7 @@
 				"app-plus": {
 					"titleNView": {
 						"autoBackButton": false,
-						"backgroundColor":"white",
+						"backgroundColor": "white",
 						"buttons": [{
 							"type": "back",
 							"float": "left"
@@ -279,7 +250,8 @@
 						"style": {
 							"background": "transparent",
 							"width": "100%",
-							"height": "100%"
+							"height": "100%",
+							"mask": "rgba(0,0,0,0)"
 						}
 					}]
 				}
@@ -314,7 +286,7 @@
 				"enablePullDownRefresh": false,
 				"app-plus": {
 					"titleNView": {
-						"backgroundColor":"white",
+						"backgroundColor": "white",
 						"buttons": [{
 							"type": "menu",
 							"float": "right"
@@ -324,53 +296,66 @@
 							"float": "right",
 							"fontSize": "16px"
 						}]
-					},
-					"subNVues": [{
-						"id": "drawer",
-						"path": "pages/subNVue/drawer",
-						"type": "popup",
-						"style": {
-							"background": "transparent"
-						}
-					}]
+					}
+
 				}
 
 			}
 
+		}, {
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/share-list/share-list",
+			"style": {
+				"navigationBarTitleText": "我的分享",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/share-detail/share-detail",
+			"style": {
+				"navigationBarTitleText": "分享详情",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/global/input-modal/input-modal",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "transparent",
+				"app-plus": {
+					"animationType": "none",
+					"background": "transparent",
+					"popGesture": "none",
+					"titleNView": false,
+					"softinputMode": "adjustResize"
+				}
+			}
+		},
+		{
+			"path": "pages/global/views-drawer/views-drawer",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "transparent",
+				"app-plus": {
+					"animationType": "none",
+					"background": "transparent",
+					"popGesture": "none",
+					"titleNView": false
+				}
+			}
 		}
-	    ,{
-            "path" : "pages/about/about",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "关于",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/share-list/share-list",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "我的分享",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/share-detail/share-detail",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "分享详情",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-    ],
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"app-plus": {
 			"titleNView": {
-				"backgroundColor":"white"
+				"backgroundColor": "white"
 			}
 		}
 	},
@@ -384,25 +369,25 @@
 			"height": "47px"
 		},
 		"list": [{
-				"pagePath": "pages/index/index",
+				"pagePath": "pages/tabbar/index/index",
 				"iconPath": "static/icon/tabBar/index.png",
 				"selectedIconPath": "static/icon/tabBar/index-active.png",
 				"text": "首页"
 			},
 			{
-				"pagePath": "pages/file/file",
+				"pagePath": "pages/tabbar/file/file",
 				"iconPath": "static/icon/tabBar/file.png",
 				"selectedIconPath": "static/icon/tabBar/file-active.png",
 				"text": "文件"
 			},
 			{
-				"pagePath": "pages/chat/chat",
+				"pagePath": "pages/tabbar/images/images",
 				"iconPath": "static/icon/tabBar/chat.png",
 				"selectedIconPath": "static/icon/tabBar/chat-active.png",
 				"text": "社交"
 			},
 			{
-				"pagePath": "pages/personal/personal",
+				"pagePath": "pages/tabbar/personal/personal",
 				"iconPath": "static/icon/tabBar/geren.png",
 				"selectedIconPath": "static/icon/tabBar/geren-active.png",
 				"text": "个人"
@@ -419,7 +404,7 @@
 	// 	"current": 0, //当前激活的模式(list 的索引项)
 	// 	"list": [{
 	// 		"name": "personal", //模式名称
-	// 		"path": "pages/share-list/share-list", //启动页面，必选
+	// 		"path": "pages/tabbar/images/images", //启动页面，必选
 	// 		"query": "" //启动参数，在页面的onLoad函数里面得到
 	// 	}]
 	// }

@@ -173,7 +173,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		width: 150rpx;
+		// width: 150rpx;
 		justify-content: flex-start;
 	}
 
@@ -181,7 +181,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		width: 150rpx;
+		// width: 150rpx;
 		padding-right: 30rpx;
 		justify-content: flex-end;
 	}

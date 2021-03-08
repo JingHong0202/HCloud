@@ -15,6 +15,13 @@
 %active-hover {
 	opacity: .5;
 }
+%positin-full {
+	position: absolute;
+	left:0;
+	right:0;
+	bottom: 0;
+	top: 0;
+}
 /* 颜色变量 */
 %status_bar {
   height: var(--status-bar-height);
@@ -133,4 +140,9 @@ $uni-font-size-paragraph:30rpx;
 .checked {
 	opacity: 1;
 }
-
+.user-avatars {
+	width: 60rpx;
+	height: 60rpx;
+	border-radius: 60rpx;
+	margin-left: 15rpx;
+}

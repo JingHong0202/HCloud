@@ -9,16 +9,8 @@
 <script>
 	import popups from '@/common/js/mixins/popups.js'
 	import customList from '@/common/js/mixins/custom-list.js'
-	// import {
-	// 	setTitleNViewRedDot
-	// } from '@/util/page.js'
 	export default {
 		mixins: [popups, customList],
-		// data() {
-		// 	return {
-		// 		downStatus: 'more'
-		// 	};
-		// },
 		onNavigationBarButtonTap(e) {
 			if (!e.index) {
 				this.openMenu = !this.openMenu
@@ -71,7 +63,6 @@
 
 <style lang="scss">
 	.dynamic-list {
-		// padding-bottom: 100rpx;
 		flex: 1;
 	}
 </style>

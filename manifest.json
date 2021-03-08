@@ -12,8 +12,8 @@
         "compilerVersion" : 3,
         "nvueStyleCompiler" : "uni-app",
         "splashscreen" : {
-            "alwaysShowBeforeRender" : true,
-            "waiting" : true,
+            "alwaysShowBeforeRender" : false,
+            "waiting" : false,
             "autoclose" : true,
             "delay" : 0
         },

@@ -1,6 +1,8 @@
 <template>
 	<view class="status" :render-whole='true'>
-		<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
+		<view class="tabs">
+			<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
+		</view>
 		<swiper  :current="tabIndex" class="status-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
 			<swiper-item class="status-swiper-item up-list">
 				<custom-statusList v-if="uplist.length" :list="uplist"></custom-statusList>
@@ -64,9 +66,6 @@
 					}
 				]
 			};
-		},
-		onNavigationBarButtonTap(e) {
-
 		},
 		watch: {
 			tabIndex: {
@@ -159,7 +158,9 @@
 		flex: 1;
 		flex-direction: column;
 	}
-
+	.tabs {
+		height: 80rpx;
+	}
 	.status-box {
 		flex: 1;
 	}

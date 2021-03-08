@@ -1,7 +1,7 @@
 <template>
 	<view class="custom-list">
 		<custom-breadCrumb :path="path" v-if='openBreadCrumb'></custom-breadCrumb>
-		<uni-list :scrollY="isScroll" :border="false" v-if='list.length' @loadmore='$emit("loadmore")'>
+		<uni-list :scrollY="isScroll" :border="false"  @loadmore='$emit("loadmore")'>
 			<template v-if="!closeLoad">
 				<uni-refresh @refresh='refresh' :display="downDisplay" v-if="!isPageScroll">
 					<uni-load-more :status="downStatus" :contentText='downText' />
@@ -150,7 +150,7 @@
 			...mapMutations('file', ['CHANGE_SELECT_LIST', 'TOGGLE_ACTION']),
 			...mapActions('file', ['ADD_DOWN_LIST']),
 			select(item) {
-				if (this.closeClick) return this.customEvent ? this.$emit('click', item) : this.addSelectList(item)
+				if (this.closeClick) return this.customEvent ? this.$emit('click', item) : null
 				if (this.action && item.type !== 25) return this.addSelectList(item)
 				this.$emit('selectTask', item)
 				let res = open({
@@ -174,7 +174,7 @@
 				return selectIcon(current.type);
 			},
 			showActionSheet(item) {
-				if (this.closeLongPress) return this.customEvent ? this.$emit('longpress', item) : this.addSelectList(item)
+				if (this.closeLongPress) return this.customEvent ? this.$emit('longpress', item) : null
 				if (this.action) return
 				return this.addSelectList(item)
 			},
@@ -214,9 +214,8 @@
 			...mapState('views', ['sortAction', 'sortMode']),
 			afterList() {
 				if (!this.isSort) return this.filterType(this.list)
-				let res = this.list.sort(sort[this.sortMode])
-				if (this.sortAction !== "up") res = res.reverse()
-				return this.filterType(res)
+				this.list.sort(sort[this.sortAction !== "up" ? this.sortMode+'_reverse' : this.sortMode])
+				return this.filterType(this.list)
 			},
 			isPath() {
 				return this.path && this.path.length > 1

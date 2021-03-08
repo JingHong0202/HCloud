@@ -26,7 +26,8 @@
 				dom.getComponentRect(this.$refs['tabbar-item'][newVal], ({
 					size
 				}) => {
-					this.x = size.left + (size.width / 2 - 15)
+					
+					this.x = (size.left - this.offsetX) + (size.width / 2 - 15)
 				})
 			}
 		},
@@ -35,7 +36,8 @@
 				dom.getComponentRect(this.$refs['tabbar-item'][0], ({
 					size
 				}) => {
-					this.x = size.left + (size.width / 2 - 15)
+					this.offsetX = size.left
+					this.x = (size.left - this.offsetX) + (size.width / 2 - 15)
 				})
 			})
 		},
@@ -49,7 +51,7 @@
 
 <style scoped lang='scss'>
 	.tabbar {
-		width: 750rpx;
+		flex: 1;
 		height: 80rpx;
 		flex-direction: row;
 		/* #ifndef APP-PLUS */
@@ -87,6 +89,7 @@
 	.tabbar-item-active-title {
 		font-size: $uni-font-size-lg !important;
 		color: rgba(0, 0, 0, .8) !important;
+		font-weight: bold;
 	}
 
 	.line {

@@ -1,0 +1,167 @@
+<template>
+	<view class="mask" @click="cancel" ref='mask' :style="{height}">
+		<view class="modal-content" ref='modal' elevation="5px" @click.stop="(e) => e.stopPropagation()" >
+			<text class="modal-title">{{title}}</text>
+			<input ref='input' type="text" @keyboardheightchange='keyboardChange' @confirm='confirm' @input='change' :value='value' class="modal-input"
+			 :placeholder="placeholder" focus adjust-position>
+			<view class="modal-footer">
+				<button type="default" class="btn-cancel" @click.stop="cancel">取消</button>
+				<button type="primary" class="btn-modal" @click.stop="confirm">确认</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		animates
+	} from '@/util/animation.js'
+	export default {
+		data() {
+			return {
+				value: '',
+				placeholder: ' ',
+				title: ' ',
+				height: uni.getSystemInfoSync().windowHeight
+			}
+		},
+		onLoad({
+			params
+		}) {
+			let {
+				title,
+				placeholder
+			} = JSON.parse(decodeURIComponent(params))
+			this.title = title
+			this.placeholder = placeholder
+		},
+		onReady() {
+			animates([{
+					target: this.$refs['mask'],
+					options: {
+						styles: {
+							backgroundColor: "rgba(0,0,0,.4)"
+						},
+						duration: 200, 
+						timingFunction: 'ease',
+						delay: 0 
+					}
+				},
+				{
+					target: this.$refs['modal'],
+					options: {
+						styles: {
+							transform: "scale(1)",
+							transformOrigin: "center center"
+						},
+						duration: 200, 
+						timingFunction: 'ease',
+						delay: 0 
+					}
+				}
+			])
+		},
+		onBackPress({
+			from
+		}) {
+			if (from === 'backbutton') {
+				this.cancel()
+				return true
+			}
+		},
+		methods: {
+			change({
+				detail: {
+					value
+				}
+			}) {
+				this.value = value.replace(/\s/g, '')
+			},
+			keyboardChange({
+				detail: {
+					height
+				}
+			}) {
+				
+				this.height = uni.getSystemInfoSync().windowHeight - height
+			},
+			cancel() {
+				animates([{
+						target: this.$refs['modal'],
+						options: {
+							styles: {
+								transform: "scale(0)",
+								transformOrigin: "center center"
+							},
+							duration: 200,
+							timingFunction: 'ease',
+							delay: 0
+						}
+					},
+					{
+						target: this.$refs['mask'],
+						options: {
+							styles: {
+								backgroundColor: "rgba(0,0,0,0)"
+							},
+							duration: 200,
+							timingFunction: 'ease',
+							delay: 0
+						}
+					}
+				]).then(() => {
+					uni.navigateBack()
+				})
+			},
+			confirm(e) {
+				e.stopPropagation()
+				// filter
+				if (!this.value) return uni.showToast({
+					position: "bottom",
+					title: "请输入文件名"
+				})
+
+				// request
+				uni.$emit('inputModal-success')
+				this.cancel()
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.mask {
+		@extend %f-ct;
+		.modal-content {
+			width: 550rpx;
+			height: 150px;
+			background-color: white;
+			border-top-left-radius: 10px;
+			border-top-right-radius: 10px;
+			flex-direction: column;
+			justify-content: space-between;
+			transform: scale(0);
+
+			.modal-title {
+				text-align: center;
+				margin-top: 15px;
+			}
+
+			.modal-input {
+				padding: 0 10px;
+			}
+
+			.modal-footer {
+				flex-direction: row;
+
+				.btn-cancel,
+				.btn-modal {
+					flex: 1;
+					border: 0;
+					border-radius: 0;
+				}
+			}
+		}
+
+	}
+</style>

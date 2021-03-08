@@ -1,5 +1,5 @@
 export function selectIcon(type) {
-	let path = '../../static/icon/type/',
+	let path = '/static/icon/type/',
 		iconFileName = [
 			'folder',
 			'images',

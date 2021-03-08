@@ -32,15 +32,16 @@ export default {
 		},
 		rename () {
 			let selectItem = [...this.selectlist][0]
+			uni.$once('showTabBar', () => {
+				uni.$off('inputModal-success')
+				uni.$once('inputModal-success', () => {
+					console.log('reset')
+				})
+				uni.navigateTo({
+					url: "/pages/global/input-modal/input-modal?params="+ encodeURIComponent(JSON.stringify({title: '修改文件名', placeholder: '请输入文件名'}))
+				})
+			})
 			this.exitAction()
-			uni.$off('mkdir-success')
-			let page = uni.getSubNVueById('rename')
-			uni.$once('mkdir-success', () => {
-				console.log('reset')
-			})
-			page.show('zoom-fade-out',100,() => {
-				uni.$emit('initPrompt', {title: '修改文件名', placeholder: '请输入文件名'})
-			})
 		},
 		restore () {
 			console.log('restore')

@@ -8,7 +8,7 @@
 	<!-- #endif -->
 	<!-- #ifdef APP-NVUE -->
 	<list class="uni-list" ref='list' :scrollable='scrollY' @loadmore='$emit("loadmore")' :class="{ 'uni-list--border': border }"
-	 :bounce='false' :show-scrollbar='false' :offset-accuracy='50' :loadmoreoffset="15">
+	 :loadmoreoffset="15">
 		<slot />
 	</list>
 	<!-- #endif -->

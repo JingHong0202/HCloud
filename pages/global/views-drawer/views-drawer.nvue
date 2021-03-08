@@ -1,0 +1,211 @@
+<template>
+	<view class="wrapper" ref='wrapper' @click.stop="close" :render-whole='true'>
+		<view class="wrapper-content" ref='wrapper-content' @click.stop="(e) => e.stopPropagation()">
+			<view class="nav">
+				<text class="iconfont c-iconfont">&#xeab6;</text>
+				<text class="nav-text">视图</text>
+			</view>
+			<view class="item-box sort-items">
+				<view class="item-header">
+					<uni-section title="升降序" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' :current="sortAction" :labels="sortActionLabels" @change='sortActionChange'></custom-selection>
+				</view>
+				<view class="item-header">
+					<uni-section title="按什么排序" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' :current="sortMode" :labels="sortModeLabels" @change='sortModeChange'></custom-selection>
+				</view>
+				<view class="item-header">
+					<uni-section title="过滤" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' current="all" :labels="filterLabels" @change='filterChange'></custom-selection>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		mapMutations,
+		mapState
+	} from 'vuex'
+	import {
+		animates
+	} from '@/util/animation.js'
+	export default {
+		onShow() {
+			animates([{
+					target: this.$refs['wrapper'],
+					options: {
+						styles: {
+							backgroundColor: "rgba(0,0,0,.4)"
+						},
+						duration: 300,
+						timingFunction: 'ease',
+						delay: 0
+					}
+				},
+				{
+					target: this.$refs['wrapper-content'],
+					options: {
+						styles: {
+							transform: "translateX(0)"
+						},
+						duration: 200,
+						timingFunction: 'ease',
+						delay: 200
+					}
+				}
+			])
+		},
+		onBackPress({
+			from
+		}) {
+			if (from === 'backbutton') {
+				this.close()
+				return true
+			}
+		},
+		methods: {
+			...mapMutations('views', ['CHANGE_SORTACTION', 'CHANGE_SORTMODE']),
+			sortActionChange({
+				value
+			}) {
+				return this.CHANGE_SORTACTION(value)
+			},
+			sortModeChange({
+				value
+			}) {
+				return this.CHANGE_SORTMODE(value)
+			},
+			filterChange({
+				value
+			}) {
+				return uni.$emit('filter-list', value)
+			},
+			close() {
+				animates([{
+						target: this.$refs['wrapper-content'],
+						options: {
+							styles: {
+								transform: "translateX(-100%)"
+							},
+							duration: 200,
+							timingFunction: 'ease',
+							delay: 0
+						}
+					},
+					{
+						target: this.$refs['wrapper'],
+						options: {
+							styles: {
+								backgroundColor: "rgba(0,0,0,0)"
+							},
+							duration: 200,
+							timingFunction: 'ease',
+							delay: 200
+						}
+					}
+				]).then(() => {
+					uni.navigateBack()
+				})
+			}
+		},
+		computed: {
+			...mapState('views', ['sortAction', 'sortMode'])
+		},
+		data() {
+			return {
+				title: '',
+				filterLabels: [{
+						name: '全部',
+						value: 'all'
+					},
+					{
+						name: '图片',
+						value: 'img'
+					},
+					{
+						name: '视频',
+						value: 'video'
+					},
+					{
+						name: '音乐',
+						value: 'music'
+					},
+					{
+						name: '办公文档',
+						value: 'office'
+					}
+				],
+				sortActionLabels: [{
+						name: '升序',
+						value: 'up'
+					},
+					{
+						name: '降序',
+						value: 'down'
+					},
+				],
+				sortModeLabels: [{
+						name: '按文件大小排序',
+						value: 'filesize'
+					},
+					{
+						name: '按时间排序',
+						value: 'time'
+					},
+					{
+						name: '按首字母排序',
+						value: 'initials'
+					}
+				]
+			}
+		}
+
+	}
+</script>
+
+<style lang="scss" scoped>
+	.wrapper {
+		flex-direction: column;
+		flex: 1;
+
+		.c-iconfont {
+			font-size: 70rpx;
+			margin-right: 10rpx;
+			margin-left: 10rpx;
+		}
+
+		.wrapper-content {
+			padding: 60rpx 0rpx 0rpx 0rpx;
+			flex-direction: column;
+			width: 550rpx;
+			background-color: white;
+			flex: 1;
+			transform: translateX(-100%);
+
+			.item-box {
+				flex: 1;
+				flex-direction: column;
+
+				.item-header {
+					height: 40px;
+				}
+
+				.item {
+					margin-bottom: 15px;
+				}
+			}
+		}
+	}
+
+	.nav-text {
+		line-height: 70rpx;
+	}
+</style>

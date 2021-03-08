@@ -3,9 +3,9 @@
 		<uni-refresh >
 			<uni-load-more  />
 		</uni-refresh>
-		<cell style="height: 390px;" ref='top'>
+		<cell style="height: 390px;" ref='top' >
 			<view class="pic">
-				<image class="pic-img" src="../../static/images/pic.jpg" mode="aspectFill"></image>
+				<image class="pic-img" src="/static/images/pic.jpg" mode="aspectFill"></image>
 			</view>
 			<view class="index-ctx">
 				<view class="index-ctx-box">
@@ -29,7 +29,7 @@
 				</view>
 			</view>
 		</cell>
-		<cell :style="{height: `${wHeight}`}">
+		<cell :style="{height: `${wHeight}`}" ref='dynamic'  >
 			<view class="dynamic">
 				<view class="dynamic-title" @click="toggleHandle">
 					<text class="dynamic-title-left">最近动态</text>
@@ -51,7 +51,8 @@
 		getOneAnyFile
 	} from '@/util/file.js'
 	import {
-		mapGetters
+		mapGetters,
+		mapState
 	} from 'vuex'
 	export default {
 		mixins: [customList],
@@ -65,11 +66,14 @@
 					contentnomore: '已经到底了,只能显示30天内上传的文件'
 				},
 				pageId: 'page',
-				wHeight: 0
+				wHeight: 0,
+				offsetTop: 0,
+				dynamicTop: 0
 			};
 		},
 		computed: {
-			...mapGetters('file', ['RUNTIME'])
+			...mapGetters('file', ['RUNTIME']),
+			...mapState('file', ['action'])
 		},
 		watch: {
 			listSwitch () {
@@ -77,6 +81,16 @@
 					animated: false,
 					offset: 0
 				})
+			},
+			action (newVal) {
+				// if (newVal) {
+				// 	dom.scrollToElement(this.$refs['dy'], {
+				// 		animated: false,
+				// 		offset: 0
+				// 	})
+				// } else {
+					
+				// }
 			}
 		},
 		created() {
@@ -98,6 +112,13 @@
 					this.status = "noMore"
 				}, 2000)
 			},
+			// pageScroll(e) {
+			// 	if (e.contentOffset.y == -this.wHeight || !e.contentOffset.y) return this.offsetTop = 0
+			// 	let offset = Math.abs(e.contentOffset.y + this.wHeight)
+			// 	if (offset * 2 + 150  >= this.dynamicTop) return
+			// 	this.offsetTop = offset
+			// 	console.log(this.offsetTop * 2,this.dynamicTop)
+			// },
 			toggleHandle() {
 				uni.setStorage({
 					key: 'index-switch',
@@ -164,20 +185,6 @@
 						})
 						break;
 				}
-			}
-		},
-		onNavigationBarSearchInputClicked() {
-			uni.navigateTo({
-				url: '/pages/search/search'
-			})
-		},
-		onNavigationBarButtonTap(e) {
-			if (!e.index) {
-
-			} else {
-				uni.navigateTo({
-					url: '/pages/status/status'
-				})
 			}
 		},
 		onReady() {
@@ -335,6 +342,9 @@
 				}
 			];
 			this.$nextTick(function() {
+				 dom.getComponentRect(this.$refs['dynamic'], ({size}) => {
+					this.dynamicTop = size.top
+				})
 				uni.$emit('setScrollRef', {
 					id: 'index'
 				})
@@ -430,7 +440,13 @@
 				}
 			}
 		}
-
+		.dynamic-action {
+			position: fixed;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			top: 0;
+		}
 		.dynamic {
 			flex-direction: column;
 			.index-list {

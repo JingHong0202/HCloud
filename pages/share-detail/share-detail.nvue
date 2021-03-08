@@ -1,7 +1,7 @@
 <template>
 	<view class="share-detail">
 		<view class="header">
-			<image class="icon" src="../../static/icon/type/cloud.png" mode="aspectFit"></image>
+			<image class="icon" src="/static/icon/type/cloud.png" mode="aspectFit"></image>
 			<text class="filename">{{item.fileName}}</text>
 			<text class="link" @click="toPage" >查看分享详情> </text>
 		</view>

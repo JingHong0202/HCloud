@@ -10,7 +10,7 @@
 		<uni-list-item :rightText="wx" title="微信号"></uni-list-item>
 		<uni-list-item showArrow title="二维码">
 			<template slot="footer">
-				<image class="qs" src="../../static/icon/page/account/qs.png" mode="aspectFit"></image>
+				<image class="qs" src="/static/icon/page/account/qs.png" mode="aspectFit"></image>
 			</template>
 		</uni-list-item>
 		<cell>
@@ -18,6 +18,9 @@
 		</cell>
 		<uni-list-item :show-switch="true" @switchChange="fingerprint" title="指纹密码"></uni-list-item>
 		<uni-list-item :show-switch="true" @switchChange="equipment" title="设备锁"></uni-list-item>
+		<cell >
+			<button class="logout-btn" type="warn">退出登录</button>
+		</cell>
 	</uni-list>
 </template>
 
@@ -25,7 +28,7 @@
 	export default {
 		data() {
 			return {
-				avatar: '../../static/images/pic.jpg',
+				avatar: '/static/images/pic.jpg',
 				name: 'username',
 				phone: '未绑定手机号',
 				wx: '未绑定微信号'
@@ -52,5 +55,11 @@
 	.qs {
 		width: 30px;
 		height: 30px;
+	}
+	.logout-btn {
+		margin-top: 15px;
+		flex: 1;
+		border: 0;
+		border-radius: 0;
 	}
 </style>
