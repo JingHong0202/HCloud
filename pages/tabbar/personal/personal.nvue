@@ -1,33 +1,47 @@
 <template>
-	<view class="personal">
-		<view class="user-box" elevation="4px">
-			<image class="avatars" src="/static/images/pic.jpg" mode="aspectFit" @click="toPage('account')"></image>
-			<view class="info">
+	<view class="personal" :render-whole='true'>
+		<view class="user-box" :style="{height: `${400+navHeight}rpx`}">
+		</view>
+		<list ref='personal' class="list" :style="{'margin-top': navHeight}" show-scrollbar="false">
+			<cell :style="{height: `${300}rpx`}">
+			</cell>
+			<uni-list-item :border='true' link to="/pages/share-list/share-list" title="分享"
+				thumb="/static/icon/page/personal/share-line.png" thumbSize="sm"></uni-list-item>
+			<uni-list-item :border='true' link to="/pages/recycle/recycle" title="回收站"
+				thumb="/static/icon/page/personal/recycle.png" thumbSize="sm"></uni-list-item>
+			<cell>
+				<ad adpid="1111111111" style="width: 750rpx;"></ad>
+			</cell>
+			<uni-list-item :border='true' to="/pages/setting/setting" link title="设置"
+				thumb="/static/icon/page/personal/shezhi.png" thumbSize="sm"></uni-list-item>
+			<uni-list-item :border='true' to="/pages/about/about" link title="关于"
+				thumb="/static/icon/page/personal/info.png" thumbSize="sm"></uni-list-item>
+				<cell>
+					<ad adpid="1111111111" style="width: 750rpx;"></ad>
+				</cell>
+			<uni-list-item :border='true' link title="退出登录" thumb="/static/icon/page/personal/user-exit.png"
+				thumbSize="sm" @click="exit"></uni-list-item>
+		</list>
+		<view class="nav" :style="{height: navHeight}" ref='nav'>
+
+			<!-- <view :style="{height: navHeight-44,'backgroundColor': 'red',position: 'absolute',right: 0,left:0,top:0}">
+				
+			</view> -->
+			<!-- <view :style="{position: 'absolute',right: 0,top: 0,bottom:0,width: 50,'justify-content': 'center', 'align-items': 'center'}">
+				<uni-icons type="scan" color="#000"  :size="33"></uni-icons>
+			</view> -->
+		</view>
+		<view class="user-box2" :style="{height: `${400+navHeight}rpx`}">
+			<image class="avatars" ref='circle' src="/static/images/pic.jpg" mode="aspectFit"
+				@click="toPage('account')"></image>
+			<view class="info" ref='user'>
 				<text class="name">未登录</text>
-				<progress class="percent" active border-radius='15' stroke-width="5" :percent="percent" activeColor="#f2cf6d" />
+				<progress class="percent" active border-radius='15' stroke-width="5" :percent="percent"
+					activeColor="#f2cf6d" />
 				<text class="used">空间使用情况: {{`${formatBytes(usedSize)}/${formatBytes(totalSize)}`}}</text>
 			</view>
-			<image class="qs" src="/static/icon/common/check.png" mode="aspectFit" @click="scanCode"></image>
+			<image class="qs" ref='qs' src="/static/icon/common/check.png" mode="aspectFit" @click="scanCode"></image>
 		</view>
-		<view class="setting-list">
-			<uni-list :border='false'>
-				<uni-list-item :border='true' link to="/pages/share-list/share-list" title="分享" thumb="/static/icon/page/personal/share-line.png"
-				 thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true' link to="/pages/recycle/recycle" title="回收站" thumb="/static/icon/page/personal/recycle.png"
-				 thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true' to="/pages/setting/setting" link title="设置" thumb="/static/icon/page/personal/shezhi.png"
-				 thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true' to="/pages/about/about" link title="关于" thumb="/static/icon/page/personal/info.png"
-				 thumbSize="sm"></uni-list-item>
-				<uni-list-item :border='true' link title="退出登录" thumb="/static/icon/page/personal/user-exit.png" thumbSize="sm"
-				 @click="exit"></uni-list-item>
-
-				<!-- <cell style="width: 750rpx;height: 200px;">
-					
-				</cell> -->
-			</uni-list>
-		</view>
-		<!-- <ad adpid="1111111111"></ad> -->
 	</view>
 </template>
 
@@ -35,11 +49,21 @@
 	import {
 		formatBytes
 	} from '@/util/file.js'
+	import {
+		getEl
+	} from '@/util/bindingx.js'
+	uni.showLoading({
+		mask: true,
+		title: '初始化中...'
+	})
+	const bindingx = uni.requireNativePlugin('bindingx'),
+		dom = uni.requireNativePlugin('dom')
 	export default {
 		data() {
 			return {
 				totalSize: 1024 * 50000,
-				usedSize: 1024 * 20000
+				usedSize: 1024 * 20000,
+				navHeight: 0
 			}
 		},
 		computed: {
@@ -47,7 +71,106 @@
 				return 100 * (this.usedSize / this.totalSize)
 			}
 		},
+		mounted() {
+			let {
+				statusBarHeight
+
+			} = uni.getSystemInfoSync()
+			this.navHeight = statusBarHeight + 44
+			this.init(statusBarHeight)
+		},
+		onReady() {
+
+		},
 		methods: {
+			init(statusBarHeight) {
+				setTimeout(() => {
+					this.$nextTick(() => {
+						dom.getComponentRect(this.$refs['circle'], (({
+							size
+						}) => {
+							let circleY_targetY = uni.upx2px(size.top + (this.navHeight -
+									statusBarHeight) + (((this.navHeight -
+									statusBarHeight) - (uni.upx2px(100) * .6)) / 2)),
+								qs_targetY = uni.upx2px(size.top + (this.navHeight -
+									statusBarHeight) + (((this.navHeight -
+									statusBarHeight) - (uni.upx2px(60) * .9)) / 2)),
+								list_header_height = uni.upx2px(300)
+							const userOpacity =
+								`max(1-min(y,${uni.upx2px(100)})/${uni.upx2px(100)},0)`,
+								navOpacity =
+								`min(y,${uni.upx2px(list_header_height+this.navHeight)})/${uni.upx2px(list_header_height+this.navHeight)}`,
+								userY = `y>${uni.upx2px(100)}?-500:0`,
+								circleY =
+								`(0-min(y,${list_header_height})/${list_header_height})*${circleY_targetY}`,
+								circleX =
+								`(0-min(y,${list_header_height})/${list_header_height})*${uni.upx2px(100)}`,
+								circleScale =
+								`(y-${this.navHeight})<=0?1:(1-min(.4,1*(y-${this.navHeight})/${list_header_height}))`,
+								qsY =
+								`(0-min(y,${list_header_height})/${list_header_height})*${qs_targetY}`,
+								qsX =
+								`min(y,${list_header_height})/${list_header_height}*${uni.upx2px(90)}`,
+								qsScale =
+								`(y-${this.navHeight})<=0?1:(1-min(.1,1*(y-${this.navHeight})/${list_header_height}))`
+							bindingx.bind({
+								eventType: 'scroll',
+								anchor: getEl(this.$refs['personal']),
+								config: {
+									transformOrigin: 'center'
+								},
+								props: [{
+										element: getEl(this.$refs['nav']),
+										property: 'opacity',
+										expression: navOpacity,
+									},
+									{
+										element: getEl(this.$refs['user']),
+										property: 'opacity',
+										expression: userOpacity,
+									},
+									{
+										element: getEl(this.$refs['user']),
+										property: 'transform.translateY',
+										expression: userY,
+									},
+									{
+										element: getEl(this.$refs['qs']),
+										property: 'transform.translateY',
+										expression: qsY
+									},
+									{
+										element: getEl(this.$refs['qs']),
+										property: 'transform.scale',
+										expression: qsScale
+									},
+									{
+										element: getEl(this.$refs['qs']),
+										property: 'transform.translateX',
+										expression: qsX
+									},
+									{
+										element: getEl(this.$refs['circle']),
+										property: 'transform.translateY',
+										expression: circleY
+									},
+									{
+										element: getEl(this.$refs['circle']),
+										property: 'transform.translateX',
+										expression: circleX
+									},
+									{
+										element: getEl(this.$refs['circle']),
+										property: 'transform.scale',
+										expression: circleScale
+									}
+								]
+							})
+							uni.hideLoading()
+						}))
+					})
+				}, 200)
+			},
 			formatBytes,
 			toPage(pageName) {
 				uni.navigateTo({
@@ -76,48 +199,63 @@
 </script>
 
 <style scoped lang='scss'>
+	.list {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.nav {
+		background-color: white;
+		@include position(absolute, 0, 0, false, 0);
+		opacity: 0;
+	}
+
 	.personal {
 		flex-direction: column;
-		background-image: linear-gradient(to right, #ecaf59, #ffed20);
-		padding-top: 30px;
+		flex: 1;
 	}
 
-	.setting-list {
-		background-color: white;
-		padding: 60px 0px 0 0px;
-	}
+
 
 	.user-box {
-		height: 200rpx;
-		flex: 1;
+		height: 400rpx;
 		flex-direction: row;
-		padding-left: 15px;
-		padding-right: 15px;
-		position: relative;
-		top: 100rpx;
+		padding: 0 100rpx;
+		@include position(absolute, 0, 0, false, 0);
 		@extend %f-ct;
-		background-color: white;
-		border-radius: 15px;
-		transform: scale(.9);
+		background-image: linear-gradient(to left, #f9d423, #ff4e50);
+		opacity: .9;
+	}
+
+	.user-box2 {
+		height: 400rpx;
+		flex-direction: row;
+		padding: 0 100rpx;
+		@include position(absolute, 0, 0, false, 0);
+		@extend %f-ct;
 
 
 		.avatars {
-			border-radius: 60px;
-			margin-right: 15px;
-			width: 60px;
-			height: 60px;
+			border-radius: 60rpx;
+			margin-right: 30rpx;
+			width: 100rpx;
+			height: 100rpx;
 		}
 
 		.qs {
-			width: 30px;
-			height: 30px;
+			width: 60rpx;
+			height: 60rpx;
 			margin-left: 15px;
+
+			&:active {
+				opacity: .3;
+			}
 		}
 
 		.info {
 			flex-direction: column;
 			height: 100rpx;
-			flex: 1;
+			@extend %flex;
 
 			.name {
 				font-size: $uni-font-size-subtitle;
@@ -130,7 +268,7 @@
 			}
 
 			.percent {
-				/* flex: 1; */
+				/* @extend %flex; */
 				width: 300rpx;
 			}
 		}

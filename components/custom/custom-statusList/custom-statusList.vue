@@ -164,7 +164,7 @@
 
 <style scoped lang="scss">
 	.status-info-box {
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 	}
 
@@ -197,7 +197,7 @@
 	}
 
 	.custom-statusList {
-		flex: 1;
+		@extend %flex;
 	}
 
 	.status-list {

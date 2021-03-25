@@ -15,18 +15,15 @@
 %active-hover {
 	opacity: .5;
 }
-%positin-full {
-	position: absolute;
-	left:0;
-	right:0;
-	bottom: 0;
-	top: 0;
+@mixin position($mode: absolute,$t:false,$r:false,$b:false,$l:false) {
+	position: $mode;
+	@if $l {left: $l}
+	@if $r {right: $r}
+	@if $t {top: $t}
+	@if $b {bottom: $b}
 }
+
 /* 颜色变量 */
-%status_bar {
-  height: var(--status-bar-height);
-  width: 100%;
-}
 // button
 $btn-disabled-status: #999;
 
@@ -54,6 +51,9 @@ $app-color-theme-alpha: #ffffcb;
 	/* #endif */
 	justify-content: center;
 	align-items: center;
+}
+%flex {
+	flex: 1;
 }
 /* 文字基本颜色 */
 $uni-text-color:#333;//基本色
@@ -146,3 +146,20 @@ $uni-font-size-paragraph:30rpx;
 	border-radius: 60rpx;
 	margin-left: 15rpx;
 }
+.c-refresh {
+	height: 50px;
+	width: 750rpx;
+	@extend %f-ct;
+}
+.row {
+		flex: 1;
+		flex-direction: row;
+
+		& .col {
+			flex: 1;
+			@extend %f-ct;
+		}
+	}
+
+
+

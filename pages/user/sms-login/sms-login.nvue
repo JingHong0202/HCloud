@@ -1,0 +1,40 @@
+<template>
+	<send :init='init' @end='handler' @tapLeft='handlerTapLeft' />
+</template>
+
+<script>
+	import send from "../common/components/send.nvue"
+	export default {
+		components: {
+			send
+		},
+		data() {
+			return {
+				init: {
+					title: '短信验证登录',
+					subBtn: '发送短信',
+					more: false,
+					lrbtn: true,
+					leftText: '新用户注册',
+					// rightText:
+				},
+			}
+		},
+		methods: {
+			handler() {
+				// uni.navigateTo({
+				// 	url: "/pages/user/common/resetpas-2"
+				// })
+				uni.reLaunch({
+					url: "/pages/tabbar/index/index"
+				})
+			},
+			handlerTapLeft() {
+				uni.navigateTo({
+					url: "/pages/user/register/register",
+					animationType: "none"
+				})
+			}
+		}
+	}
+</script>

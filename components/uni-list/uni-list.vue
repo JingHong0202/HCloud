@@ -7,7 +7,7 @@
 	</view>
 	<!-- #endif -->
 	<!-- #ifdef APP-NVUE -->
-	<list class="uni-list" ref='list' :scrollable='scrollY' @loadmore='$emit("loadmore")' :class="{ 'uni-list--border': border }"
+	<list class="uni-list" ref='list'  @scroll="scroll"  :scrollable='scrollY' @loadmore='$emit("loadmore")' :class="{ 'uni-list--border': border }"
 	 :loadmoreoffset="15">
 		<slot />
 	</list>
@@ -15,6 +15,7 @@
 </template>
 
 <script>
+	const dom = uni.requireNativePlugin('dom')
 	/**
 	 * List 列表
 	 * @description 列表组件
@@ -51,7 +52,13 @@
 		},
 		methods: {
 			scroll(e) {
-				console.log(e)
+				this.$emit('scroll',e)
+			},
+			toScrollTop(child, animate) {
+				dom.scrollToElement(child,{
+					animated: animate,
+					offset: 0
+				})
 			}
 		}
 	};

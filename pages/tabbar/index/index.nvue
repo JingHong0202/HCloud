@@ -1,42 +1,57 @@
 <template>
-	<list class="index" ref='index' id="index" :bounce="false" show-scrollbar="false"  :scrollable='listSwitch' >
-		<uni-refresh >
-			<uni-load-more  />
-		</uni-refresh>
-		<cell style="height: 390px;" ref='top' >
+	<!-- @scroll='pageScroll' -->
+	<list :render-whole='true' class="index" ref='index' id="index" disabled :bounce="false" show-scrollbar="false">
+		<refresh :display="downDisplay" @refresh="refresh" class="c-refresh">
+			<uni-load-more :status="downStatus" :contentText='downText' />
+		</refresh>
+		<cell ref='top' class="pic-box">
 			<view class="pic">
-				<image class="pic-img" src="/static/images/pic.jpg" mode="aspectFill"></image>
+				<image class="pic-img" src="/static/images/pic.jpg" mode="aspectFill" ref='pic'></image>
+				<view class="index-nav">
+					<uni-status-bar />
+					<uni-nav-bar :border='false' @clickLeft='toAccount' backgroundColor="rgba(0,0,0,0)">
+						<view slot="left">
+							<image elevation="8px" :src="info.avatars" mode="aspectFit" class="user-avatars">
+							</image>
+						</view>
+					</uni-nav-bar>
+				</view>
 			</view>
 			<view class="index-ctx">
 				<view class="index-ctx-box">
-					<view class="index-ctx-top hover" elevation="5px" @click="toPage(1)"  >
-						<image class='index-ctx-img' src="/static/icon/page/index/chuanshu.png" mode="aspectFit"></image>
+					<view class="index-ctx-top hover" elevation="5px" @click="toPage(1)">
+						<image class='index-ctx-img' src="/static/icon/page/index/chuanshu.png" mode="aspectFit">
+						</image>
 						<text class="index-ctx-title">传输列表</text>
 						<view class="redDot" v-if="RUNTIME">
-							<uni-badge :text="RUNTIME" type="error" size="small"></uni-badge>
+							<uni-badge :text="RUNTIME" type="error"></uni-badge>
 						</view>
 					</view>
 					<view class="index-ctx-bottom ">
 						<view class="index-ctx-bottom-left hover" elevation="5px" @click="toPage(2)">
-							<image class='index-ctx-img' src="/static/icon/page/index/shangchuan.png" mode="aspectFit"></image>
+							<image class='index-ctx-img' src="/static/icon/page/index/shangchuan.png" mode="aspectFit">
+							</image>
 							<text class="index-ctx-title">上传文件</text>
 						</view>
 						<view class="index-ctx-bottom-right hover" elevation="5px" @click="toPage(3)">
-							<image class='index-ctx-img' src="/static/icon/page/index/search-a.png" mode="aspectFit"></image>
+							<image class='index-ctx-img' src="/static/icon/page/index/search-a.png" mode="aspectFit">
+							</image>
 							<text class="index-ctx-title">搜索文件</text>
 						</view>
 					</view>
 				</view>
 			</view>
 		</cell>
-		<cell :style="{height: `${wHeight}`}" ref='dynamic'  >
+		<cell :style="{height: `${wHeight}`}" ref='dynamic'>
 			<view class="dynamic">
 				<view class="dynamic-title" @click="toggleHandle">
 					<text class="dynamic-title-left">最近动态</text>
 					<text class="dynamic-title-right iconfont">{{listSwitch ? '&#xe79f;' : '&#xe64b;'}}</text>
 				</view>
-				<view class="index-list" style="width: 750rpx;flex: 1;" >
-					<custom-list  :isSort="false" :isShow="listSwitch" @loadmore='ReachBottom' isPageScroll ref='list' :list="list" @clean='cleanList' @all='selectAll' :status="status" :loadText='loadText'></custom-list>
+				<view class="index-list" style="width: 750rpx;">
+					<custom-list ref='list' :isShowFabTop='listSwitch' :isSort="false" :isShow="listSwitch"
+						@loadmore='ReachBottom' isPageScroll :list="list" @clean='cleanList' @all='selectAll'
+						:status="status" :loadText='loadText'></custom-list>
 				</view>
 			</view>
 		</cell>
@@ -44,8 +59,16 @@
 </template>
 
 <script>
-	const dom = uni.requireNativePlugin('dom')
+	const dom = uni.requireNativePlugin('dom'),
+		bindingx = uni.requireNativePlugin('bindingx');
+
 	import customList from '@/common/js/mixins/custom-list.js'
+	import nav from '@/common/js/mixins/nav.js'
+	import refresh from '@/common/js/mixins/refresh.js'
+	import nested from '@/common/js/mixins/nested-list.js'
+	import {
+		getEl
+	} from '@/util/bindingx.js'
 	import {
 		getMedia,
 		getOneAnyFile
@@ -55,47 +78,33 @@
 		mapState
 	} from 'vuex'
 	export default {
-		mixins: [customList],
+		mixins: [customList, nav, refresh, nested],
 		data() {
 			return {
 				listSwitch: uni.getStorageSync('index-switch') || false,
-				scrollTop: 0,
 				loadText: {
 					contentdown: '上拉显示更多',
 					contentrefresh: '正在加载...',
 					contentnomore: '已经到底了,只能显示30天内上传的文件'
 				},
-				pageId: 'page',
-				wHeight: 0,
-				offsetTop: 0,
-				dynamicTop: 0
+				wHeight: 0
 			};
 		},
 		computed: {
 			...mapGetters('file', ['RUNTIME']),
-			...mapState('file', ['action'])
+			...mapState('file', ['action']),
+			...mapState('user', ['info'])
 		},
 		watch: {
-			listSwitch () {
-				dom.scrollToElement(this.$refs['top'], {
-					animated: false,
-					offset: 0
-				})
+			listSwitch() {
+				// dom.scrollToElement(this.$refs['top'], {
+				// 	animated: false,
+				// 	offset: 0
+				// })
+				this.$refs['list'].toScrollTop()
 			},
-			action (newVal) {
-				// if (newVal) {
-				// 	dom.scrollToElement(this.$refs['dy'], {
-				// 		animated: false,
-				// 		offset: 0
-				// 	})
-				// } else {
-					
-				// }
-			}
 		},
-		created() {
-			this.wHeight = uni.getSystemInfoSync().windowHeight
-		},
+
 		methods: {
 			ReachBottom() {
 				if (this.status === 'loading' || this.status === 'noMore') return
@@ -109,16 +118,9 @@
 						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
 						uuid: 141
 					})
-					this.status = "noMore"
+					this.status = "more"
 				}, 2000)
 			},
-			// pageScroll(e) {
-			// 	if (e.contentOffset.y == -this.wHeight || !e.contentOffset.y) return this.offsetTop = 0
-			// 	let offset = Math.abs(e.contentOffset.y + this.wHeight)
-			// 	if (offset * 2 + 150  >= this.dynamicTop) return
-			// 	this.offsetTop = offset
-			// 	console.log(this.offsetTop * 2,this.dynamicTop)
-			// },
 			toggleHandle() {
 				uni.setStorage({
 					key: 'index-switch',
@@ -128,6 +130,17 @@
 						this.cleanList()
 					}
 				})
+			},
+			refresh(e) {
+				this.downStatus = 'loading'
+				setTimeout(() => {
+					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
+					this.downStatus = "noMore"
+					if (this.$refs['list'].action) this.$refs['list'].exitAction()
+					setTimeout(() => {
+						this.downStatus = "more"
+					}, 1000)
+				}, 1000)
 			},
 			toPage(index) {
 				switch (index) {
@@ -160,7 +173,7 @@
 										// 	url: '/pages/upload/upload?dir=root'
 										// })
 										uni.navigateTo({
-											url: '/pages/upload/upload?dir=root'
+											url: '/pages/upload/upload'
 										})
 										break;
 									case 2:
@@ -342,46 +355,71 @@
 				}
 			];
 			this.$nextTick(function() {
-				 dom.getComponentRect(this.$refs['dynamic'], ({size}) => {
+				dom.getComponentRect(this.$refs['dynamic'], ({
+					size
+				}) => {
 					this.dynamicTop = size.top
-				})
-				uni.$emit('setScrollRef', {
-					id: 'index'
+					bindingx.bind({
+						eventType: 'scroll',
+						anchor: getEl(this.$refs['index']),
+						props: [{
+							element: getEl(this.$refs['top']),
+							property: 'opacity',
+							expression: '1-y/' + this.dynamicTop
+						}]
+					});
+					uni.$emit('setScrollRef', {
+						id: 'index'
+					})
 				})
 			})
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
 	.index {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
+
 		.hover:active {
 			background-color: $uni-bg-color-hover;
 		}
-		.null {
-			flex: 1;
+
+		// .null {
+		// 	@extend %flex;
+		// 	width: 750rpx;
+		// 	height: 200px;
+		// }
+
+		.pic {
 			width: 750rpx;
-			height: 200px;
+			height: 660rpx;
 		}
 
-		.active {
-			background-color: red;
+		.index-refresh {
+			height: 50px;
+			width: 750rpx;
+			@extend %f-ct;
+		}
+
+		.index-nav {
+			flex-direction: column;
 		}
 
 		.pic-img {
-			width: 750rpx;
-			height: 350px;
+			@include position(absolute, 0, 0, 0, 0);
+		}
+
+		.pic-box {
+			height: 780rpx;
+			flex-direction: column;
+			position: relative;
 		}
 
 		.index-ctx {
-			left: 0;
-			right: 0;
-			height: 200px;
-			position: absolute;
-			top: 215px;
 			@extend %f-ct;
+			@include position(absolute, 440rpx, 0, false, 0);
 
 			.index-ctx-title {
 				font-size: $uni-font-size-sm
@@ -400,30 +438,28 @@
 				.index-ctx-top {
 					background-color: white;
 					width: 450rpx;
-					height: 80px;
+					height: 160rpx;
 					margin-bottom: 20rpx;
 					border-radius: 10px;
 					@extend %f-ct;
 					flex-direction: column;
 					position: relative;
-					
+
 					.redDot {
-						position: absolute;
-						right: 0;
-						top: 0;
+						@include position(absolute, 10rpx, 10rpx, false, false)
 					}
 				}
 
 				.index-ctx-bottom {
 					width: 450rpx;
-					height: 80px;
+					height: 160rpx;
 					flex-direction: row;
 					justify-content: space-between;
 					padding-bottom: 10px;
 
 					.index-ctx-bottom-left {
 						margin-right: 10px;
-						flex: 1;
+						@extend %flex;
 						background-color: white;
 						border-radius: 10px;
 						@extend %f-ct;
@@ -431,7 +467,7 @@
 					}
 
 					.index-ctx-bottom-right {
-						flex: 1;
+						@extend %flex;
 						background-color: white;
 						border-radius: 10px;
 						@extend %f-ct;
@@ -440,25 +476,19 @@
 				}
 			}
 		}
-		.dynamic-action {
-			position: fixed;
-			top: 0;
-			left: 0;
-			bottom: 0;
-			top: 0;
-		}
+
 		.dynamic {
 			flex-direction: column;
+
 			.index-list {
 				flex-direction: column;
-				flex: 1;
+				@extend %flex;
 			}
 
 			.dynamic-title {
 				padding: 25px 10px 5px;
 				justify-content: space-between;
 				align-items: center;
-				position: sticky;
 				background-color: white;
 
 				.dynamic-title-left {

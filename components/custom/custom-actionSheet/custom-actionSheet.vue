@@ -59,10 +59,7 @@
 
 <style lang="scss" scoped>
 	.action-sheet {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
+		@include position(fixed, false, 0, 0, 0);
 		background-color: #e4c774;
 		/* #ifdef APP-NVUE */
 		border-top-style: solid;
@@ -77,24 +74,28 @@
 	.action {
 		margin: 0;
 		padding: 0;
-		flex: 1;
+		@extend %flex;
 		@extend %f-ct;
 		flex-direction: column;
-		padding-top: 5px;
 		position: relative;
+
 		&:active {
 			@extend %active-hover
 		}
 	}
 
 	.action-icon {
-		width: 50rpx;
-		flex: 1;
+		width: 28px;
+		height: 28px;
+		padding: 1px;
+		@extend %flex;
 	}
 
 	.action-text {
-		font-size: $uni-font-size-sm;
+		font-size: 10px;
 		color: white;
+		line-height: 15px;
+		height: 15px;
 	}
 
 	.custom-tabbar {
@@ -104,25 +105,4 @@
 		flex-direction: row;
 		height: 50px;
 	}
-
-	// .redDot-box {
-	// 	position: absolute;
-	// 	right: 0;
-	// 	top: 0;
-	// 	width: 60rpx;
-	// 	height: 60rpx;
-	// 	@extend %f-ct;
-	// }
-	// .redDot-select-length {
-	// 	text-align: left;
-	// 	flex: 1;
-	// 	color: $uni-color-subtitle;
-	// 	/* #ifndef APP-NVUE */
-	// 	padding-bottom: 10px;
-	// 	/* #endif */
-	// 	/* #ifdef APP-NVUE */
-	// 	padding-bottom: 20px;
-	// 	/* #endif */
-	// 	font-size: $uni-font-size-sm;
-	// }
 </style>

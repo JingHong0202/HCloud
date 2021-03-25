@@ -1,0 +1,65 @@
+<template>
+	<custom-loginBase :mode='init' @submit='submit' :disabled='checkPas'>
+		<template slot="from">
+			<view class="input vs-row vs-align-center margin-b40">
+				<image class="input-icon margin-r20" src="/static/icon/page/login/password.png" mode=""></image>
+				<input class="vs-flex-item color-base font-30" :password='!toggle' value="" confirm-type='next'
+					@input='(e) => {password = e.detail.value}'  placeholder="请设置你的账号密码"
+					placeholder-class="input-placeholder" />
+				<text class="iconfont color-base" @tap='toggle = !toggle'>
+					{{toggle ? '&#xe79f;' : '&#xe64b;'}}
+				</text>
+			</view>
+			<view class="input vs-row vs-align-center margin-b40">
+				<input class="vs-flex-item color-base font-30" :password='!toggle_re' value=""
+					@input='(e) => {repassword = e.detail.value}' placeholder="再次确认你的密码"
+					placeholder-class="input-placeholder" />
+				<text class="iconfont color-base" @tap='toggle_re = !toggle_re'>
+					{{toggle_re ? '&#xe79f;' : '&#xe64b;'}}
+				</text>
+			</view>
+		</template>
+	</custom-loginBase>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				init: {
+					title: '账号密码设置',
+					subBtn: '确认',
+					more: false,
+					lrbtn: false,
+				},
+				password: '',
+				repassword: '',
+				toggle: true,
+				toggle_re: true
+			}
+		},
+		computed: {
+			checkPas() {
+				return !!this.password && !!this.repassword && this.password === this.repassword
+			}
+		},
+		methods: {
+			submit() {
+				if (!this.password || !this.repassword) return uni.showToast({
+						title: "不能为空",
+						icon: "none",
+						position: "bottom"
+					})
+				if (!this.checkPas) return  uni.showToast({
+						title: "两次密码不一致",
+						icon: "none",
+						position: "bottom"
+					})
+				
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "~../common/user.scss";</style>

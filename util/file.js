@@ -129,31 +129,13 @@ function single(file) {
 		case 0:
 			//folder
 			// 根据uuid请求对应列表
-			return {
-				list: [{
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04'
-				}, {
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04'
-				}, {
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04'
-				}],
-				parentId: 1002,
-				path: [{
-						title: "全部文件",
-						uuid: 1
-					},
-					{
-						title: "uni-app教学视频",
-						uuid: 2
-					}
-				]
-			}
+			// return {
+
+			// }
+			uni.navigateTo({
+				url: '/pages/open-list/open-list?type=folder&uuid='+file.uuid,
+				animationType: 'none'
+			});
 			break;
 		case 1:
 			//images
@@ -177,9 +159,9 @@ function single(file) {
 		case 20:
 			//collection
 			uni.navigateTo({
-				url: '/pages/dynamic-list/dynamic-list',
-				success() {
-					uni.$emit('open-dynamicList', {
+				url: '/pages/open-list/open-list?type=collection',
+				complete() {
+					uni.$emit('open-list', {
 						data: file
 					});
 				}

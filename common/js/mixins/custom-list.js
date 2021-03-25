@@ -3,6 +3,9 @@ import {
 	mapState
 } from 'vuex'
 export default {
+	onHide() {
+		this.cleanList()
+	},
 	onShow() {
 		uni.$off('select-all')
 		uni.$off('cancel-all')

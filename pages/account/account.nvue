@@ -14,7 +14,7 @@
 			</template>
 		</uni-list-item>
 		<cell>
-			<uni-section title="账号登录设置"></uni-section>
+			<uni-section title="账号登录设置" type="line"></uni-section>
 		</cell>
 		<uni-list-item :show-switch="true" @switchChange="fingerprint" title="指纹密码"></uni-list-item>
 		<uni-list-item :show-switch="true" @switchChange="equipment" title="设备锁"></uni-list-item>
@@ -47,18 +47,18 @@
 
 <style lang="scss" scoped>
 	.avatar {
-		width: 30px;
-		height: 30px;
-		border-radius: 30px;
+		width: 60rpx;
+		height: 60rpx;
+		border-radius: 60rpx;
 	}
 
 	.qs {
-		width: 30px;
-		height: 30px;
+		width: 60rpx;
+		height: 60rpx;
 	}
 	.logout-btn {
-		margin-top: 15px;
-		flex: 1;
+		margin-top: 30rpx;
+		@extend %flex;
 		border: 0;
 		border-radius: 0;
 	}

@@ -1,0 +1,29 @@
+<template>
+	<send :init='init' @end='handler' />
+</template>
+
+<script>
+	import send from "../common/components/send.nvue"
+	export default {
+		components: {
+			send
+		},
+		data() {
+			return {
+				init: {
+					title: '用户注册',
+					subBtn: '发送短信',
+					more: false,
+					lrbtn: false,
+				},
+			}
+		},
+		methods: {
+			handler() {
+				uni.navigateTo({
+					url: "/pages/user/common/resetpas-2"
+				})
+			}
+		}
+	}
+</script>

@@ -55,58 +55,58 @@
 
 <style lang="scss" scoped>
 	%common-btn {
-		flex: 1;
+		@extend %flex;
 		border-radius: 0;
 	}
 	.share-detail {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
 
 		.header {
 			@extend %f-ct;
 			flex-direction: column;
-			height: 200px;
+			height: 400rpx;
 
 			.filename {
 				font-size: $uni-font-size-base;
-				line-height: 25px;
+				line-height: 50rpx;
 				font-weight: bold;
 			}
 
 			.link {
 				font-size: $uni-font-size-sm;
-				line-height: 25px;
+				line-height: 50rpx;
 				color: $uni-color-primary;
 			}
 
 			.icon {
-				width: 80px;
-				height: 80px;
-				border-radius: 5px;
+				width: 160rpx;
+				height: 160rpx;
+				border-radius: 10rpx;
 			}
 		}
 
 		.content {
 			flex-direction: column;
-			flex: 1;
+			@extend %flex;
 
 			.box {
-				height: 50px;
+				height: 100rpx;
 				flex-direction: column;
 				justify-content: flex-start;
-				margin-top: 5px;
+				margin-top: 10rpx;
 			}
 
 			.m-text {
 				font-size: $uni-font-size-sm;
-				margin-top: 5px;
-				padding-left: 10px;
+				margin-top: 10rpx;
+				padding-left: 20rpx;
 			}
 		}
 
 		.footer {
 			flex-direction: row;
-			height: 50px;
+			height: 100rpx;
 
 			.l-btn {
 				@extend %common-btn;

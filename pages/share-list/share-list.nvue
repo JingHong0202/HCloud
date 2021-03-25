@@ -98,6 +98,6 @@
 
 <style lang="scss" scoped>
 	.share-list {
-		flex: 1;
+		@extend %flex;
 	}
 </style>

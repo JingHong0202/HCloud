@@ -99,7 +99,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 		/* #ifdef H5 */
 		width: 100%;
@@ -110,7 +110,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		// flex: 1;
+		// @extend %flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 	}

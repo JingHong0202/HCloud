@@ -71,7 +71,7 @@
 
 <style lang="scss" scoped>
 	.mkdir-box {
-		flex: 1;
+		@extend %flex;
 		@extend %f-ct;
 
 		.mkdir-content {
@@ -95,11 +95,11 @@
 				flex-direction: row;
 
 				.btn-cancel {
-					flex: 1;
+					@extend %flex;
 				}
 
 				.btn-mkdir {
-					flex: 1;
+					@extend %flex;
 				}
 			}
 		}

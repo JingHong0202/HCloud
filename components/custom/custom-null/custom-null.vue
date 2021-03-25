@@ -13,13 +13,9 @@
 
 <style scoped lang='scss'>
 	.noCtx {
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		top: 0;
+		@include position(absolute,0,0,0,0)
 	}
 	.no-image {
-		flex: 1;
+		@extend %flex;
 	}
 </style>

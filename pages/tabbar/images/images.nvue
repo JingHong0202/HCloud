@@ -1,18 +1,15 @@
 <template>
 	<view class="images" :render-whole='true'>
 		<uni-status-bar />
-		<uni-nav-bar :border='false' @clickLeft='toAccount'>
+		<uni-nav-bar :border='false' @clickLeft='toAccount' rightIcon="more-filled" @clickRight='openMenu = !openMenu'>
 			<view slot="left">
-				<image src="/static/images/pic.jpg" mode="aspectFit" class="user-avatars">
-
-				</image>
+				<image :src="info.avatars" mode="aspectFit" class="user-avatars" />
 			</view>
-			<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
+			<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables' />
 		</uni-nav-bar>
 
 		<swiper :current="tabIndex" class="content-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
 			<swiper-item class="photo-swiper">
-				<!-- @scroll='PScroll' -->
 				<custom-floatPanel :list="photoList" @end='pDropEnd'>
 					<custom-media ref='photo' @refresh='pRefresh' :downStatus="PhotoPageDownStatus" :status='PhotoPageStatus'
 					 @scrolltolower='PhotoPageScrollHandler' :list='photoList'>
@@ -26,12 +23,12 @@
 					</custom-media>
 				</custom-floatPanel>
 			</swiper-item>
-			<swiper-item class="category-swiper">
+		<!-- 	<swiper-item class="category-swiper">
 
-			</swiper-item>
+			</swiper-item> -->
 		</swiper>
 
-		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
+		<custom-popups  :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 		<custom-actionSheet @download='addDownList' @rename='rename' @move='move' @del='del'></custom-actionSheet>
 	</view>
 </template>
@@ -45,28 +42,24 @@
 	import popups from '@/common/js/mixins/popups.js'
 	import actionsheet from '@/common/js/mixins/actionsheet.js'
 	import nav from '@/common/js/mixins/nav.js'
-	// import {
-	// 	setTitleNViewRedDot
-	// } from '@/util/page.js'
 	export default {
 		mixins: [popups, actionsheet, nav],
-		// onNavigationBarButtonTap(e) {
-		// 	if (!e.index) {} else {
-		// 		this.openMenu = !this.openMenu
-		// 	}
-		// },
+		onHide() {
+			this.exitAction()
+		},
 		onNavigationBarSearchInputClicked() {
 			uni.navigateTo({
 				url: '/pages/search/search'
 			})
 		},
 		computed: {
-			...mapState('file', ['action', 'selectlist'])
+			...mapState('file', ['action', 'selectlist']),
+			...mapState('user', ['info'])
 		},
 		data() {
 			return {
 				TabLables: [
-					'照片', '视频', '相册'
+					'照片', '视频'
 				],
 				tabIndex: 0,
 				PhotoPageStatus: 'more',
@@ -75,6 +68,8 @@
 				VideoPageDownStatus: 'more',
 				photoList: [],
 				videoList: [],
+				afterTop:0,
+				labels: []
 			}
 		},
 		onShow() {
@@ -219,9 +214,13 @@
 						]
 					}
 				]
-				// 排序
-				.sort(function(a, b) {
-					return Date.parse(b.date) - Date.parse(a.date)
+				
+				
+				this.$nextTick(function(){
+					let {
+						statusBarHeight
+					} = uni.getSystemInfoSync()
+					this.afterTop = statusBarHeight + 50
 				})
 			// uni.setStorage({
 			// 	key:
@@ -520,10 +519,6 @@
 										]
 									}
 								]
-								// 排序
-								.sort(function(a, b) {
-									return Date.parse(b.date) - Date.parse(a.date)
-								})
 
 							// 该定时器解决初始化下拉刷新冲突问题
 							setTimeout(() => {
@@ -600,7 +595,7 @@
 
 <style lang="scss" scoped>
 	.images {
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 	}
 
@@ -608,9 +603,9 @@
 	.category-swiper,
 	.video-swiper {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
 	}
 	.content-box {
-		flex: 1;
+		@extend %flex;
 	}
 </style>

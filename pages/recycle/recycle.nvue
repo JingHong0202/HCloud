@@ -1,7 +1,7 @@
 <template>
 	<view class="recycle" :render-whole='true'>
-		<custom-list closeClick closeLongPress :actionSheetLabels='actionSheetLabels' :filter="filter" ref='list' @refresh='refresh'
-		 :downStatus='downStatus' :status='status' @scrolltolower='scrollHandler' :list="list" @clean='cleanList' @all='selectAll'></custom-list>
+		<custom-list closeClick closeLongPress customEvent  :actionSheetLabels='actionSheetLabels' :filter="filter" ref='list' @refresh='refresh'
+		 :downStatus='downStatus' :status='status' @scrolltolower='scrollHandler' :list="list" @clean='cleanList' @all='selectAll'  @click='handlerClick' @longpress='handlerLong' ></custom-list>
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 	</view>
 </template>
@@ -27,8 +27,13 @@
 			};
 		},
 		methods: {
+			handlerClick(item) {
+				return this.$refs['list'].addSelectList(item)
+			},
+			handlerLong(item) {
+				return this.$refs['list'].addSelectList(item)
+			},
 			refresh() {
-				console.log(2)
 				this.downStatus = 'loading'
 				setTimeout(() => {
 					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
@@ -88,6 +93,6 @@
 
 <style lang="scss" scoped>
 	.recycle {
-		flex: 1;
+		@extend %flex;
 	}
 </style>

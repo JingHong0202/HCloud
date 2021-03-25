@@ -155,18 +155,18 @@
 
 <style lang="scss" scoped>
 	.status {
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 	}
 	.tabs {
 		height: 80rpx;
 	}
 	.status-box {
-		flex: 1;
+		@extend %flex;
 	}
 
 	.status-swiper-item {
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 	}
 </style>

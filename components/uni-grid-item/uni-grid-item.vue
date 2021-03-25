@@ -116,7 +116,7 @@
 		width: 100%;
 		/* #endif */
 		position: relative;
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 		// justify-content: center;
 		// align-items: center;
@@ -147,7 +147,7 @@
 	}
 
 	.grid-item-box {
-		flex: 1;
+		@extend %flex;
 		justify-content: center;
 		align-items: center;
 	}
@@ -171,7 +171,7 @@
 	.c-iconfont {
 		position: absolute;
 		top: 60rpx;
-		font-size: 15px;
+		font-size: 40rpx;
 		opacity: .8;
 	}
 </style>

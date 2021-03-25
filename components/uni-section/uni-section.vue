@@ -66,7 +66,7 @@
 		align-items: center;
 		padding: 0 10px;
 		height: 40px;
-		flex: 1;
+		@extend %flex;
 		background-color: $uni-bg-color-grey;
 		/* #ifdef APP-NVUE */
 		// border-bottom-color: $uni-border-color;
@@ -115,7 +115,7 @@
 
 	.uni-section__content {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
 		color: $uni-text-color;
 	}
 

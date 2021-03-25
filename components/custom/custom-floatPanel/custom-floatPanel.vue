@@ -1,28 +1,32 @@
 <template>
-	<view class="media-box" ref='photo-box'  @touchend="toggle = false" @touchmove.stop.provent='move'>
-		<slot  />
-		<view elevation="5px" class="drop-float" :style="{'transform': `translateY(${y}px)`}"
-			 @touchend="end" @touchstart.stop="start">
-				<text class="iconfont c-iconfont">&#xe666;</text>
-				<text class="current-date" v-if="toggle">{{date}}</text>
-			</view>
+	<view class="media-box" ref='photo-box' @touchend="toggle = false" @touchmove.stop.provent='move'>
+		<slot />
+		<view elevation="5px" class="drop-float" :style="{'transform': `translateY(${y}px)`}" @touchend="end"
+			@touchstart.stop="start">
+			<text class="iconfont c-iconfont">&#xe666;</text>
+			<text class="current-date" v-if="toggle">{{date}}</text>
+		</view>
+		<view v-if="toggle" class="tip">
+			<text class="tip-text">{{this.date}}</text>
+		</view>
+
 	</view>
 </template>
 
 <script>
 	const dom = uni.requireNativePlugin('dom'),
-	floatPanelHeight = 40
-	
+		floatPanelHeight = 40
+	import {mapState} from 'vuex'
 	export default {
-		data () {
+		data() {
 			return {
 				date: '',
 				toggle: false,
-				y:0
+				y: 0
 			}
 		},
 		watch: {
-			indexList (newVal, oldVal) {
+			indexList(newVal, oldVal) {
 				if (oldVal.length && newVal.length !== oldVal.length) {
 					this.y = (this.maxY - floatPanelHeight) - ((newVal.length - oldVal.length) * this.itemHeight)
 				}
@@ -33,14 +37,19 @@
 				return this.list.map(item => item.date).sort(this[this.sort])
 			},
 			itemHeight() {
-				return this.maxY / this.list.length
-			}
+				return (this.maxY - (this.action ? 50 : 0)) / this.list.length
+			},
+			...mapState('file', ['action']),
 		},
 		mounted() {
-			dom.getComponentRect(this.$refs['photo-box'], ({
-				size
-			}) => {
-				this.maxY = size.height
+			this.$nextTick(function(){
+				setTimeout(() => {
+					dom.getComponentRect(this.$refs['photo-box'], ({
+						size
+					}) => {
+						this.maxY = size.height
+					})
+				}, 200)
 			})
 		},
 		props: {
@@ -61,13 +70,15 @@
 				let {
 					pageY
 				} = changedTouches[0]
-				if (pageY < 0 || pageY > (this.maxY - floatPanelHeight)) return
-				this.date = this.indexList[~~((pageY + (pageY > floatPanelHeight ?  floatPanelHeight : 0)) / this.itemHeight)] || this.date
+				if (pageY < 0 || pageY > (this.maxY - (floatPanelHeight + (this.action ? 50:0)))) return
+				this.date = this.indexList[~~((pageY + (pageY > floatPanelHeight ? floatPanelHeight : 0)) / this
+						.itemHeight)] ||
+					this.date
 				this.y = pageY
 			},
 			end() {
 				this.toggle = false
-				this.$emit('end',this.date)
+				this.$emit('end', this.date)
 			},
 			start() {
 				this.toggle = true
@@ -89,12 +100,30 @@
 
 <style lang="scss" scoped>
 	.media-box {
-		flex: 1;
+		@extend %flex;
+	}
+
+	.tip {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.tip-text {
+		padding: 20rpx;
+		background-color: #333;
+		border-radius: 20rpx;
+		color: white;
 	}
 
 	.drop-float {
-		position: absolute;
-		right: 0px;
+		// position: absolute;
+		// right: 0px;
+		@include position(absolute, false, 0);
 		height: 40px;
 		background-color: white;
 		border-top-left-radius: 25px;

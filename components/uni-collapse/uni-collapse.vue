@@ -46,7 +46,7 @@
 		display: flex;
 		/* #endif */
 		/* #ifdef APP-NVUE */
-		flex: 1;
+		@extend %flex;
 		/* #endif */
 		flex-direction: column;
 		background-color: $uni-bg-color;

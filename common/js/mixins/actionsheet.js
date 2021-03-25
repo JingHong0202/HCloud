@@ -56,6 +56,14 @@ export default {
 			}).catch((res) => {
 				this.$hide()
 			})
+		},
+		share () {
+			this.exitAction()
+			uni.$once('showTabBar', () => {
+				uni.navigateTo({
+					url: '/pages/share/share'
+				})
+			})
 		}
 	}
 }

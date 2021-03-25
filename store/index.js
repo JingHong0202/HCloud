@@ -3,12 +3,14 @@ import Vuex from 'vuex';
 
 import file from './modules/file.js'
 import views from './modules/views.js'
+import user from './modules/user.js'
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
 	modules: {
 		file,
-		views
+		views,
+		user
 	}
 });

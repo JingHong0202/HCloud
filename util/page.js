@@ -96,9 +96,10 @@ export function createSelectNav() {
 	])
 	nav.addEventListener('touchstart', function(e) {
 		// console.log("点击原生控件："+JSON.stringify(e));
-		if (e.screenX < 45) {
+		let itemWidth = windowWidth * 0.2
+		if (e.screenX < itemWidth) {
 			uni.$emit('select-all')
-		} else if (e.screenX > (windowWidth - 45)) {
+		} else if (e.screenX > (windowWidth - itemWidth)) {
 			uni.$emit('cancel-all')
 		}
 	})

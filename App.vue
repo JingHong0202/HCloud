@@ -12,20 +12,6 @@
 	import {
 		formatBytes
 	} from '@/util/file.js'
-
-	// function preloadPageSync(url) {
-	// 	return new Promise((resolve, reject) => {
-	// 		uni.preloadPage({
-	// 			url,
-	// 			success() {
-	// 				resolve()
-	// 			},
-	// 			fail(res) {
-	// 				reject(res)
-	// 			}
-	// 		})
-	// 	})
-	// }
 	export default {
 		mixins: [downlist, uplist, tabbar],
 		watch: {
@@ -102,7 +88,9 @@
 				})
 				return
 			})
+			// 初始化选择模式的导航栏
 			this.nav = createSelectNav()
+			getApp().globalData.navObj = this.nav
 			// 锁定竖屏
 			plus.screen.lockOrientation("portrait-primary")
 
@@ -137,7 +125,7 @@
 	/*每个页面公共css */
 	/* #ifndef APP-NVUE */
 	@import "~@/static/icon/iconfont/iconfont.css";
-	@import "~@/common/css/animate.css";
+	// @import "~@/common/css/animate.css";
 
 	/* #endif */
 	/* #ifdef APP-NVUE */

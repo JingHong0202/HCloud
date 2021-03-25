@@ -21,13 +21,16 @@
 				default: () => []
 			}
 		},
+		created() {
+			this.wWidth = uni.getSystemInfoSync().windowWidth
+		},
 		watch: {
 			index(newVal, oldVal) {
 				dom.getComponentRect(this.$refs['tabbar-item'][newVal], ({
 					size
 				}) => {
 					
-					this.x = (size.left - this.offsetX) + (size.width / 2 - 15)
+					this.x = (size.left - this.offsetX) + (size.width / 2 - uni.upx2px(30))
 				})
 			}
 		},
@@ -37,13 +40,13 @@
 					size
 				}) => {
 					this.offsetX = size.left
-					this.x = (size.left - this.offsetX) + (size.width / 2 - 15)
+					this.x = (size.left - this.offsetX) + (size.width / 2 - uni.upx2px(30) )
 				})
 			})
 		},
 		data() {
 			return {
-				x: 0
+				x: -300
 			}
 		}
 	}
@@ -51,7 +54,7 @@
 
 <style scoped lang='scss'>
 	.tabbar {
-		flex: 1;
+		@extend %flex;
 		height: 80rpx;
 		flex-direction: row;
 		/* #ifndef APP-PLUS */
@@ -65,7 +68,7 @@
 		display: inline-block;
 		/* #endif */
 		flex-wrap: nowrap;
-		flex: 1;
+		@extend %flex;
 		padding-left: 34rpx;
 		padding-right: 34rpx;
 	}
@@ -75,7 +78,7 @@
 		font-size: 24rpx;
 		height: 80rpx;
 		line-height: 80rpx;
-		flex: 1;
+		@extend %flex;
 		flex-wrap: nowrap;
 		color: rgba(0, 0, 0, .5);
 		text-align: center;
@@ -93,13 +96,11 @@
 	}
 
 	.line {
-		position: absolute;
-		bottom: 5px;
-		left: 0;
-		height: 5px;
-		width: 30px;
+		@include position(absolute, false,false,5px,0);
+		height: 10rpx;
+		width: 60rpx;
 		background-color: #ffde82;
-		border-radius: 25px;
+		border-radius: 50rpx;
 		transition-property: transform;
 		transition-duration: .5s;
 	}

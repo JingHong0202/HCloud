@@ -1,0 +1,222 @@
+<template>
+	<custom-dragPanel ref='drag-panel'>
+		<view class="code-box">
+			<view style="flex-direction: column;">
+				<text class="desc">
+					验证码已发送到手机号码为:
+				</text>
+				<text class="mobile">
+					{{mobile}}
+				</text>
+
+			</view>
+			<view class="code-flex">
+				<input type="number" @focus='status = "focus"' @blur='status = "blur"' id='code' maxlength="4"
+					@input='change' focus="true" class="hide" ref='code' />
+				<label for="code" style="flex: 1;" @tap='$refs["code"].focus()'>
+					<view class="box " :class="{'active-box': curIndex(1)}">
+						<view class="line-box">
+							<view class="line" ref='line-1' v-if='curIndex(1)'></view>
+						</view>
+						<text class="box-text ">
+							{{code[0]}}
+						</text>
+					</view>
+					<view class="box " :class="{'active-box': curIndex(2)}">
+						<view class="line-box">
+							<view class="line" ref='line-2' v-if='curIndex(2)'></view>
+						</view>
+						<text class="box-text">
+							{{code[1]}}
+						</text>
+					</view>
+					<view class="box " :class="{'active-box': curIndex(3)}">
+						<view class="line-box">
+							<view class="line" ref='line-3' v-if='curIndex(3)'></view>
+						</view>
+						<text class="box-text">
+							{{code[2]}}
+						</text>
+					</view>
+					<view class="box " :class="{'active-box': curIndex(4)}">
+						<view class="line-box">
+							<view class="line" ref='line-4' v-if='curIndex(4)'></view>
+						</view>
+						<text class="box-text">
+							{{code[3]}}
+						</text>
+					</view>
+				</label>
+			</view>
+		</view>
+	</custom-dragPanel>
+</template>
+<script>
+	import {
+		animate
+	} from '@/util/animation.js'
+	export default {
+		onLoad(params) {
+			this.mobile = params.mobile
+		},
+		onReady() {
+			this.$refs['drag-panel'].show()
+		},
+		onUnload() {
+			if (this.checkCode)uni.$emit('checkCode-success')
+		},
+		data() {
+			return {
+				code: [],
+				status: '',
+				checkCode: false
+			}
+		},
+		computed: {
+			curIndex() {
+				return (num) => {
+					return this.code.length + 1 === num
+				}
+			},
+			current() {
+				return this.$refs['line-' + (!this.code.length ? 1 : this.code.length + 1)]
+			}
+		},
+		mounted() {
+			this.$nextTick(function() {
+				this.startAnimate()
+				// uni.getClipboardData({
+				// 	success: function(res) {
+				// 		console.log(res.data);
+				// 	}
+				// });
+			})
+		},
+		methods: {
+			startAnimate() {
+				if (this.animate) return
+				this.animate = setInterval(() => {
+					animate(this.current, {
+						styles: {
+							opacity: "0"
+						},
+						duration: 400,
+						timingFunction: 'ease',
+						delay: 0
+					}).then(() => {
+						if (this.status === 'blur') return
+						animate(this.current, {
+							styles: {
+								opacity: "1"
+							},
+							duration: 400,
+							timingFunction: 'ease',
+							delay: 0
+						})
+					})
+				}, 800)
+
+			},
+			change({
+				detail: {
+					value
+				}
+			}) {
+				this.code = value.split('').map(item => +item)
+				if (this.code.length === 4) return this.submit()
+			},
+			submit() {
+				console.log(this.code)
+				// request
+				this.checkCode = true
+				this.$refs['drag-panel'].back();
+			}
+		},
+		onBackPress({
+			from
+		}) {
+			if (from === 'backbutton') {
+				this.$refs['drag-panel'].back();
+				return true
+			}
+		}
+	}
+</script>
+<style lang="scss" scoped>
+	.code-box {
+		flex: 1;
+		@extend %f-ct;
+		flex-direction: column;
+		padding: 20rpx;
+
+		& .desc {
+			font-size: $uni-font-size-base;
+			line-height: 25px;
+			height: 90rpx;
+
+		}
+
+		& .mobile {
+			color: #007aff;
+			font-size: $uni-font-size-lg;
+			height: 100rpx;
+		}
+
+		& .code-flex {
+			@extend %flex;
+			width: 730rpx;
+		}
+
+		& .hide {
+			position: absolute;
+			top: 1000rpx;
+			left: 0;
+		}
+
+		& .line-box {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			flex: 1;
+			justify-content: center;
+			align-items: flex-end;
+
+			& .line {
+				height: 50rpx;
+				width: 7rpx;
+				margin-bottom: 20rpx;
+				background-color: #5064eb;
+			}
+		}
+
+		& .box {
+			border-bottom: 3px;
+			border-color: rgba(0, 0, 0, .3);
+			position: relative;
+			@extend %flex;
+			@extend %f-ct;
+			margin: 0 20rpx;
+			height: 150rpx;
+
+			&.active-box {
+				border-color: #5064eb;
+				border-bottom: 5px;
+			}
+
+			& .box-text {
+				font-size: 64rpx;
+				text-align: center;
+				width: 50rpx;
+				color: #333;
+				font-weight: bold;
+			}
+
+			&.active {
+				border: 1px;
+				border-color: $uni-color-primary;
+			}
+		}
+	}
+</style>

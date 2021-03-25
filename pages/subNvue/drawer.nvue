@@ -116,7 +116,7 @@
 <style lang="scss" scoped>
 	.wrapper {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
 		.c-iconfont {
 			font-size: 70rpx;
 			margin-right: 10rpx;
@@ -130,7 +130,7 @@
 			background-color: white;
 
 			.item-box {
-				flex: 1;
+				@extend %flex;
 				flex-direction: column;
 
 				.item-header {

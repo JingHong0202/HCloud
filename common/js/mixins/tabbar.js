@@ -5,11 +5,7 @@ export default {
 				this.nav.hide()
 				this.TOGGLE_ACTION(false)
 				this.$forceUpdate()
-				setTimeout(() => {
-					uni.showTabBar().then(() => {
-						uni.$emit('showTabBar')
-					})
-				}, 100)
+				uni.$emit('showTabBar')
 			} else {
 				this.nav.draw([{
 					tag: 'font',
@@ -25,12 +21,8 @@ export default {
 					}
 				}])
 				this.nav.show();
-				uni.hideTabBar().then(() => {
-					setTimeout(() => {
-						this.TOGGLE_ACTION(true)
-						this.$forceUpdate()
-					}, 100)
-				});
+				this.TOGGLE_ACTION(true)
+				this.$forceUpdate()
 
 			}
 			this.CHANGE_SELECT_LIST(newVal)

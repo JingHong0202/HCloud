@@ -1,20 +1,25 @@
 <template>
-	<view class="file" :render-whole='true'>
-		<uni-status-bar />
-		<uni-nav-bar :border='false' color="#333333" background-color="#FFFFFF" rightIcon="more-filled" @clickLeft='toAccount'
-		 @clickRight='openMenu = !openMenu'>
-			<view class="input-view" @click="toSearch">
-				<uni-icons class="input-uni-icon" type="search" size="24rpx" color="#333" />
-				<text class="input-placeholder">点击搜索</text>
-			</view>
-			<view slot="left">
-				<image src="/static/images/pic.jpg" mode="aspectFit" class="user-avatars" />
-			</view>
-		</uni-nav-bar>
-		<custom-list ref='list' :filter="filter" :openBreadCrumb="true" :path='path' @changeList='changeFileList' :list="list"
-		 @scrolltolower='scrolltolower' @refresh='refresh' :downStatus='downStatus' @clean='cleanList' @all='selectAll'
-		 :status='status'></custom-list>
-		<custom-popups :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
+	<view class="file" :render-whole='true' ref='file'>
+		<view style="flex-direction: column;" ref='nav'>
+			<uni-status-bar />
+			<uni-nav-bar :border='false' color="#333333" background-color="#FFFFFF" rightIcon="more-filled"
+				@clickLeft='toAccount' @clickRight='openMenu = !openMenu'>
+				<view class="input-view" @click="toSearch">
+					<uni-icons class="input-uni-icon" type="search" size="24" color="#868686" />
+					<text class="input-placeholder">点击搜索</text>
+				</view>
+				<view slot="left">
+					<image src="/static/images/pic.jpg" mode="aspectFit" class="user-avatars" />
+				</view>
+			</uni-nav-bar>
+		</view>
+		<view :style="{height: wHeight}" ref='list-box'>
+			<custom-list @loadmore='scrolltolower' :closeDownLoad="true" isPageScroll ref='list' :filter="filter"
+				:openBreadCrumb="true" :path='path' @changeList='changeFileList' :list="list" @refresh='refresh'
+				:downStatus='downStatus' @clean='cleanList' @all='selectAll' :status='status'></custom-list>
+		</view>
+		<custom-popups :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick'
+			@exit='openMenu = !openMenu' />
 	</view>
 </template>
 
@@ -22,6 +27,11 @@
 	import popups from '@/common/js/mixins/popups.js'
 	import nav from '@/common/js/mixins/nav.js'
 	import customList from '@/common/js/mixins/custom-list.js'
+	import {
+		getEl
+	} from '@/util/bindingx.js'
+	const bindingx = uni.requireNativePlugin('bindingx'),
+		dom = uni.requireNativePlugin('dom')
 	export default {
 		mixins: [popups, nav, customList],
 		data() {
@@ -30,7 +40,7 @@
 					title: "全部文件",
 					uuid: 1
 				}],
-				afterTop: 0
+				afterTop: 0,
 			}
 		},
 		onReady() {
@@ -74,9 +84,39 @@
 			// 	key:
 			// })
 			let {
-				statusBarHeight
+				statusBarHeight,
+				windowHeight
 			} = uni.getSystemInfoSync()
-			this.afterTop = statusBarHeight + 50
+			this.afterTop = statusBarHeight + 44
+			this.wHeight = windowHeight
+			this.scrolltolower()
+			this.$nextTick(function() {
+				dom.getComponentRect(this.$refs['list-box'], ({
+					size
+				}) => {
+					// let {
+					// 	top
+					// } = size
+
+					// let list = getEl(this.$refs['list'].$refs['list'].$refs['list'])
+					// bindingx.bind({
+					// 	anchor: list,
+					// 	eventType: 'scroll',
+					// 	props: [{
+					// 		expression: `dy<=0?0:-68`,
+					// 		element: getEl(this.$refs['list-box']),
+					// 	}]
+					// },({dy}) => {
+					// 	// bindingx.bind
+					// 	if (dy < 0) {
+					// 		this.t = 'up'
+					// 	} else {
+					// 		this.t = 'down'
+					// 	}
+					// 	console.log(this.t)
+					// })
+				})
+			})
 		},
 		methods: {
 			refresh() {
@@ -140,8 +180,8 @@
 		flex: 1;
 		background-color: #F7F7F7;
 		flex-direction: row;
-		border-radius: 20px;
-		height: 30px;
+		border-radius: 70rpx;
+		height: 70rpx;
 		@extend %f-ct;
 
 		.input-placeholder {

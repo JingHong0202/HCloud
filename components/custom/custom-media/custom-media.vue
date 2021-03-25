@@ -1,32 +1,39 @@
 <template>
 	<!-- @scroll='handlerScroll' -->
-	<list class="media-album"  :scrollable='scrollY' :bounce='false' :show-scrollbar='false' :offset-accuracy='50'
-	 :loadmoreoffset="15">
+	<list class="media-album" :scrollable='scrollY' :bounce='false' :show-scrollbar='false' :offset-accuracy='50'
+		@loadmore='loadMore'>
 		<uni-refresh @refresh='refresh' :display="downDisplay">
 			<uni-load-more :status="downStatus" :contentText='downText' />
 		</uni-refresh>
-		<template v-if="list.length" v-for="(item,i) in list">
-			<cell class="media-album" :ref="`media-${item.date}`">
-				<view>
+		<template v-if="list.length" v-for="(item,i) in afterList">
+			<header :ref="`media-${item.date}`">
+				<view class="date-box">
 					<text class="media-date" @longpress="selectBlock(item)">{{item.date}}</text>
 					<checkbox-group @change='toggleBlock(item,$event)'>
-						<checkbox v-if="action" :value="!!item" :checked="blockChecked(item)" style="transform:scale(0.8)"></checkbox>
+						<checkbox v-if="action" :value="!!item" :checked="blockChecked(item)"
+							style="transform:scale(0.8)">
+						</checkbox>
 					</checkbox-group>
 				</view>
-				<uni-grid :column="4" :highlight="true" @change="change" @longpress='showActionSheet' :showBorder='false'>
-					<uni-grid-item v-for="(item2, index) in item.list" :mode='mode' :data='item2' :parentIndex='i' :index="index" :key="index">
+			</header>
+			<cell class="media-album">
+
+				<uni-grid :column="4" :highlight="true" @change="change" @longpress='showActionSheet'
+					:showBorder='false'>
+					<uni-grid-item v-for="(item2, index) in item.list" :mode='mode' :data='item2' :parentIndex='i'
+						:index="index" :key="index">
 					</uni-grid-item>
 				</uni-grid>
 			</cell>
 		</template>
-		<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
+		<!-- <loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
 			<uni-load-more :status="status" :contentText='upText' />
-		</loading>
-		<cell v-else>
-			<uni-load-more status="noMore" :contentText='upText' />
+		</loading> -->
+		<cell>
+			<uni-load-more :status="status" :contentText='upText' />
 		</cell>
 		<cell v-if='action'>
-			<view style="height: 150px">
+			<view style="height: 150rpx">
 
 			</view>
 		</cell>
@@ -61,11 +68,17 @@
 			}
 		},
 		computed: {
-			...mapState('file', ['selectlist', 'action'])
+			...mapState('file', ['selectlist', 'action']),
+			afterList() {
+				return this.list // 排序
+					.sort(function(a, b) {
+						return Date.parse(b.date) - Date.parse(a.date)
+					})
+			}
 		},
 		methods: {
 			...mapMutations('file', ['CHANGE_SELECT_LIST']),
-			
+
 			// handlerScroll({
 			// 	contentOffset: {
 			// 		x,
@@ -184,10 +197,18 @@
 		@extend %f-cl;
 	}
 
+	.date-box {
+		flex: 1;
+		background-color: white;
+		flex-direction: row;
+		padding: 20rpx 25rpx 0;
+		align-items: center;
+	}
+
 	.media-date {
 		font-size: $uni-font-size-lg;
 		color: $uni-color-subtitle;
-		margin: 20rpx 20rpx;
+		margin-right: 20rpx;
 	}
 
 	// .image {
@@ -196,10 +217,8 @@
 	// }
 
 	// .grid-item-box {
-	// 	flex: 1;
+	// 	@extend %flex;
 	// 	justify-content: center;
 	// 	align-items: center;
 	// }
-
-	
 </style>

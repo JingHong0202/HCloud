@@ -1,22 +1,22 @@
 <template>
 	<view class="custom-list">
 		<custom-breadCrumb :path="path" v-if='openBreadCrumb'></custom-breadCrumb>
-		<uni-list :scrollY="isScroll" :border="false"  @loadmore='$emit("loadmore")'>
-			<template v-if="!closeLoad">
-				<uni-refresh @refresh='refresh' :display="downDisplay" v-if="!isPageScroll">
+		<uni-list ref='list' :scrollY="isScroll" :border="false" @loadmore='$emit("loadmore")' @scroll='scroll'>
+			<template v-if="!closeDownLoad">
+				<uni-refresh @refresh='refresh' :display="downDisplay" >
 					<uni-load-more :status="downStatus" :contentText='downText' />
 				</uni-refresh>
 			</template>
 			<!-- 有路径时，代表已经进入文件夹，显示返回按钮 -->
-			<uni-list-item v-if='isPath' :ellipsis="2" clickable :title="'返回上一级'" @click="select({type: 25})" :thumb="selectThumb({type: 25})">
+			<uni-list-item v-if='isPath' :ellipsis="2" clickable :title="'返回上一级'" @tap="select({type: 25})" :thumb="selectThumb({type: 25})">
 			</uni-list-item>
-			<cell style='height: 250px;' v-if='!isShow'>
+			<cell style='flex:1' v-if='!isShow'>
 				<custom-null></custom-null>
 			</cell>
 			<template v-if="isShow">
 				<template v-for="(item, i) in afterList">
-					<uni-list-item :key='item.uuid' :ellipsis="2" clickable :title="item.list ? item.list[0].fileName + '等等...' : item.fileName"
-					 :note="note(item)" :thumb="selectThumb(item)" @click="select(item)" @longpress='showActionSheet(item)'>
+					<uni-list-item :ref='!i ? "top" :  ""' :key='item.uuid' :ellipsis="2" clickable :title="item.list ? item.list[0].fileName + '等等...' : item.fileName"
+					 :note="note(item)" :thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
 						<template slot='footer'>
 							<view class="item-right">
 								<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''" :checked="item.checked">
@@ -28,7 +28,7 @@
 			</template>
 
 
-			<template v-if="!closeLoad && isShow">
+			<template v-if="!closeUpLoad && isShow">
 				<template v-if='isPageScroll'>
 					<cell>
 						<uni-load-more :status="status" :contentText='loadText' />
@@ -45,12 +45,23 @@
 			</template>
 
 			<cell>
-				<view style="height: 150px;">
+				<view style="height: 300rpx;">
+					
 				</view>
 			</cell>
+
 		</uni-list>
+		<view class="fab"  elevation="5px" ref='fab-top' :style="{bottom: action ? '65px' :  '15px'}" :class="{ 'fab-active': fabActive &&　isShowFabTop}">
+			<uni-icons type="arrowthinup" size="80" color="white" @click='toScrollTop(true)'></uni-icons>
+		</view>
+		<!-- <view class="select-nav" v-if='action'>
+			<uni-status-bar ref='statusBar' />
+			<uni-nav-bar  @clickLeft='selectAll'  @clickRight='exitAction' :fixed="false" :border='false' color="#333333" leftText="全选" :title="`已选择${selectlist.length}项`"  rightText="取消" backgroundColor="white" >
+				
+			</uni-nav-bar>
+		</view> -->
 		<custom-actionSheet :labels='actionSheetLabels' v-if="openActionSheet" @download='addDownList' @del='del' @move='move'
-		 @rename='rename' @restore='restore' @recycleDel='recycleDel'></custom-actionSheet>
+		 @rename='rename' @restore='restore' @recycleDel='recycleDel' @share='share'></custom-actionSheet>
 	</view>
 </template>
 
@@ -69,6 +80,10 @@
 	import refresh from '@/common/js/mixins/refresh.js'
 	import actionsheet from '@/common/js/mixins/actionsheet.js'
 	import sort from '@/util/sort.js'
+	import {
+		animate
+	} from '@/util/animation.js'
+	// plus.webview.currentWebview().append(getApp().globalData.navObj)
 	export default {
 		mixins: [loading, refresh, actionsheet],
 		props: {
@@ -112,9 +127,13 @@
 				default: () => []
 			},
 			// 是否关闭组件自带的上拉下拉加载功能
-			closeLoad: {
+			closeDownLoad: {
 				type: Boolean,
 				default: false
+			},
+			closeUpLoad: {
+				type: Boolean,
+				dafault: false
 			},
 			// 是否关闭长按触发事件
 			closeLongPress: {
@@ -144,6 +163,17 @@
 			filter: {
 				type: [String, Number],
 				default: 'all'
+			},
+			// 是否显示返回顶部按钮
+			isShowFabTop: {
+				type: [String, Boolean],
+				default: true
+			}
+		},
+		data() {
+			return {
+				fabActive: false,
+				wHeight: uni.getSystemInfoSync().windowHeight
 			}
 		},
 		methods: {
@@ -157,9 +187,9 @@
 					current: item,
 					list: this.list
 				})
-				if (res) {
-					this.$emit('changeList', res)
-				}
+				// if (res) {
+				// 	this.$emit('changeList', res)
+				// }
 			},
 			selectAll() {
 				this.$emit('all')
@@ -190,6 +220,10 @@
 				}
 				this.$forceUpdate()
 			},
+			// 滚动到顶部
+			toScrollTop(animate = false) {
+				this.$refs['list'].toScrollTop(this.$refs['top'][0], animate)
+			},
 			filterType(list) {
 				switch (this.filter) {
 					case 'img':
@@ -207,6 +241,16 @@
 					default:
 						return list
 				}
+			},
+			scroll({
+				contentOffset
+			}) {
+				this.$emit('scroll')
+				if (Math.abs(contentOffset.y) >= this.wHeight) {
+					this.fabActive = true
+				} else {
+					this.fabActive = false
+				}
 			}
 		},
 		computed: {
@@ -214,7 +258,7 @@
 			...mapState('views', ['sortAction', 'sortMode']),
 			afterList() {
 				if (!this.isSort) return this.filterType(this.list)
-				this.list.sort(sort[this.sortAction !== "up" ? this.sortMode+'_reverse' : this.sortMode])
+				this.list.sort(sort[this.sortAction !== "up" ? this.sortMode + '_reverse' : this.sortMode])
 				return this.filterType(this.list)
 			},
 			isPath() {
@@ -233,7 +277,7 @@
 <style lang="scss" scoped>
 	.custom-list {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
 	}
 
 	.placeholder {
@@ -244,5 +288,30 @@
 		/* #ifdef APP-NVUE */
 		@extend %f-ct;
 		/* #endif  */
+	}
+	.select-nav {
+		@include position(fixed, 0,0,false,0);
+		flex: 1;
+		flex-direction: column;
+		background-color: white;
+	}
+	.fab {
+		// position: fixed;
+		// bottom: 15px;
+		// right: 0;
+		@include position(fixed, false, 0,15px);
+		border-radius: 100rpx;
+		background-image: linear-gradient(top right, #ecaf59, #ffed20);
+		width: 100rpx;
+		height: 100rpx;
+		@extend %f-ct;
+		transition-property: transform;
+		transition-duration: 300;
+		transition-timing-function: ease-in;
+		transform: translateX(100%);
+	}
+
+	.fab-active {
+		transform: translateX(-15px);
 	}
 </style>

@@ -1,0 +1,51 @@
+<template>
+	<custom-loginBase  :mode='init' @submit='submit' :disabled='isMobile'  @tapLeft='$emit("tapLeft")' @tapRight='$emit("tapRight")'  >
+		<template slot="from">
+			<view class="input vs-row vs-align-center margin-b40">
+				<image class="input-icon margin-r20" src="/static/icon/page/login/account.png" mode=""></image>
+				<input class="vs-flex-item color-base font-30" type="text" value="" @confirm='submit'   @input='(e) => {mobile = e.detail.value}' :maxlength="11"
+					placeholder="请输入您的手机号" placeholder-class="input-placeholder" />
+			</view>
+		</template> 
+	</custom-loginBase>
+</template>
+
+<script>
+	import userCommon from '@/common/js/mixins/user'
+	export default {
+		mixins:[userCommon],
+		props: {
+			init: Object
+		},
+		data() {
+			return {
+				mobile: ''
+			}
+		},
+		methods: {
+			submit () {
+				const {mobile} = this
+				if (!this.isMobile)  return uni.showToast({
+						title: "无效的手机号码",
+						icon: "none",
+						position: "bottom"
+					})
+				uni.navigateTo({
+					url: '/pages/user/code/code?mobile='+mobile,
+					success: () => {
+						uni.$once('checkCode-success', () => {
+							
+							this.$emit('end')
+						})
+					}
+				})
+				// send
+				// console.log(mobile)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "~../../common/user.scss";
+</style>

@@ -181,7 +181,7 @@
 	}
 
 	.uni-collapse-cell__title-text {
-		flex: 1;
+		@extend %flex;
 		font-size: $uni-font-size-base;
 		/* #ifndef APP-NVUE */
 		white-space: nowrap;

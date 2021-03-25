@@ -49,16 +49,17 @@
 		align-items: center;
 		padding: 0 25rpx;
 		background-color: white;
+		margin-top: 20rpx;
 	}
 
 	.breadCrumb-item-text {
 		color: #808080;
-		font-size: $uni-font-size-sm;
+		font-size: $uni-font-size-base;
 	}
 
 	.separator {
 		margin: 0 10rpx;
-		font-size: $uni-font-size-sm;
+		font-size: $uni-font-size-base;
 	}
 
 	.current-breadCrumb-item {

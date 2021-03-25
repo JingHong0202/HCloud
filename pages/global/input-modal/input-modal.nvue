@@ -1,5 +1,5 @@
 <template>
-	<view class="mask" @click="cancel" ref='mask' :style="{height}">
+	<view class="mask" @click="cancel" ref='mask' :style="{height}" :render-whole='true'>
 		<view class="modal-content" ref='modal' elevation="5px" @click.stop="(e) => e.stopPropagation()" >
 			<text class="modal-title">{{title}}</text>
 			<input ref='input' type="text" @keyboardheightchange='keyboardChange' @confirm='confirm' @input='change' :value='value' class="modal-input"
@@ -122,7 +122,7 @@
 				})
 
 				// request
-				uni.$emit('inputModal-success')
+				uni.$emit('inputModal-success', this.value)
 				this.cancel()
 			}
 		}
@@ -134,7 +134,7 @@
 		@extend %f-ct;
 		.modal-content {
 			width: 550rpx;
-			height: 150px;
+			height: 300rpx;
 			background-color: white;
 			border-top-left-radius: 10px;
 			border-top-right-radius: 10px;
@@ -144,21 +144,21 @@
 
 			.modal-title {
 				text-align: center;
-				margin-top: 15px;
+				margin-top: 30rpx;
 			}
 
 			.modal-input {
-				padding: 0 10px;
+				padding: 0 20rpx;
 			}
 
 			.modal-footer {
 				flex-direction: row;
-
 				.btn-cancel,
 				.btn-modal {
-					flex: 1;
+					@extend %flex;
 					border: 0;
 					border-radius: 0;
+					height: 80rpx;
 				}
 			}
 		}

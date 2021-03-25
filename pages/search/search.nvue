@@ -15,9 +15,7 @@
 <script>
 	import popups from '@/common/js/mixins/popups.js'
 	import customList from '@/common/js/mixins/custom-list.js'
-	// import {
-	// 	setTitleNViewRedDot
-	// } from '@/util/page.js'
+	
 	export default {
 		mixins: [customList, popups],
 		onNavigationBarSearchInputConfirmed() {
@@ -80,7 +78,11 @@
 				}, 1000)
 			},
 			async search() {
-				if (!this.query) return
+				if (!this.query) return uni.showToast({
+					title: "请输入要搜索的文件名",
+					icon: "none",
+					position: "bottom"
+				})
 
 				this.list = [{
 						fileName: 'uni-app教学视频',
@@ -182,12 +184,12 @@
 
 <style lang='scss' scoped>
 	.search {
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 	}
 
 	.filter {
-		flex: 1;
+		@extend %flex;
 		height: 60rpx;
 		padding: 0 20px;
 		justify-content: center;

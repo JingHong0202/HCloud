@@ -1,16 +1,16 @@
 <template>
-	<view class="uni-navbar">
-		<view :class="{ 'uni-navbar--fixed': fixed, 'uni-navbar--shadow': shadow, 'uni-navbar--border': border }" :style="{ 'background-color': backgroundColor }"
-		 class="uni-navbar__content">
+	<view class="uni-navbar" bubble='true'>
+		<view :class="{ 'uni-navbar--fixed': fixed, 'uni-navbar--shadow': shadow, 'uni-navbar--border': border }"
+		 :style="{ 'background-color': backgroundColor }" class="uni-navbar__content">
 			<uni-status-bar v-if="statusBar" />
 			<view :style="{ color: color,backgroundColor: backgroundColor }" class="uni-navbar__header uni-navbar__content_view">
 				<view @tap="onClickLeft" class="uni-navbar__header-btns uni-navbar__header-btns-left uni-navbar__content_view">
 					<view class="uni-navbar__content_view" v-if="leftIcon.length">
-						<uni-icons :color="color" :type="leftIcon" size="24" />
+						<uni-icons :color="color" :type="leftIcon" size="40" />
 					</view>
 					<view :class="{ 'uni-navbar-btn-icon-left': !leftIcon.length }" class="uni-navbar-btn-text uni-navbar__content_view"
 					 v-if="leftText.length">
-						<text :style="{ color: color, fontSize: '14px' }">{{ leftText }}</text>
+						<text :style="{ color: color, fontSize: '30rpx' }">{{ leftText }}</text>
 					</view>
 					<slot name="left" />
 				</view>
@@ -21,13 +21,13 @@
 					<!-- 标题插槽 -->
 					<slot />
 				</view>
-				<view :class="title.length ? 'uni-navbar__header-btns-right' : ''" @tap="onClickRight" class="uni-navbar__header-btns uni-navbar__content_view">
+				<view :class="title.length ? 'uni-navbar__header-btns-right' : ''" @tap.stop="onClickRight" class="uni-navbar__header-btns uni-navbar__content_view">
 					<view class="uni-navbar__content_view" v-if="rightIcon.length">
-						<uni-icons :color="color" :type="rightIcon" size="24" />
+						<uni-icons :color="color" :type="rightIcon" size="40" />
 					</view>
 					<!-- 优先显示图标 -->
 					<view class="uni-navbar-btn-text uni-navbar__content_view" v-if="rightText.length && !rightIcon.length">
-						<text class="uni-nav-bar-right-text">{{ rightText }}</text>
+						<text :style="{ color: color, fontSize: '30rpx' }">{{ rightText }}</text>
 					</view>
 					<slot name="right" />
 				</view>
@@ -96,16 +96,17 @@
 				default: true
 			}
 		},
-        mounted() {
-          if(uni.report && this.title !== '') {
-              uni.report('title', this.title)
-          }
-        },
+		mounted() {
+			if (uni.report && this.title !== '') {
+				uni.report('title', this.title)
+			}
+		},
 		methods: {
 			onClickLeft() {
 				this.$emit("clickLeft");
 			},
-			onClickRight() {
+			onClickRight(e) {
+			
 				this.$emit("clickRight");
 			}
 		}
@@ -114,6 +115,7 @@
 
 <style lang="scss" scoped>
 	$nav-height: 44px;
+
 	.uni-nav-bar-text {
 		/* #ifdef APP-PLUS */
 		font-size: 34rpx;
@@ -122,6 +124,7 @@
 		font-size: $uni-font-size-lg;
 		/* #endif */
 	}
+
 	.uni-nav-bar-right-text {
 		font-size: $uni-font-size-base;
 	}
@@ -182,19 +185,19 @@
 		display: flex;
 		/* #endif */
 		// width: 150rpx;
-		padding-right: 30rpx;
+		// padding-right: 30rpx;
 		justify-content: flex-end;
 	}
 
 	.uni-navbar__header-container {
-		flex: 1;
+		@extend %flex;
 	}
 
 	.uni-navbar__header-container-inner {
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		flex: 1;
+		@extend %flex;
 		align-items: center;
 		justify-content: center;
 		font-size: $uni-font-size-base;

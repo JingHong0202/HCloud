@@ -39,7 +39,7 @@
 
 <style scoped lang="scss">
 	.custom-selection {
-		flex: 1;
+		@extend %flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 

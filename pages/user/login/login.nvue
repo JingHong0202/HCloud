@@ -1,0 +1,135 @@
+<template>
+	<custom-loginBase :mode='init' @submit='submit' @tapLeft='tapLeft' @tapRight='tapRight' :disabled='isMobile && isNotNull'>
+		<template slot="from">
+			<view class="input vs-row vs-align-center margin-b40">
+				<image class="input-icon margin-r20" src="/static/icon/page/login/account.png" mode=""></image>
+				<input class="vs-flex-item color-base font-30" type="text" value="" confirm-type='next' @input='(e) => {mobile = e.detail.value}'
+				 :maxlength="11" placeholder="请输入您的手机号" placeholder-class="input-placeholder" />
+			</view>
+			<view class="input vs-row vs-align-center margin-b40">
+				<image class="input-icon margin-r20" src="/static/icon/page/login/password.png" mode=""></image>
+				<input class="vs-flex-item color-base font-30" type="text" :password='!toggle' value="" @confirm='submit' @input='(e) => {password = e.detail.value}'
+				 placeholder="请输入您的登录密码" placeholder-class="input-placeholder" />
+				<text class="iconfont color-base" @tap='toggle = !toggle'>
+					{{toggle ? '&#xe79f;' : '&#xe64b;'}}
+				</text>
+			</view>
+		</template>
+		<template slot='other'>
+			<text  v-if='isOneLogin' class="font-24" @tap='oneLogin'>一键登录</text>
+		</template>
+	</custom-loginBase>
+</template>
+
+<script>
+	function getProviderSync() {
+		return new Promise((resolve,reject) => {
+			uni.getProvider({
+			    service: 'oauth',
+			    success: function (res) {
+			        resolve(res.provider)
+			    }
+			});
+		})
+	}
+	import userCommon from '@/common/js/mixins/user'
+	export default {
+		mixins: [userCommon],
+		data() {
+			return {
+				init: {
+					title: '账号登录',
+					subBtn: '立即登录',
+					more: true,
+					leftText: "短信验证登录",
+					rightText: "忘记密码?",
+					lrbtn: true
+				},
+				mobile: '',
+				password: '',
+				toggle: false,
+				// 判断当前环境支不支持一键登录
+				isOneLogin: null
+			}
+		},
+		created() {
+			getProviderSync().then(res => {
+				this.isOneLogin = res.indexOf('univerify') >= 0
+			})
+		},
+		computed: {
+			isNotNull() {
+				return !!this.password
+			}
+		},
+		methods: {
+			oneLogin() {
+				//  https://uniapp.dcloud.io/univerify 参考链接
+				uni.showLoading({
+					mask: true,
+					title: "加载中..."
+				})
+				uni.preLogin({
+					provider: 'univerify',
+					success() { //预登录成功
+						uni.hideLoading()
+						// 显示一键登录选项
+						uni.login({
+							provider: 'univerify',
+							
+							univerifyStyle: { // 自定义登录框样式
+								"fullScreen": true,
+								// "icon": {  
+								//       "path": "/static/icon/page/login/account.png" // 自定义显示在授权框中的logo，仅支持本地图片 默认显示App logo   
+								//   },  
+							},
+							success(res) { // 登录成功
+								console.log(res.authResult); // {openid:'登录授权唯一标识',access_token:'接口返回的 token'}
+							},
+							fail(res) { // 登录失败
+								console.log(res.errCode)
+								console.log(res.errMsg)
+							}
+						})
+					},
+					fail(res) { // 预登录失败
+						// 不显示一键登录选项（或置灰）
+						// 根据错误信息判断失败原因，如有需要可将错误提交给统计服务器
+						console.log(res.errCode)
+						console.log(res.errMsg)
+					}
+				})
+			},
+			submit() {
+				const {
+					mobile,
+					password
+				} = this
+				if (!this.isMobile) {
+					return uni.showToast({
+						title: "无效的手机号码",
+						icon: "none",
+						position: "bottom"
+					})
+				}
+				console.log(mobile, password)
+			},
+			tapLeft() {
+				uni.navigateTo({
+					url: "/pages/user/sms-login/sms-login",
+					animationType: "none"
+				})
+			},
+			tapRight() {
+				uni.navigateTo({
+					url: "/pages/user/resetpas/resetpas",
+					animationType: "none"
+				})
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	@import "~../common/user.scss";
+</style>

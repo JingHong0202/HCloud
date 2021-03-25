@@ -269,7 +269,7 @@
 		background-color: #fff;
 		flex-direction: row;
 		/* #ifdef APP-NVUE */
-		flex: 1;
+		@extend %flex;
 		/* #endif */
 	}
 
@@ -289,7 +289,7 @@
 		flex-direction: row;
 		padding: $list-item-pd;
 		padding-left: $uni-spacing-row-lg;
-		flex: 1;
+		@extend %flex;
 		overflow: hidden;
 		align-items: center;
 	}
@@ -334,7 +334,7 @@
 		display: flex;
 		/* #endif */
 		padding-right: 8px;
-		flex: 1;
+		@extend %flex;
 		color: #3b4144;
 		// overflow: hidden;
 		flex-direction: column;

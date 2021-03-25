@@ -174,7 +174,7 @@
 <style lang="scss" scoped>
 	.wrapper {
 		flex-direction: column;
-		flex: 1;
+		@extend %flex;
 
 		.c-iconfont {
 			font-size: 70rpx;
@@ -187,11 +187,11 @@
 			flex-direction: column;
 			width: 550rpx;
 			background-color: white;
-			flex: 1;
+			@extend %flex;
 			transform: translateX(-100%);
 
 			.item-box {
-				flex: 1;
+				@extend %flex;
 				flex-direction: column;
 
 				.item-header {

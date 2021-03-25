@@ -71,9 +71,7 @@
 
 <style lang="scss" scoped>
 	.redDot {
-		position: absolute;
-		left: 0;
-		top: 0;
+		@include position(absolute, 0,false,false,0)
 	}
 
 	.redDot-offset {
@@ -82,11 +80,7 @@
 	}
 
 	.popups-mask {
-		position: fixed;
-		left: 0;
-		right: 0;
-		top: 0;
-		bottom: 0;
+		@include position(fixed, 0,0,0,0)
 		background-color: rgba(0, 0, 0, .5);
 		z-index: 999;
 	}
@@ -94,9 +88,7 @@
 	.custom-popups-after {
 		width: 15px;
 		height: 15px;
-		position: absolute;
-		right: 23px;
-		top: 5px;
+		@include position(fixed, 5px,23px,false,false)
 		background-color: white;
 		transform: rotate(45deg);
 		border-radius: 1px;
