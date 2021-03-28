@@ -2,7 +2,7 @@
 	<view class="upload" :render-whole='true'>
 		<custom-breadCrumb :path="path"></custom-breadCrumb>
 		<uni-list :border="false" :scrollY="true">
-			<uni-list-item v-if='isPath' :ellipsis="2" clickable :title="'返回上一级'" @click="select({type: 25})" :thumb="selectThumb({type: 25})">
+			<uni-list-item v-if='isPath'  clickable :title="'返回上一级'" @click="select({type: 25})" :thumb="selectThumb({type: 25})">
 			</uni-list-item>
 			<uni-list-item v-for=" (item,i) in list" :key='item' :title="item.fileName" :ellipsis="1" clickable :thumb="selectThumb(item)"
 			 @click="select(item)">

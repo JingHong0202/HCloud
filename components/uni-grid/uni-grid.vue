@@ -7,9 +7,7 @@
 </template>
 
 <script>
-	// #ifdef APP-NVUE
 	const dom = uni.requireNativePlugin('dom');
-	// #endif
 	export default {
 		name: 'UniGrid',
 		props: {
@@ -73,22 +71,10 @@
 				this.$emit('longpress', e)
 			},
 			_getSize(fn) {
-				// #ifndef APP-NVUE
-				uni.createSelectorQuery()
-					.in(this)
-					.select(`#${this.elId}`)
-					.boundingClientRect()
-					.exec(ret => {
-						this.width = parseInt((ret[0].width-1) / this.column) + 'px'
-						fn(this.width)
-					})
-				// #endif
-				// #ifdef APP-NVUE
 				dom.getComponentRect(this.$refs['uni-grid'], (ret) => {
 					this.width = parseInt((ret.size.width-1) / this.column) 
 					fn(this.width || 750 / this.column + 'rpx')
 				})
-				// #endif
 			}
 		}
 	}
@@ -96,21 +82,11 @@
 
 <style lang="scss" scoped>
 	.uni-grid-wrap {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
 		@extend %flex;
 		flex-direction: column;
-		/* #ifdef H5 */
-		width: 100%;
-		/* #endif */
 	}
 
 	.uni-grid {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
-		// @extend %flex;
 		flex-direction: row;
 		flex-wrap: wrap;
 	}

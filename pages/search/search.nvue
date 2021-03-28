@@ -5,9 +5,9 @@
 				<text class="filter-text">搜索{{array[index].name}}</text><text class="filter-text-alpha" style="transform: scale(.3);">▼</text>
 			</view>
 		</picker>
-		<custom-list ref='list' :filter="filter" :list="list" @clean='cleanList' @scrolltolower='scrollHandler' @refresh='refresh' :downStatus='downStatus'
+		<custom-list ref='list'  multiple closeSkeleton :filter="filter"  :list="list" @clean='cleanList' @scrolltolower='scrollHandler' @refresh='refresh' :downStatus='downStatus'
 		 :status='status'></custom-list>
-		<custom-null v-if='!list.length'></custom-null>
+		<!-- <custom-null v-else></custom-null> -->
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 	</view>
 </template>

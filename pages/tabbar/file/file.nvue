@@ -13,17 +13,19 @@
 				</view>
 			</uni-nav-bar>
 		</view>
-		<view :style="{height: wHeight}" ref='list-box'>
-			<custom-list @loadmore='scrolltolower' :closeDownLoad="true" isPageScroll ref='list' :filter="filter"
-				:openBreadCrumb="true" :path='path' @changeList='changeFileList' :list="list" @refresh='refresh'
-				:downStatus='downStatus' @clean='cleanList' @all='selectAll' :status='status'></custom-list>
-		</view>
+
+		<!-- <skeleton :skeleton="skeletonList"  :loading="!list.length" animate ref='skeleton' v-if="skeletonList.length"> -->
+			<custom-list multiple @scrolltolower='scrolltolower' ref='list' :filter="filter"
+				@changeList='changeFileList' :list="list" @refresh='refresh' :downStatus='downStatus' @clean='cleanList'
+				@all='selectAll' :status='status'></custom-list>
+		<!-- </skeleton> -->
 		<custom-popups :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick'
 			@exit='openMenu = !openMenu' />
 	</view>
 </template>
 
 <script>
+	// import skeleton from '@/components/ls-skeleton/ls-skeleton.nvue'
 	import popups from '@/common/js/mixins/popups.js'
 	import nav from '@/common/js/mixins/nav.js'
 	import customList from '@/common/js/mixins/custom-list.js'
@@ -32,91 +34,69 @@
 	} from '@/util/bindingx.js'
 	const bindingx = uni.requireNativePlugin('bindingx'),
 		dom = uni.requireNativePlugin('dom')
+	let {
+		windowHeight,
+		statusBarHeight
+	} = uni.getSystemInfoSync()
 	export default {
+		// components: {
+		// 	skeleton
+		// },
 		mixins: [popups, nav, customList],
 		data() {
 			return {
-				path: [{
-					title: "全部文件",
-					uuid: 1
-				}],
 				afterTop: 0,
+				// skeletonList: []
 			}
 		},
 		onReady() {
+
 			// request
-			this.list = [{
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-01',
-					uuid: 233,
-					fileSize: 1000333
-				},
-				{
-					fileName: '教ani-app学图片',
-					type: 1,
-					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					date: '2020-12-04',
-					thumb: 'https://ss.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-					uuid: 2334,
-					fileSize: 100033
-				},
-				{
-					fileName: 'bni-app教学图片',
-					type: 1,
-					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					date: '2010-12-04',
-					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					uuid: 234.,
-					fileSize: 10002
-				},
-				{
-					fileName: 'uni-app教学视频',
-					type: 3,
-					url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
-					date: '2020-12-04',
-					thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					uuid: 230,
-					fileSize: 1003
-				}
-			]
 			// uni.setStorage({
 			// 	key:
 			// })
-			let {
-				statusBarHeight,
-				windowHeight
-			} = uni.getSystemInfoSync()
-			this.afterTop = statusBarHeight + 44
-			this.wHeight = windowHeight
-			this.scrolltolower()
-			this.$nextTick(function() {
-				dom.getComponentRect(this.$refs['list-box'], ({
-					size
-				}) => {
-					// let {
-					// 	top
-					// } = size
 
-					// let list = getEl(this.$refs['list'].$refs['list'].$refs['list'])
-					// bindingx.bind({
-					// 	anchor: list,
-					// 	eventType: 'scroll',
-					// 	props: [{
-					// 		expression: `dy<=0?0:-68`,
-					// 		element: getEl(this.$refs['list-box']),
-					// 	}]
-					// },({dy}) => {
-					// 	// bindingx.bind
-					// 	if (dy < 0) {
-					// 		this.t = 'up'
-					// 	} else {
-					// 		this.t = 'down'
-					// 	}
-					// 	console.log(this.t)
-					// })
-				})
-			})
+			setTimeout(() => {
+				this.list = [{
+						fileName: '11uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频',
+						type: 0,
+						date: '2020-12-01',
+						uuid: 233,
+						fileSize: 1000333
+					},
+					{
+						fileName: '教ani-app学图片',
+						type: 1,
+						url: 'https://t7.baidu.com/it/u=4036010509,3445021118&fm=193&f=GIF',
+						date: '2020-12-04',
+						thumb: 'https://t7.baidu.com/it/u=4036010509,3445021118&fm=193&f=GIF',
+						uuid: 2334,
+						fileSize: 100033
+					},
+					{
+						fileName: 'bni-app教学图片',
+						type: 1,
+						url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+						date: '2010-12-04',
+						thumb: 'https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF',
+						uuid: 234.,
+						fileSize: 10002
+					},
+					{
+						fileName: 'uni-app教学视频',
+						type: 3,
+						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
+						date: '2020-12-04',
+						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+						uuid: 230,
+						fileSize: 1003
+					}
+				]
+			}, 1000)
+			// this.skeletonList = this.$store.state.views.column === 1 ?
+			// 	Array(Math.round(uni.upx2px(windowHeight) / uni.upx2px(70))).fill('column-default') :
+			// 	Array(Math.round(uni.upx2px(windowHeight) / uni.upx2px(130))).fill('column-3')
+			this.afterTop = statusBarHeight + 44
 		},
 		methods: {
 			refresh() {
@@ -149,30 +129,14 @@
 						this.status = 'more'
 					}, 2000)
 				}
-			},
-			changeFileList(res) {
-				this.list = res.list
-				this.path = res.path
 			}
-		},
-		// onBackPress() {
-		// 	// 返回时，如果在选择模式时则退出，解决相册视频页面返回键失效，当有路径时则返回上一层
-		// 	if (this.action) {
-		// 		this.exitAction()
-		// 		return true
-		// 	}
-		// 	if (this.tabIndex) return
-		// 	if (this.path.length > 1) {
-		// 		// this.list[0].parentId
-		// 		return true
-		// 	}
-		// }
+		}
 	}
 </script>
 
 <style lang="scss" scoped>
 	.file {
-		flex: 1;
+		@extend %flex;
 		flex-direction: column;
 	}
 

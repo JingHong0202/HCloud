@@ -1,5 +1,5 @@
 <template>
-	<uni-list :border="false">
+	<list class="account">
 		<uni-list-item title='头像' showArrow>
 			<template slot="footer">
 				<image class="avatar" :src="avatar" mode="aspectFit"></image>
@@ -18,10 +18,10 @@
 		</cell>
 		<uni-list-item :show-switch="true" @switchChange="fingerprint" title="指纹密码"></uni-list-item>
 		<uni-list-item :show-switch="true" @switchChange="equipment" title="设备锁"></uni-list-item>
-		<cell >
+		<cell>
 			<button class="logout-btn" type="warn">退出登录</button>
 		</cell>
-	</uni-list>
+	</list>
 </template>
 
 <script>
@@ -51,13 +51,19 @@
 		height: 60rpx;
 		border-radius: 60rpx;
 	}
-
+	.account {
+		// @include position(absolute, 0,0,0,0);
+		flex-direction: column;
+		flex: 1;
+	}
 	.qs {
 		width: 60rpx;
 		height: 60rpx;
 	}
+
 	.logout-btn {
 		margin-top: 30rpx;
+		margin: 10rpx;
 		@extend %flex;
 		border: 0;
 		border-radius: 0;

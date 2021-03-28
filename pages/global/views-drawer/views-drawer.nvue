@@ -24,6 +24,12 @@
 				<view class="item">
 					<custom-selection mode='radio' current="all" :labels="filterLabels" @change='filterChange'></custom-selection>
 				</view>
+				<view class="item-header">
+					<uni-section title="视图" type="line"></uni-section>
+				</view>
+				<view class="item">
+					<custom-selection mode='radio' :current="column" :labels="columnLabels" @change='columnChange'></custom-selection>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -45,7 +51,7 @@
 						styles: {
 							backgroundColor: "rgba(0,0,0,.4)"
 						},
-						duration: 300,
+						duration: 200,
 						timingFunction: 'ease',
 						delay: 0
 					}
@@ -58,7 +64,7 @@
 						},
 						duration: 200,
 						timingFunction: 'ease',
-						delay: 200
+						delay: 0
 					}
 				}
 			])
@@ -72,7 +78,7 @@
 			}
 		},
 		methods: {
-			...mapMutations('views', ['CHANGE_SORTACTION', 'CHANGE_SORTMODE']),
+			...mapMutations('views', ['CHANGE_SORTACTION', 'CHANGE_SORTMODE','CHANGE_COLUMN_COUNT']),
 			sortActionChange({
 				value
 			}) {
@@ -87,6 +93,9 @@
 				value
 			}) {
 				return uni.$emit('filter-list', value)
+			},
+			columnChange({value}) {
+				return this.CHANGE_COLUMN_COUNT(value)
 			},
 			close() {
 				animates([{
@@ -117,7 +126,7 @@
 			}
 		},
 		computed: {
-			...mapState('views', ['sortAction', 'sortMode'])
+			...mapState('views', ['sortAction', 'sortMode', 'column'])
 		},
 		data() {
 			return {
@@ -164,6 +173,10 @@
 						name: '按首字母排序',
 						value: 'initials'
 					}
+				],
+				columnLabels: [
+					{name: "列表", value: 1},
+					{name: "缩略图", value: 3},
 				]
 			}
 		}

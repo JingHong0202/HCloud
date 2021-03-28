@@ -93,26 +93,26 @@ export class show_model{
 	   this.bodyModel=view;
 	   this.confirmModel=viewconfirm;
 	}
-    showModalAnimationClose(){
-		var options = {type:'pop-out',duration:300};
-			plus.nativeObj.View.startAnimation(options,{view:this.bodyModel},{view:this.cancelModel},{view:this.viewconfirm},function(){
-				console.log('plus.nativeObj.View.startAnimation动画结束');
-				// 关闭原生动画
-				plus.nativeObj.View.clearAnimation();
-			});
-	}
-	showModalAnimationOpen(){
-		var options = {type:'pop-in',duration:1000};
+ //    showModalAnimationClose(){
+	// 	var options = {type:'pop-out',duration:300};
+	// 		plus.nativeObj.View.startAnimation(options,{view:this.bodyModel},{view:this.cancelModel},{view:this.viewconfirm},function(){
+	// 			console.log('plus.nativeObj.View.startAnimation动画结束');
+	// 			// 关闭原生动画
+	// 			plus.nativeObj.View.clearAnimation();
+	// 		});
+	// }
+	// showModalAnimationOpen(){
+	// 	var options = {type:'pop-in',duration:1000};
 		
-			plus.nativeObj.View.startAnimation(options,{view:this.bodyModel},{view:this.cancelModel},{view:this.viewconfirm},function(){
-				console.log('plus.nativeObj.View.startAnimation动画结束');
-				// 关闭原生动画
-				plus.nativeObj.View.clearAnimation();
-			});
-	}
+	// 		plus.nativeObj.View.startAnimation(options,{view:this.bodyModel},{view:this.cancelModel},{view:this.viewconfirm},function(){
+	// 			console.log('plus.nativeObj.View.startAnimation动画结束');
+	// 			// 关闭原生动画
+	// 			plus.nativeObj.View.clearAnimation();
+	// 		});
+	// }
 	show(){
         
-		this.showModalAnimationOpen();
+		// this.showModalAnimationOpen();
 		this.bodyModel.show();
 		if(this.cancelModel){
 			this.cancelModel.show();
@@ -122,7 +122,7 @@ export class show_model{
 	
 	}
 	hide(){
-		this.showModalAnimationClose();
+		// this.showModalAnimationClose();
 		this.bodyModel.hide();
 		if(this.cancelModel){
 	      this.cancelModel.hide();	

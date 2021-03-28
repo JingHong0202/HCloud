@@ -1,33 +1,121 @@
 <template>
 	<view class="custom-list">
 		<custom-breadCrumb :path="path" v-if='openBreadCrumb'></custom-breadCrumb>
-		<uni-list ref='list' :scrollY="isScroll" :border="false" @loadmore='$emit("loadmore")' @scroll='scroll'>
+		<skeleton :skeleton="skeletonList" :loading="!list.length" animate ref='skeleton' v-if='!closeSkeleton' >
+			<uni-list :multiple='multiple' ref='list' :scrollY="isScroll" :border="false" @loadmore='$emit("loadmore")'
+				@scroll='scroll'>
+				<template v-if="!closeDownLoad">
+					<uni-refresh @refresh='refresh' :display="downDisplay">
+						<uni-load-more :status="downStatus" :contentText='downText' />
+					</uni-refresh>
+				</template>
+
+				<cell style='flex:1' v-if='!isShow'>
+					<custom-null></custom-null>
+				</cell>
+				<template v-if="isShow">
+					<template v-if='multiple && column > 1'>
+						<template v-for="(item, i) in afterList">
+							<uni-list-item height="220rpx" direction="column" thumbSize="lg" :ref='!i ? "top" :  ""'
+								:key='item.uuid' :ellipsis="1" clickable :title='item.fileName'
+								:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
+								<template slot='footer'>
+									<view class="item-right">
+										<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+											:checked="item.checked">
+										</radio>
+									</view>
+								</template>
+							</uni-list-item>
+						</template>
+					</template>
+					<template v-else>
+						<template v-for="(item, i) in afterList">
+							<uni-list-item height="115rpx" :ref='!i ? "top" :  ""' thumbSize="base" :key='item.uuid'
+								:ellipsis="2" clickable
+								:title="item.list ? item.list[0].fileName + '等等...' : item.fileName" :note="note(item)"
+								:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
+								<template slot='footer'>
+									<view class="item-right">
+										<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+											:checked="item.checked">
+										</radio>
+									</view>
+								</template>
+							</uni-list-item>
+						</template>
+					</template>
+				</template>
+
+
+				<template v-if="!closeUpLoad && isShow">
+					<template v-if='isPageScroll'>
+						<cell>
+							<uni-load-more :status="status" :contentText='loadText' />
+						</cell>
+					</template>
+					<template v-else>
+						<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
+							<uni-load-more :status="status" :contentText='upText' />
+						</loading>
+						<cell v-else>
+							<uni-load-more status="noMore" :contentText='upText' />
+						</cell>
+					</template>
+				</template>
+				<cell>
+					<view style="height: 300rpx;">
+
+					</view>
+				</cell>
+			</uni-list>
+		</skeleton>
+		<uni-list :multiple='multiple' ref='list' :scrollY="isScroll" :border="false" @loadmore='$emit("loadmore")'
+			@scroll='scroll' v-else>
 			<template v-if="!closeDownLoad">
-				<uni-refresh @refresh='refresh' :display="downDisplay" >
+				<uni-refresh @refresh='refresh' :display="downDisplay">
 					<uni-load-more :status="downStatus" :contentText='downText' />
 				</uni-refresh>
 			</template>
-			<!-- 有路径时，代表已经进入文件夹，显示返回按钮 -->
-			<uni-list-item v-if='isPath' :ellipsis="2" clickable :title="'返回上一级'" @tap="select({type: 25})" :thumb="selectThumb({type: 25})">
-			</uni-list-item>
+		
 			<cell style='flex:1' v-if='!isShow'>
 				<custom-null></custom-null>
 			</cell>
 			<template v-if="isShow">
-				<template v-for="(item, i) in afterList">
-					<uni-list-item :ref='!i ? "top" :  ""' :key='item.uuid' :ellipsis="2" clickable :title="item.list ? item.list[0].fileName + '等等...' : item.fileName"
-					 :note="note(item)" :thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
-						<template slot='footer'>
-							<view class="item-right">
-								<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''" :checked="item.checked">
-								</radio>
-							</view>
-						</template>
-					</uni-list-item>
+				<template v-if='multiple && column > 1'>
+					<template v-for="(item, i) in afterList">
+						<uni-list-item height="220rpx" direction="column" thumbSize="lg" :ref='!i ? "top" :  ""'
+							:key='item.uuid' :ellipsis="1" clickable :title='item.fileName'
+							:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
+							<template slot='footer'>
+								<view class="item-right">
+									<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+										:checked="item.checked">
+									</radio>
+								</view>
+							</template>
+						</uni-list-item>
+					</template>
+				</template>
+				<template v-else>
+					<template v-for="(item, i) in afterList">
+						<uni-list-item height="115rpx" :ref='!i ? "top" :  ""' thumbSize="base" :key='item.uuid'
+							:ellipsis="2" clickable
+							:title="item.list ? item.list[0].fileName + '等等...' : item.fileName" :note="note(item)"
+							:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
+							<template slot='footer'>
+								<view class="item-right">
+									<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+										:checked="item.checked">
+									</radio>
+								</view>
+							</template>
+						</uni-list-item>
+					</template>
 				</template>
 			</template>
-
-
+		
+		
 			<template v-if="!closeUpLoad && isShow">
 				<template v-if='isPageScroll'>
 					<cell>
@@ -43,25 +131,19 @@
 					</cell>
 				</template>
 			</template>
-
 			<cell>
 				<view style="height: 300rpx;">
-					
+		
 				</view>
 			</cell>
-
 		</uni-list>
-		<view class="fab"  elevation="5px" ref='fab-top' :style="{bottom: action ? '65px' :  '15px'}" :class="{ 'fab-active': fabActive &&　isShowFabTop}">
-			<uni-icons type="arrowthinup" size="80" color="white" @click='toScrollTop(true)'></uni-icons>
+		<view class="fab" elevation="5px" ref='fab-top' :style="{bottom: action ? '65px' :  '15px'}"
+			:class="{ 'fab-active': fabActive &&　isShowFabTop}">
+			<uni-icons type="arrowthinup" size="60" color="white" @click='toScrollTop(true)'></uni-icons>
 		</view>
-		<!-- <view class="select-nav" v-if='action'>
-			<uni-status-bar ref='statusBar' />
-			<uni-nav-bar  @clickLeft='selectAll'  @clickRight='exitAction' :fixed="false" :border='false' color="#333333" leftText="全选" :title="`已选择${selectlist.length}项`"  rightText="取消" backgroundColor="white" >
-				
-			</uni-nav-bar>
-		</view> -->
-		<custom-actionSheet :labels='actionSheetLabels' v-if="openActionSheet" @download='addDownList' @del='del' @move='move'
-		 @rename='rename' @restore='restore' @recycleDel='recycleDel' @share='share'></custom-actionSheet>
+		<custom-actionSheet :labels='actionSheetLabels' v-if="openActionSheet" @download='addDownList' @del='del'
+			@move='move' @rename='rename' @restore='restore' @recycleDel='recycleDel' @share='share'>
+		</custom-actionSheet>
 	</view>
 </template>
 
@@ -76,6 +158,7 @@
 		open,
 		formatBytes
 	} from '@/util/file.js';
+	import skeleton from '@/components/ls-skeleton/ls-skeleton.nvue'
 	import loading from '@/common/js/mixins/loading.js'
 	import refresh from '@/common/js/mixins/refresh.js'
 	import actionsheet from '@/common/js/mixins/actionsheet.js'
@@ -83,14 +166,20 @@
 	import {
 		animate
 	} from '@/util/animation.js'
-	// plus.webview.currentWebview().append(getApp().globalData.navObj)
 	export default {
 		mixins: [loading, refresh, actionsheet],
+		components: {
+			skeleton
+		},
 		props: {
 			// 是否隐藏列表
 			isShow: {
 				type: Boolean,
-				default: () => true
+				default: true
+			},
+			closeSkeleton: {
+				type: Boolean,
+				default: false
 			},
 			// 上拉提示文本,但是页面滚动时该选项才有用
 			loadText: {
@@ -168,12 +257,22 @@
 			isShowFabTop: {
 				type: [String, Boolean],
 				default: true
+			},
+			// 是否开启多列模式
+			multiple: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
+			const wHeight = uni.getSystemInfoSync().windowHeight
 			return {
 				fabActive: false,
-				wHeight: uni.getSystemInfoSync().windowHeight
+				wHeight,
+				// 自动计算骨架屏数量以便撑满屏幕
+				skeletonList: this.$store.state.views.column === 1 || !this.multiple ?
+					Array(Math.round(uni.upx2px(wHeight) / uni.upx2px(70))).fill('column-default') : Array(Math.round(uni
+						.upx2px(wHeight) / uni.upx2px(130))).fill('column-3')
 			}
 		},
 		methods: {
@@ -183,13 +282,10 @@
 				if (this.closeClick) return this.customEvent ? this.$emit('click', item) : null
 				if (this.action && item.type !== 25) return this.addSelectList(item)
 				this.$emit('selectTask', item)
-				let res = open({
+				return open({
 					current: item,
 					list: this.list
 				})
-				// if (res) {
-				// 	this.$emit('changeList', res)
-				// }
 			},
 			selectAll() {
 				this.$emit('all')
@@ -255,14 +351,11 @@
 		},
 		computed: {
 			...mapState('file', ['selectlist', 'action']),
-			...mapState('views', ['sortAction', 'sortMode']),
+			...mapState('views', ['sortAction', 'sortMode', 'column']),
 			afterList() {
 				if (!this.isSort) return this.filterType(this.list)
 				this.list.sort(sort[this.sortAction !== "up" ? this.sortMode + '_reverse' : this.sortMode])
 				return this.filterType(this.list)
-			},
-			isPath() {
-				return this.path && this.path.length > 1
 			},
 			note() {
 				return (item) => {
@@ -285,21 +378,18 @@
 	}
 
 	.item-right {
-		/* #ifdef APP-NVUE */
 		@extend %f-ct;
-		/* #endif  */
 	}
+
 	.select-nav {
-		@include position(fixed, 0,0,false,0);
+		@include position(fixed, 0, 0, false, 0);
 		flex: 1;
 		flex-direction: column;
 		background-color: white;
 	}
+
 	.fab {
-		// position: fixed;
-		// bottom: 15px;
-		// right: 0;
-		@include position(fixed, false, 0,15px);
+		@include position(fixed, false, 0, 15px);
 		border-radius: 100rpx;
 		background-image: linear-gradient(top right, #ecaf59, #ffed20);
 		width: 100rpx;

@@ -1,16 +1,19 @@
 <template>
 	<view v-if="width" :style="'width:'+width+';'+(square?'height:'+width:'')" class="uni-grid-item">
-		<view :class="{ 'uni-grid-item--border': showBorder,  'uni-grid-item--border-top': showBorder && index < column, 'uni-highlight': highlight }"
-		 :style="{  'border-right-color': borderColor ,'border-bottom-color': borderColor ,'border-top-color': borderColor }"
-		 class="uni-grid-item__box" @click="_onClick" @longpress='_onLongPress'>
+		<view
+			:class="{ 'uni-grid-item--border': showBorder,  'uni-grid-item--border-top': showBorder && index < column, 'uni-highlight': highlight }"
+			:style="{  'border-right-color': borderColor ,'border-bottom-color': borderColor ,'border-top-color': borderColor }"
+			class="uni-grid-item__box" @click="_onClick" @longpress='_onLongPress'>
 			<view class="grid-item-box">
 				<slot>
-					<image  :src="data.thumb" @error='previewThumbError' class="image" mode="aspectFit" v-if="mode === 'photo'" />
+					<image :src="data.thumb" @error='previewThumbError' class="image" mode="aspectFit"
+						v-if="mode === 'photo'" />
 					<view class="video-thumb" v-else>
-						<image  :src="data.thumb" @error='previewThumbError' class="image" mode="aspectFit" />
+						<image :src="data.thumb" @error='previewThumbError' class="image" mode="aspectFit" />
 						<text class="iconfont c-iconfont">&#xe637;</text>
 					</view>
-					<radio class='round radio' color="#e4c774" :class="data.checked ? 'checked' : ''" :checked="data.checked "></radio>
+					<radio class='round radio' color="#e4c774" :class="data.checked ? 'checked' : ''"
+						:checked="data.checked "></radio>
 				</slot>
 			</view>
 		</view>
@@ -103,18 +106,10 @@
 </script>
 
 <style lang="scss" scoped>
-	.uni-grid-item {
-		/* #ifndef APP-NVUE */
-		height: 100%;
-		display: flex;
-		/* #endif */
-	}
+	.uni-grid-item {}
 
 	.uni-grid-item__box {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		width: 100%;
-		/* #endif */
+
 		position: relative;
 		@extend %flex;
 		flex-direction: column;
@@ -136,10 +131,7 @@
 		border-top-color: $uni-border-color;
 		border-top-style: solid;
 		border-top-width: 1px;
-		/* #ifndef APP-NVUE */
-		height: 100%;
-		box-sizing: border-box;
-		/* #endif */
+
 	}
 
 	.uni-highlight:active {

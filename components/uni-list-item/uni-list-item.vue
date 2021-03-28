@@ -1,16 +1,13 @@
 <template>
-	<!-- #ifdef APP-NVUE -->
-	<cell insert-animation='none' delete-animation='none'>
-		<!-- #endif -->
-
+	<cell insert-animation='none' delete-animation='none' >
 		<view :class="{ 'uni-list-item--disabled': disabled }" 
-		 class="uni-list-item" @click.stop="onClick" @longpress='onLongress'>
+		 class="uni-list-item" @click.stop="onClick" @longpress='onLongress' :style="{height}">
 			<view v-if="!isFirstChild" class="border--left" :class="{ 'uni-list--border': border }"></view>
 			<view class="uni-list-item__container" :class="{ 'container--right': showArrow || link, 'flex--direction': direction === 'column' }">
 				<slot name="header">
 					<view class="uni-list-item__header">
 						<view v-if="thumb" class="uni-list-item__icon">
-							<image @error='previewThumbError' :src="previewThumb" class="uni-list-item__icon-img" :class="['uni-list--' + thumbSize]" />
+							<image @error='previewThumbError' :src="previewThumb" mode="aspectFit" class="uni-list-item__icon-img" :class="['uni-list--' + thumbSize]" />
 						</view>
 						<view v-else-if="showExtraIcon" class="uni-list-item__icon">
 							<uni-icons :color="extraIcon.color" :size="extraIcon.size" :type="extraIcon.type" />
@@ -19,8 +16,8 @@
 				</slot>
 				<slot name="body">
 					<view class="uni-list-item__content" :class="{ 'uni-list-item__content--center': thumb || showExtraIcon || showBadge || showSwitch }">
-						<text v-if="title" class="uni-list-item__content-title" :class="[ellipsis !== 0 && ellipsis <= 2 ? 'uni-ellipsis-' + ellipsis : '']">{{ title }}</text>
-						<text v-if="note" class="uni-list-item__content-note">{{ note }}</text>
+						<text v-if="title"  class="uni-list-item__content-title" :class="[ellipsis !== 0 && ellipsis <= 2 ? 'uni-ellipsis-' + ellipsis : '',direction === 'column' ? 'text-ct' : '']">{{ title }}</text>
+						<text v-if="note" class="uni-list-item__content-note" :class="[direction === 'column' ? 'text-ct' : '']">{{ note }}</text>
 					</view>
 				</slot>
 				<slot name="footer">
@@ -35,9 +32,7 @@
 				<uni-icons :size="16" color="#bbb" type="arrowright" />
 			</view>
 		</view>
-		<!-- #ifdef APP-NVUE -->
 	</cell>
-	<!-- #endif -->
 </template>
 
 <script>
@@ -162,6 +157,9 @@
 			border: {
 				type: [Boolean,String],
 				default: false
+			},
+			height: {
+				type: [String,Number]
 			}
 		},
 		data() {
@@ -260,19 +258,19 @@
 	$list-item-pd: $uni-spacing-col-lg $uni-spacing-row-lg;
 
 	.uni-list-item {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
 		font-size: $uni-font-size-lg;
 		position: relative;
 		justify-content: space-between;
+		align-items: center;
 		background-color: #fff;
 		flex-direction: row;
-		/* #ifdef APP-NVUE */
 		@extend %flex;
-		/* #endif */
 	}
-
+	.text-ct {
+		text-align: center;
+		font-size: 23rpx !important;
+		width: 200rpx;
+	}
 	.uni-list-item--disabled {
 		opacity: 0.3;
 	}
@@ -350,6 +348,7 @@
 		font-size: $uni-font-size-base;
 		color: #3b4144;
 		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.uni-list-item__content-note {
@@ -414,8 +413,9 @@
 	}
 
 	.uni-list--lg {
-		height: $uni-img-size-lg;
-		width: $uni-img-size-lg;
+		height: 150rpx;
+		width: 150rpx;
+		padding: 20rpx;
 	}
 
 	.uni-list--base {

@@ -1,7 +1,7 @@
 <template>
 	<view class="open-list" :render-whole='true'>
-		<custom-breadCrumb :path="path" v-if='type==="folder"'></custom-breadCrumb>
-		<custom-list :filter="filter" ref='list' :isScroll='!openMenu' @refresh='refresh' :downStatus='downStatus'
+		<custom-breadCrumb :path="path" v-if='type==="folder"' />
+		<custom-list multiple :filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus'
 			@scrolltolower='scrollHandler' :list="list" @clean='cleanList' @all='selectAll' :status='status'>
 		</custom-list>
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
@@ -31,34 +31,36 @@
 			},
 			initFolder(option) {
 				console.log(option.uuid)
-				this.list = [{
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04'
-				}, {
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04'
-				}, {
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04'
-				}]
-				this.path = [{
-						title: "全部文件",
-						uuid: 1
-					},
-					{
-						title: "uni-app教学视频",
-						uuid: 2
-					}
-				]
-				// this.parentId = xxx.parentId
-				const title = this.path[this.path.length - 1].title
-				uni.setNavigationBarTitle({
-					title
+				this.$nextTick(function() {
+					this.list = [{
+						fileName: 'uni-app教学视频',
+						type: 0,
+						date: '2020-12-04'
+					}, {
+						fileName: 'uni-app教学视频',
+						type: 0,
+						date: '2020-12-04'
+					}, {
+						fileName: 'uni-app教学视频',
+						type: 0,
+						date: '2020-12-04'
+					}]
+					this.path = [{
+							title: "全部文件",
+							uuid: 1
+						},
+						{
+							title: "uni-app教学视频",
+							uuid: 2
+						}
+					]
+					// this.parentId = xxx.parentId
+					const title = this.path[this.path.length - 1].title
+					uni.setNavigationBarTitle({
+						title
+					})
+					this.type = option.type
 				})
-				this.type = option.type
 			},
 			refresh() {
 				this.downStatus = 'loading'

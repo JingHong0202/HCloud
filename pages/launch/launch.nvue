@@ -1,12 +1,13 @@
 <template>
-	<view class="container" :render-whole='true'>
-		<!-- <ad-draw class="ad-draw" adpid="1507000690"></ad-draw> -->
+	<view class="container" :render-whole='true'
+		style="flex: 1;flex-direction: column;align-items: center;justify-content: flex-end;">
 		<view style="flex-direction: row;justify-content: center; align-items: center;">
-			<image src="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" mode="aspectFit" class="logo"></image>
+			<image src="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" mode="aspectFit" class="logo"
+				style="width: 100rpx;height: 100rpx;"></image>
 			<view style="height: 50rpx; width: 1px;background-color: #000000;margin: 0 15rpx;"></view>
 			<text style="font-size: 36rpx;">HCloud</text>
 		</view>
-		<view class="tip">
+		<view class="tip" style="font-size: $uni-font-size-base;color: #333;width: 220rpx;">
 			<uni-load-more status="loading" />
 		</view>
 	</view>
@@ -28,18 +29,18 @@
 	} from 'vuex'
 	export default {
 		onShow() {
-			if(process.env.NODE_ENV === 'development'){
-			   setTimeout(() => {
-				   uni.reLaunch({
-				   	url: "/pages/tabbar/index/index"
-				   })
-			   }, 100)
-			}else{
-			    // console.log('生产环境')
+			if (process.env.NODE_ENV === 'development') {
+				setTimeout(() => {
+					uni.reLaunch({
+						url: "/pages/tabbar/index/index"
+					})
+				}, 100)
+			} else {
+				// console.log('生产环境')
 				// 判断客户是否已经登录
-				
-			}
 			
+			}
+
 		},
 		methods: {
 			toLogin() {
@@ -50,7 +51,7 @@
 						preloadPage('/pages/user/resetpas/resetpas'),
 						preloadPage('/pages/user/sms-login/sms-login'),
 					]
-					).then(() => {
+				).then(() => {
 					uni.redirectTo({
 						url: "/pages/user/login/login"
 					})
@@ -62,23 +63,3 @@
 		}
 	}
 </script>
-
-<style lang="scss" scoped>
-	.container {
-		flex: 1;
-		flex-direction: column;
-		align-items: center;
-		justify-content: flex-end;
-
-		& .tip {
-			font-size: $uni-font-size-base;
-			color: #333;
-			width: 220rpx;
-		}
-
-		& .logo {
-			width: 100rpx;
-			height: 100rpx;
-		}
-	}
-</style>

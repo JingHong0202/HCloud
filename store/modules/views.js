@@ -3,6 +3,7 @@ export default {
 	state: {
 		sortAction: uni.getStorageSync('sortAction') || "up",
 		sortMode: uni.getStorageSync('sortMode') || 'initials',
+		column:  uni.getStorageSync('column') || 1
 	},
 	mutations: {
 		CHANGE_SORTACTION(state, val) {
@@ -23,6 +24,14 @@ export default {
 				}
 			})
 		},
-		
+		CHANGE_COLUMN_COUNT(state, val) {
+			uni.setStorage({
+				key: 'column',
+				data: val,
+				success() {
+					state.column = val
+				}
+			})
+		},
 	}
 }

@@ -1,18 +1,16 @@
 <template>
-	<!-- @scroll='pageScroll' -->
 	<list :render-whole='true' class="index" ref='index' id="index" disabled :bounce="false" show-scrollbar="false">
 		<refresh :display="downDisplay" @refresh="refresh" class="c-refresh">
 			<uni-load-more :status="downStatus" :contentText='downText' />
 		</refresh>
 		<cell ref='top' class="pic-box">
 			<view class="pic">
-				<image class="pic-img" src="/static/images/pic.jpg" mode="aspectFill" ref='pic'></image>
+				<image class="pic-img" src="/static/images/pic.jpg" mode="aspectFill" ref='pic' />
 				<view class="index-nav">
 					<uni-status-bar />
 					<uni-nav-bar :border='false' @clickLeft='toAccount' backgroundColor="rgba(0,0,0,0)">
 						<view slot="left">
-							<image elevation="8px" :src="info.avatars" mode="aspectFit" class="user-avatars">
-							</image>
+							<image elevation="4px" :src="info.avatars" mode="aspectFit" class="user-avatars" />
 						</view>
 					</uni-nav-bar>
 				</view>
@@ -20,8 +18,7 @@
 			<view class="index-ctx">
 				<view class="index-ctx-box">
 					<view class="index-ctx-top hover" elevation="5px" @click="toPage(1)">
-						<image class='index-ctx-img' src="/static/icon/page/index/chuanshu.png" mode="aspectFit">
-						</image>
+						<image class='index-ctx-img' src="/static/icon/page/index/chuanshu.png" mode="aspectFit" />
 						<text class="index-ctx-title">传输列表</text>
 						<view class="redDot" v-if="RUNTIME">
 							<uni-badge :text="RUNTIME" type="error"></uni-badge>
@@ -29,13 +26,12 @@
 					</view>
 					<view class="index-ctx-bottom ">
 						<view class="index-ctx-bottom-left hover" elevation="5px" @click="toPage(2)">
-							<image class='index-ctx-img' src="/static/icon/page/index/shangchuan.png" mode="aspectFit">
-							</image>
+							<image class='index-ctx-img' src="/static/icon/page/index/shangchuan.png"
+								mode="aspectFit" />
 							<text class="index-ctx-title">上传文件</text>
 						</view>
 						<view class="index-ctx-bottom-right hover" elevation="5px" @click="toPage(3)">
-							<image class='index-ctx-img' src="/static/icon/page/index/search-a.png" mode="aspectFit">
-							</image>
+							<image class='index-ctx-img' src="/static/icon/page/index/search-a.png" mode="aspectFit" />
 							<text class="index-ctx-title">搜索文件</text>
 						</view>
 					</view>
@@ -80,8 +76,9 @@
 	export default {
 		mixins: [customList, nav, refresh, nested],
 		data() {
+			let listSwitch = uni.getStorageSync('index-switch');
 			return {
-				listSwitch: uni.getStorageSync('index-switch') || false,
+				listSwitch: listSwitch === '' ? true : listSwitch,
 				loadText: {
 					contentdown: '上拉显示更多',
 					contentrefresh: '正在加载...',
@@ -95,16 +92,11 @@
 			...mapState('file', ['action']),
 			...mapState('user', ['info'])
 		},
-		watch: {
-			listSwitch() {
-				// dom.scrollToElement(this.$refs['top'], {
-				// 	animated: false,
-				// 	offset: 0
-				// })
-				this.$refs['list'].toScrollTop()
-			},
-		},
-
+		// watch: {
+		// 	listSwitch() {
+		// 		this.$refs['list'].toScrollTop()
+		// 	},
+		// },
 		methods: {
 			ReachBottom() {
 				if (this.status === 'loading' || this.status === 'noMore') return
@@ -386,11 +378,6 @@
 			background-color: $uni-bg-color-hover;
 		}
 
-		// .null {
-		// 	@extend %flex;
-		// 	width: 750rpx;
-		// 	height: 200px;
-		// }
 
 		.pic {
 			width: 750rpx;

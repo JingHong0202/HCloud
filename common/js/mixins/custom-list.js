@@ -17,6 +17,10 @@ export default {
 		})
 	},
 	onBackPress() {
+		if (getApp().globalData.modal) {
+			uni.$hide()
+			return true
+		}
 		if (this.action) {
 			this.cleanList()
 			return true

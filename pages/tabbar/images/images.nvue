@@ -23,9 +23,6 @@
 					</custom-media>
 				</custom-floatPanel>
 			</swiper-item>
-		<!-- 	<swiper-item class="category-swiper">
-
-			</swiper-item> -->
 		</swiper>
 
 		<custom-popups  :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
@@ -583,6 +580,10 @@
 		},
 		onBackPress() {
 			// 返回时，如果在选择模式时则退出，解决相册视频页面返回键失效，当有路径时则返回上一层
+			if (getApp().globalData.modal) {
+				uni.$hide()
+				return true
+			}
 			if (this.action) {
 				this.exitAction()
 				return true

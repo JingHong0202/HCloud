@@ -96,18 +96,8 @@
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
-					"titleNView": false,
-					"subNVues": [{
-						"id": "rename",
-						"path": "pages/subNVue/mkdir",
-						"type": "popup",
-						"style": {
-							"background": "transparent",
-							"width": "100%",
-							"height": "100%",
-							"mask": "rgba(0,0,0,0)"
-						}
-					}]
+					"titleNView": false
+
 				}
 			}
 		},
@@ -119,15 +109,6 @@
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
-					"subNVues": [{
-						"id": "drawer",
-						"path": "pages/subNVue/drawer",
-						"type": "popup",
-						"style": {
-							"background": "transparent",
-							"mask": "rgba(0,0,0,0)"
-						}
-					}],
 					"titleNView": false
 
 				}
@@ -311,18 +292,7 @@
 							"type": "back",
 							"float": "left"
 						}]
-					},
-					"subNVues": [{
-						"id": "mkdir",
-						"path": "pages/subNVue/mkdir",
-						"type": "popup",
-						"style": {
-							"background": "transparent",
-							"width": "100%",
-							"height": "100%",
-							"mask": "rgba(0,0,0,0)"
-						}
-					}]
+					}
 				}
 			}
 
@@ -495,7 +465,7 @@
 	// 	"current": 0, //当前激活的模式(list 的索引项)
 	// 	"list": [{
 	// 		"name": "personal", //模式名称
-	// 		"path": "pages/tabbar/images/images", //启动页面，必选
+	// 		"path": "pages/tabbar/file/file", //启动页面，必选
 	// 		"query": "" //启动参数，在页面的onLoad函数里面得到
 	// 	}]
 	// }
