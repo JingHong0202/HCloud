@@ -2,7 +2,7 @@
 	<view class="folder-list" :render-whole='true'>
 		<custom-list :isShowFabTop='false' :openBreadCrumb="true" :closeLongPress='true' @selectTask='select' :closeClick="true" :closeDownLoad="true"  :closeUpLoad='true'  customEvent @click='open' :path='path' :openActionSheet="false" @changeList='changeFileList'
 		 :list="list"></custom-list>
-		<view class="folder-footer">
+		<view class="folder-footer" elevation="10px">
 			<view class="btnBox-left"  @click="mkdir"><text class="left-text">新建文件夹</text></view>
 			<view class="btnBox-right" @click="confirm" v-if="!only_mkdir" ><text class="right-text">确定</text></view>
 		</view>
@@ -26,13 +26,15 @@
 				this.only_mkdir = true
 			}
 			//request
-			this.list = [...new Array(20)].map(item => {
-				return {
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-04',
-					uuid: 233
-				}
+			this.$nextTick(function(){
+				this.list = [...new Array(20)].map(item => {
+					return {
+						fileName: 'uni-app教学视频',
+						type: 0,
+						date: '2020-12-04',
+						uuid: 233
+					}
+				})
 			})
 		},
 		onUnload() {

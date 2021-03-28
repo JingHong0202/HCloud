@@ -579,11 +579,11 @@
 			}
 		},
 		onBackPress() {
-			// 返回时，如果在选择模式时则退出，解决相册视频页面返回键失效，当有路径时则返回上一层
 			if (getApp().globalData.modal) {
 				uni.$hide()
 				return true
 			}
+			// 返回时，如果在选择模式时则退出，解决相册视频页面返回键失效，当有路径时则返回上一层
 			if (this.action) {
 				this.exitAction()
 				return true

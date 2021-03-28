@@ -1,8 +1,8 @@
 <template>
 	<view class="open-list" :render-whole='true'>
 		<custom-breadCrumb :path="path" v-if='type==="folder"' />
-		<custom-list multiple :filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus'
-			@scrolltolower='scrollHandler' :list="list" @clean='cleanList' @all='selectAll' :status='status'>
+		<custom-list isPageScroll multiple :filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus'
+			@loadmore='scrollHandler' :list="list" @clean='cleanList' @all='selectAll' :status='status'>
 		</custom-list>
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 	</view>
@@ -96,6 +96,7 @@
 			} else if (option.type === 'collection') {
 				this.initCollection()
 			}
+			this.scrollHandler()
 		},
 	}
 </script>

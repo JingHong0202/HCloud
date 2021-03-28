@@ -1,6 +1,6 @@
 <template>
-	<view class="file" :render-whole='true' ref='file'>
-		<view style="flex-direction: column;" ref='nav'>
+	<view class="file" :render-whole='true' >
+		<view style="flex-direction: column;" >
 			<uni-status-bar />
 			<uni-nav-bar :border='false' color="#333333" background-color="#FFFFFF" rightIcon="more-filled"
 				@clickLeft='toAccount' @clickRight='openMenu = !openMenu'>
@@ -14,18 +14,14 @@
 			</uni-nav-bar>
 		</view>
 
-		<!-- <skeleton :skeleton="skeletonList"  :loading="!list.length" animate ref='skeleton' v-if="skeletonList.length"> -->
-			<custom-list multiple @scrolltolower='scrolltolower' ref='list' :filter="filter"
-				@changeList='changeFileList' :list="list" @refresh='refresh' :downStatus='downStatus' @clean='cleanList'
-				@all='selectAll' :status='status'></custom-list>
-		<!-- </skeleton> -->
+		<custom-list  isPageScroll multiple @loadmore='scrolltolower' ref='list' :filter="filter" :list="list" @refresh='refresh'
+			:downStatus='downStatus' @clean='cleanList' @all='selectAll' :status='status'></custom-list>
 		<custom-popups :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick'
 			@exit='openMenu = !openMenu' />
 	</view>
 </template>
 
 <script>
-	// import skeleton from '@/components/ls-skeleton/ls-skeleton.nvue'
 	import popups from '@/common/js/mixins/popups.js'
 	import nav from '@/common/js/mixins/nav.js'
 	import customList from '@/common/js/mixins/custom-list.js'
@@ -39,14 +35,11 @@
 		statusBarHeight
 	} = uni.getSystemInfoSync()
 	export default {
-		// components: {
-		// 	skeleton
-		// },
+
 		mixins: [popups, nav, customList],
 		data() {
 			return {
 				afterTop: 0,
-				// skeletonList: []
 			}
 		},
 		onReady() {
@@ -93,10 +86,9 @@
 					}
 				]
 			}, 1000)
-			// this.skeletonList = this.$store.state.views.column === 1 ?
-			// 	Array(Math.round(uni.upx2px(windowHeight) / uni.upx2px(70))).fill('column-default') :
-			// 	Array(Math.round(uni.upx2px(windowHeight) / uni.upx2px(130))).fill('column-3')
+
 			this.afterTop = statusBarHeight + 44
+			this.scrolltolower()
 		},
 		methods: {
 			refresh() {
@@ -104,7 +96,7 @@
 				setTimeout(() => {
 					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
 					this.downStatus = "noMore"
-					if (this.action) this.exitAction()
+					if (this.action) this.cleanList()
 					setTimeout(() => {
 						this.downStatus = "more"
 					}, 1000)

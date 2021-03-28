@@ -16,21 +16,14 @@
 				thumb="/static/icon/page/personal/shezhi.png" thumbSize="sm"></uni-list-item>
 			<uni-list-item :border='true' to="/pages/about/about" link title="关于"
 				thumb="/static/icon/page/personal/info.png" thumbSize="sm"></uni-list-item>
-				<cell>
-					<ad adpid="1111111111" style="width: 750rpx;"></ad>
-				</cell>
+			<cell>
+				<ad adpid="1111111111" style="width: 750rpx;"></ad>
+			</cell>
 			<uni-list-item :border='true' link title="退出登录" thumb="/static/icon/page/personal/user-exit.png"
 				thumbSize="sm" @click="exit"></uni-list-item>
 		</list>
-		<view class="nav" :style="{height: navHeight}" ref='nav'>
+		<view class="nav" :style="{height: navHeight}" ref='nav' />
 
-			<!-- <view :style="{height: navHeight-44,'backgroundColor': 'red',position: 'absolute',right: 0,left:0,top:0}">
-				
-			</view> -->
-			<!-- <view :style="{position: 'absolute',right: 0,top: 0,bottom:0,width: 50,'justify-content': 'center', 'align-items': 'center'}">
-				<uni-icons type="scan" color="#000"  :size="33"></uni-icons>
-			</view> -->
-		</view>
 		<view class="user-box2" :style="{height: `${400+navHeight}rpx`}">
 			<image class="avatars" ref='circle' src="/static/images/pic.jpg" mode="aspectFit"
 				@click="toPage('account')"></image>
@@ -78,9 +71,6 @@
 			} = uni.getSystemInfoSync()
 			this.navHeight = statusBarHeight + 44
 			this.init(statusBarHeight)
-		},
-		onReady() {
-
 		},
 		methods: {
 			init(statusBarHeight) {
@@ -194,6 +184,12 @@
 					this.$hide()
 				})
 			}
+		},
+		onBackPress() {
+			if (getApp().globalData.modal) {
+				uni.$hide()
+				return true
+			}
 		}
 	}
 </script>
@@ -259,7 +255,6 @@
 
 			.name {
 				font-size: $uni-font-size-subtitle;
-				/* font-weight: bold; */
 			}
 
 			.used {
@@ -268,7 +263,6 @@
 			}
 
 			.percent {
-				/* @extend %flex; */
 				width: 300rpx;
 			}
 		}
