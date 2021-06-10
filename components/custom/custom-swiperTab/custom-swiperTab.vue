@@ -99,7 +99,7 @@
 		@include position(absolute, false,false,5px,0);
 		height: 10rpx;
 		width: 60rpx;
-		background-color: #ffde82;
+		background-color: $app-color-theme-main;
 		border-radius: 50rpx;
 		transition-property: transform;
 		transition-duration: .5s;

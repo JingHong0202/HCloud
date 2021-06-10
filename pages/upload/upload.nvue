@@ -1,52 +1,67 @@
 <template>
 	<view class="upload" :render-whole='true'>
-		<custom-breadCrumb :path="path"></custom-breadCrumb>
+		<custom-breadCrumb :path="path" @click='toItem'></custom-breadCrumb>
 		<uni-list :border="false" :scrollY="true">
-			<uni-list-item v-if='isPath'  clickable :title="'返回上一级'" @click="select({type: 25})" :thumb="selectThumb({type: 25})">
+			<uni-list-item v-if='isPath' clickable :title="'返回上一级'" @click="select({type: 25})"
+				:thumb="selectThumb({type: 25})">
 			</uni-list-item>
-			<uni-list-item v-for=" (item,i) in list" :key='item' :title="item.fileName" :ellipsis="1" clickable :thumb="selectThumb(item)"
-			 @click="select(item)">
+			<uni-list-item v-for=" (item,i) in list" :key='item' :title="item.fileName" :ellipsis="1" clickable
+				:thumb="selectThumb(item)" @click="select(item)">
 				<template slot='footer' v-if='item.type'>
 					<view class="item-right">
-						<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''" :checked="item.checked">
+						<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+							:checked="item.checked">
 						</radio>
 					</view>
 				</template>
 			</uni-list-item>
 		</uni-list>
 		<view class="upload-footer">
-			<view class="used-progress">
-				<progress percent="60" stroke-width="10" backgroundColor="#999" />
-				<view class="used-text">
-					<text class="used-text-ctx">
-						可用空间100g
-					</text>
+			<template v-if='!mode'>
+				<view class="used-progress">
+					<progress active :percent="avaiable_space_percent" stroke-width="10" backgroundColor="#999" />
+					<view class="used-text">
+						<text class="used-text-ctx">
+							可用空间{{avaiable_space}}
+						</text>
+					</view>
 				</view>
-			</view>
-			<view class="upload-footer-btn">
-				<view class="upload-footer-btn-left" @click="toUploadTarget">
-					<text class="btn-left-label">上传至: </text>
-					<text class="btn-left-target">我的文件</text>
+				<view class="upload-footer-btn">
+					<view class="upload-footer-btn-left" @click="toUploadTarget">
+						<text class="btn-left-label">上传至: </text>
+						<text class="btn-left-target">{{target.title }}</text>
+					</view>
+					<view class="upload-footer-btn-right" :class="{'upload-footer-btn-right-active': selectlist.length}"
+						@click="upload">
+						<text class="submit">上传{{selectlist.length ? `(${selectlist.length})` : ''}}</text>
+					</view>
 				</view>
-				<view class="upload-footer-btn-right" :class="{'upload-footer-btn-right-active': selectlist.length}" @click="upload">
-					<text class="submit">上传{{selectlist.length ? `(${selectlist.length})` : ''}}</text>
-				</view>
-			</view>
+			</template>
+			<template v-else>
+				<button type="primary" class="dir-btn"  @click="confirm" >确定</button>
+			</template>
 		</view>
 	</view>
 </template>
 
 <script>
 	import {
-		selectIcon
+		upload
+	} from '@/api/file.js'
+	import {
+		selectIcon,
+		getFileMimeType
 	} from '@/util/file.js'
 
 	import {
 		mapState,
-		mapMutations
+		mapMutations,
+		mapActions
 	} from 'vuex'
 	import files from '@/util/files.js'
-	// var fileSelect = uni.requireNativePlugin("Aq-fileSelect");
+	import {
+		formatBytes
+	} from '@/util/file.js'
 	export default {
 		onNavigationBarButtonTap(e) {
 			if (!e.index) {
@@ -58,7 +73,15 @@
 				this.selectAll()
 			}
 		},
-		onLoad(option) {
+		onLoad({
+			mode
+		}) {
+			this.mode = mode
+			if (this.mode) {
+				uni.setNavigationBarTitle({
+					title: '选择下载目录'
+				})
+			}
 			files.getRootDir().then(res => {
 				this.path = res.path
 				this.list = res.list
@@ -75,35 +98,81 @@
 			})
 		},
 		data() {
+			const user = getApp().globalData.userinfo
 			return {
 				list: [],
 				path: [],
-				// labels: [
-				// 	{
-				// 		text: '',
-				// 		method: ''
-				// 	}
-				// ]
+				user,
+				target: uni.getStorageSync(`${user.mobile}-upload-target`) || {
+					title: '我的文件'
+				},
 			};
 		},
 		computed: {
 			...mapState('file', ['action', 'selectlist']),
 			isPath() {
 				return this.path && this.path.length > 1
+			},
+			avaiable_space() {
+				return formatBytes(this.user.total_space - this.user.used_space)
+			},
+			avaiable_space_percent() {
+				return 100 * (this.user.used_space / this.user.total_space)
+			}
+		},
+		destroyed() {
+			if (this.mode && this.confirm_path) {
+				uni.setStorageSync(`${getApp().globalData.userinfo.mobile}-down-target`,
+					this.confirm_path || '/storage/emulated/0/HCloud_downloads')
+				this.$store.commit('settings/CHANGE_DOWN_TARGET', this.confirm_path ||
+					'/storage/emulated/0/HCloud_downloads')
 			}
 		},
 		methods: {
 			...mapMutations('file', ['CHANGE_SELECT_LIST']),
-			upload() {
-				let selectlist = [...this.selectlist]
+			...mapActions('file', ['ADD_UP_LIST']),
+			confirm() {
+				this.isClose = true
+				this.confirm_path =  this.path[this.path.length - 1].path.toString()
+				uni.navigateBack({
+					delta: 1
+				})
+			},
+			async toItem(item) {
+				if (item.title === '根目录') {
+					files.getRootDir().then(res => {
+						this.path = res.path
+						this.list = res.list
+						this.$forceUpdate()
+					})
+				} else {
+					files.getSubDir(item.path).then(res => {
+						this.list = res.list
+						this.path = this.path.slice(0, this.path.findIndex(item2 => item2.title === item
+							.title) + 1)
+						this.$forceUpdate()
+					})
+				}
+			},
+			async upload() {
+				if (!this.selectlist.length) return
+				await this.ADD_UP_LIST({
+					target: this.target.uuid,
+					selectlist: this.selectlist
+				})
+				this.cleanList()
+				uni.redirectTo({
+					url: '../status/status'
+				})
 			},
 			toUploadTarget() {
 				if (this.action) return
 				uni.navigateTo({
 					url: '/pages/folder-list/folder-list',
-					success() {
+					success: () => {
 						uni.$once('returnData', (res) => {
-							console.log(res)
+							this.target = res
+							uni.setStorageSync(`${this.user.mobile}-upload-target`, res)
 						})
 					}
 				})
@@ -125,7 +194,7 @@
 				this.CHANGE_SELECT_LIST(selectlist)
 			},
 			selectThumb(current) {
-				if (current.type === 1 || current.type === 3) return current.thumb;
+				// if (current.type === 1 || current.type === 3) return current.thumb;
 				return selectIcon(current.type);
 			},
 			addSelectList(item) {
@@ -161,21 +230,10 @@
 						break;
 					default:
 						return this.addSelectList(item)
-						// uni.getFileInfo({
-						// 	filePath: "file:///" + item.path.toString(),
-						// 	success(r) {
-						// 		console.log(item.path.toString(), r.size)
-						// 	},
-						// 	fail(err) {
-						// 		console.log("err:", err);
-						// 	}
-						// })
 				}
 			},
 		},
 		onBackPress() {
-			// if (this.timer) clearInterval(this.timer)
-			// setTimeout(() => {})
 			if (this.isClose) return
 			if (this.action) {
 				this.cleanList()
@@ -208,7 +266,14 @@
 		@extend %flex;
 		flex-direction: column
 	}
-
+	// .dir-path {
+	// 	font-size: $uni-font-size-base;
+	// }
+	.dir-btn {
+		@extend %flex;
+		font-size: $uni-font-size-lg;
+		margin: 25rpx;
+	}
 	.item-right {
 		/* #ifndef APP-NVUE  */
 		height: 100%;
@@ -233,7 +298,7 @@
 		}
 
 		.used-text-ctx {
-			font-size: 20rpx;
+			font-size: 22rpx;
 			text-align: left;
 			margin-right: 30rpx;
 			color: $uni-color-primary;

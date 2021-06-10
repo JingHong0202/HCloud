@@ -1,0 +1,41 @@
+<template>
+	<view class="qr-box">
+		<image :src="qr && qr.data" mode="widthFix" class="qr"></image>
+	</view>
+</template>
+
+<script>
+	const ikiwNvueQrcode = uni.requireNativePlugin("Ikiw-NvueQrcode")
+	import {
+		formatLink
+	} from '@/api/share.js'
+	export default {
+		onLoad(params) {
+			const that = this
+			ikiwNvueQrcode.generate({
+					text: JSON.stringify({link: `${formatLink(params.text)}`, desc: '该链接现在只能复制到HCloud APP中识别'}),
+				},
+				(ret) => {
+					that.qr = ret;
+				})
+		},
+		data () {
+			return {
+				qr: ''
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.qr-box {
+		@include position(absolute, 0, 0, 0, 0);
+		@extend %f-ct;
+
+		.qr {
+			width: 400rpx;
+			height: 300px;
+			border-radius: 10rpx;
+		}
+	}
+</style>

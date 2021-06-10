@@ -1,7 +1,9 @@
 <template>
 	<view class="custom-list">
-		<custom-breadCrumb :path="path" v-if='openBreadCrumb'></custom-breadCrumb>
-		<skeleton :skeleton="skeletonList" :loading="!list.length" animate ref='skeleton' v-if='!closeSkeleton' >
+		<custom-breadCrumb :path="path" v-if='openBreadCrumb' @click='(item) => $emit("breadClick", item)'>
+		</custom-breadCrumb>
+		<skeleton :skeleton="skeletonList" :loading="skeletonLoading" animate ref='skeleton' v-if='!closeSkeleton'>
+			<!-- :isNull="list.length" -->
 			<uni-list :multiple='multiple' ref='list' :scrollY="isScroll" :border="false" @loadmore='$emit("loadmore")'
 				@scroll='scroll'>
 				<template v-if="!closeDownLoad">
@@ -10,64 +12,74 @@
 					</uni-refresh>
 				</template>
 
-				<cell style='flex:1' v-if='!isShow'>
-					<custom-null></custom-null>
-				</cell>
-				<template v-if="isShow">
-					<template v-if='multiple && column > 1'>
+				<template v-if='!list.length || !isShow'>
+					<header style='flex:1;'>
+						<custom-null :params='placeholder' ></custom-null>
+					</header>
+				</template>
+				<template v-else>
+					<template v-if='isMultiple'>
 						<template v-for="(item, i) in afterList">
 							<uni-list-item height="220rpx" direction="column" thumbSize="lg" :ref='!i ? "top" :  ""'
 								:key='item.uuid' :ellipsis="1" clickable :title='item.fileName'
 								:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
 								<template slot='footer'>
 									<view class="item-right">
-										<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+										<radio class="radio" color="#4070ff" :class="item.checked ? 'checked' : ''"
 											:checked="item.checked">
 										</radio>
 									</view>
 								</template>
 							</uni-list-item>
+							<template v-if="(i === afterList.length - 1)&& !closeUpLoad && isShow && list.length">
+								<template v-if='isPageScroll'>
+									<header>
+										<uni-load-more :status="status" :contentText='loadText' />
+									</header>
+								</template>
+								<template v-else>
+									<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
+										<uni-load-more :status="status" :contentText='upText' />
+									</loading>
+									<cell v-else>
+										<uni-load-more status="noMore" :contentText='upText' />
+									</cell>
+								</template>
+							</template>
 						</template>
 					</template>
 					<template v-else>
 						<template v-for="(item, i) in afterList">
 							<uni-list-item height="115rpx" :ref='!i ? "top" :  ""' thumbSize="base" :key='item.uuid'
-								:ellipsis="2" clickable
-								:title="item.list ? item.list[0].fileName + '等等...' : item.fileName" :note="note(item)"
+								:ellipsis="1" clickable
+								:title="item.list ? item.list[0].fileName + '...' : item.fileName" :note="note(item)"
 								:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
 								<template slot='footer'>
 									<view class="item-right">
-										<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+										<radio class="radio" color="#4070ff" :class="item.checked ? 'checked' : ''"
 											:checked="item.checked">
 										</radio>
 									</view>
 								</template>
 							</uni-list-item>
+							<template v-if="(i === afterList.length - 1)&& !closeUpLoad && isShow && list.length">
+								<template v-if='isPageScroll'>
+									<header>
+										<uni-load-more :status="status" :contentText='loadText' />
+									</header>
+								</template>
+								<template v-else>
+									<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
+										<uni-load-more :status="status" :contentText='upText' />
+									</loading>
+									<cell v-else>
+										<uni-load-more status="noMore" :contentText='upText' />
+									</cell>
+								</template>
+							</template>
 						</template>
 					</template>
 				</template>
-
-
-				<template v-if="!closeUpLoad && isShow">
-					<template v-if='isPageScroll'>
-						<cell>
-							<uni-load-more :status="status" :contentText='loadText' />
-						</cell>
-					</template>
-					<template v-else>
-						<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
-							<uni-load-more :status="status" :contentText='upText' />
-						</loading>
-						<cell v-else>
-							<uni-load-more status="noMore" :contentText='upText' />
-						</cell>
-					</template>
-				</template>
-				<cell>
-					<view style="height: 300rpx;">
-
-					</view>
-				</cell>
 			</uni-list>
 		</skeleton>
 		<uni-list :multiple='multiple' ref='list' :scrollY="isScroll" :border="false" @loadmore='$emit("loadmore")'
@@ -77,50 +89,78 @@
 					<uni-load-more :status="downStatus" :contentText='downText' />
 				</uni-refresh>
 			</template>
-		
+
 			<cell style='flex:1' v-if='!isShow'>
-				<custom-null></custom-null>
+				<custom-null :params='placeholder' ></custom-null>
 			</cell>
-			<template v-if="isShow">
-				<template v-if='multiple && column > 1'>
+			<template v-if='list.length'>
+				<template v-if='isMultiple'>
 					<template v-for="(item, i) in afterList">
 						<uni-list-item height="220rpx" direction="column" thumbSize="lg" :ref='!i ? "top" :  ""'
-							:key='item.uuid' :ellipsis="1" clickable :title='item.fileName'
-							:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
+							:key='item.uuid' :ellipsis="1" clickable :title='item.fileName' :thumb="selectThumb(item)"
+							@tap="select(item)" @longpress='showActionSheet(item)'>
 							<template slot='footer'>
 								<view class="item-right">
-									<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+									<radio class="radio" color="#4070ff" :class="item.checked ? 'checked' : ''"
 										:checked="item.checked">
 									</radio>
 								</view>
 							</template>
 						</uni-list-item>
+						<template v-if="(i === afterList.length - 1)&& !closeUpLoad && isShow && list.length">
+							<template v-if='isPageScroll'>
+								<header>
+									<uni-load-more :status="status" :contentText='loadText' />
+								</header>
+							</template>
+							<template v-else>
+								<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
+									<uni-load-more :status="status" :contentText='upText' />
+								</loading>
+								<cell v-else>
+									<uni-load-more status="noMore" :contentText='upText' />
+								</cell>
+							</template>
+						</template>
 					</template>
 				</template>
 				<template v-else>
 					<template v-for="(item, i) in afterList">
 						<uni-list-item height="115rpx" :ref='!i ? "top" :  ""' thumbSize="base" :key='item.uuid'
-							:ellipsis="2" clickable
-							:title="item.list ? item.list[0].fileName + '等等...' : item.fileName" :note="note(item)"
-							:thumb="selectThumb(item)" @tap="select(item)" @longpress='showActionSheet(item)'>
+							:ellipsis="1" clickable :title="item.list ? item.list[0].fileName + '等等...' : item.fileName"
+							:note="note(item)" :thumb="selectThumb(item)" @tap="select(item)"
+							@longpress='showActionSheet(item)'>
 							<template slot='footer'>
 								<view class="item-right">
-									<radio class="radio" color="#e4c774" :class="item.checked ? 'checked' : ''"
+									<radio class="radio" color="#4070ff" :class="item.checked ? 'checked' : ''"
 										:checked="item.checked">
 									</radio>
 								</view>
 							</template>
 						</uni-list-item>
+						<template v-if="(i === afterList.length - 1)&& !closeUpLoad && isShow && list.length">
+							<template v-if='isPageScroll'>
+								<header>
+									<uni-load-more :status="status" :contentText='loadText' />
+								</header>
+							</template>
+							<template v-else>
+								<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
+									<uni-load-more :status="status" :contentText='upText' />
+								</loading>
+								<cell v-else>
+									<uni-load-more status="noMore" :contentText='upText' />
+								</cell>
+							</template>
+						</template>
 					</template>
 				</template>
 			</template>
-		
-		
-			<template v-if="!closeUpLoad && isShow">
+			<!-- <template v-if="!closeUpLoad && isShow && list.length">
 				<template v-if='isPageScroll'>
-					<cell>
+					<header>
 						<uni-load-more :status="status" :contentText='loadText' />
-					</cell>
+					</header>
 				</template>
 				<template v-else>
 					<loading @loading='loadMore' :display='display' v-if='status !== "noMore"'>
@@ -130,19 +170,15 @@
 						<uni-load-more status="noMore" :contentText='upText' />
 					</cell>
 				</template>
-			</template>
-			<cell>
-				<view style="height: 300rpx;">
-		
-				</view>
-			</cell>
+			</template> -->
 		</uni-list>
 		<view class="fab" elevation="5px" ref='fab-top' :style="{bottom: action ? '65px' :  '15px'}"
 			:class="{ 'fab-active': fabActive &&　isShowFabTop}">
 			<uni-icons type="arrowthinup" size="60" color="white" @click='toScrollTop(true)'></uni-icons>
 		</view>
 		<custom-actionSheet :labels='actionSheetLabels' v-if="openActionSheet" @download='addDownList' @del='del'
-			@move='move' @rename='rename' @restore='restore' @recycleDel='recycleDel' @share='share'>
+			@move='move' @rename='rename' @restore='restore' @recycleDel='recycleDel' @share='share'
+			@cancelShare='cancelShare' @copyLink='copyLink' @save='save' @openDir='openDir'>
 		</custom-actionSheet>
 	</view>
 </template>
@@ -163,6 +199,9 @@
 	import refresh from '@/common/js/mixins/refresh.js'
 	import actionsheet from '@/common/js/mixins/actionsheet.js'
 	import sort from '@/util/sort.js'
+	import {
+		preview
+	} from '@/api/file.js'
 	import {
 		animate
 	} from '@/util/animation.js'
@@ -262,6 +301,14 @@
 			multiple: {
 				type: Boolean,
 				default: false
+			},
+			skeletonLoading: {
+				type: Boolean,
+				default: true
+			},
+			placeholder: {
+				type: Object,
+				default: () => {return {text: '暂无文件', mode: 'null'}}
 			}
 		},
 		data() {
@@ -280,8 +327,9 @@
 			...mapActions('file', ['ADD_DOWN_LIST']),
 			select(item) {
 				if (this.closeClick) return this.customEvent ? this.$emit('click', item) : null
-				if (this.action && item.type !== 25) return this.addSelectList(item)
+				if (this.action && item.type !== 25 && item.type !== 20) return this.addSelectList(item)
 				this.$emit('selectTask', item)
+				if (this.action && item.type === 20) return
 				return open({
 					current: item,
 					list: this.list
@@ -293,10 +341,12 @@
 			},
 			exitAction() {
 				this.$emit('clean')
-
+			},
+			refresh_list() {
+				this.$emit('refreshList')
 			},
 			selectThumb(current) {
-				if (current.type === 1 || current.type === 3) return current.thumb;
+				if (current.type === 1 || current.type === 3) return preview(current.uuid, true)
 				return selectIcon(current.type);
 			},
 			showActionSheet(item) {
@@ -360,8 +410,11 @@
 			note() {
 				return (item) => {
 					return item.list ? `${item.list.length}个文件 ${item.date}` :
-						`${item.date} ${formatBytes(item.fileSize)}`
+						`${item.date.split(' ')[0]}   ${item.file_size ? formatBytes(item.file_size) : ''}`
 				}
+			},
+			isMultiple() {
+				return this.multiple && this.column > 1
 			}
 		},
 	}
@@ -371,6 +424,14 @@
 	.custom-list {
 		flex-direction: column;
 		@extend %flex;
+	}
+
+	.null-flex {
+		@extend %flex;
+	}
+
+	.null-full {
+		@include position(fixed, 0, 0, 0, 0)
 	}
 
 	.placeholder {

@@ -1,7 +1,9 @@
 <template>
 	<view class="recycle" :render-whole='true'>
-		<custom-list closeClick closeLongPress customEvent  :actionSheetLabels='actionSheetLabels' :filter="filter" ref='list' @refresh='refresh'
-		 :downStatus='downStatus' :status='status' @scrolltolower='scrollHandler' :list="list" @clean='cleanList' @all='selectAll'  @click='handlerClick' @longpress='handlerLong' ></custom-list>
+		<custom-list isPageScroll :skeletonLoading="skeletonLoading" closeClick closeLongPress customEvent
+			:actionSheetLabels='actionSheetLabels' :filter="filter" ref='list' @refresh='refresh'
+			:downStatus='downStatus' :status='status' @loadmore='scrolltolower' :list="list" @clean='cleanList'
+			@all='selectAll' @click='handlerClick' @refreshList='refresh' @longpress='handlerLong'></custom-list>
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 	</view>
 </template>
@@ -9,6 +11,15 @@
 <script>
 	import customList from '@/common/js/mixins/custom-list.js'
 	import popups from '@/common/js/mixins/popups.js'
+	import {
+		del,
+	} from '@/api/file.js'
+	import {
+		mapState
+	} from 'vuex'
+	import {
+		getrecycle
+	} from '@/api/file.js'
 	export default {
 		mixins: [customList, popups],
 		data() {
@@ -33,60 +44,55 @@
 			handlerLong(item) {
 				return this.$refs['list'].addSelectList(item)
 			},
-			refresh() {
-				this.downStatus = 'loading'
-				setTimeout(() => {
-					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
-					this.downStatus = "noMore"
-					if (this.$refs['list'].action) this.$refs['list'].exitAction()
-					setTimeout(() => {
-						this.downStatus = "more"
-					}, 1000)
-				}, 1000)
+			async init(isCache = 1) {
+				const {
+					data: {
+						filelist,
+						count
+					}
+				} = (await getrecycle(this.page, this.num, isCache)).data
+				this.list = filelist
+				this.count = count
+				this.page_max = Math.floor(count / this.num)
+				if (count) setTimeout(() => {
+					this.scrolltolower()
+				}, 500)
 			},
-			scrollHandler() {
-				console.log(1)
-				if (this.status === 'loading' || this.status === 'noMore') return
-				this.status = 'loading'
-				setTimeout(() => {
-					this.list.push({
-						fileName: 'office',
-						type: 26,
-						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-						date: '2020-12-04',
-						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						uuid: 142
-					})
-					this.status = "noMore"
-				}, 2000)
+			async load() {
+				const {
+					data: {
+						filelist
+					}
+				} = (await getrecycle(this.page, this.num, 1)).data
+				if (!filelist.length) return this.page -= 1
+				this.list = this.list.concat(filelist)
 			}
 		},
 		onNavigationBarButtonTap(e) {
 			if (!e.index) {
 				this.openMenu = !this.openMenu
 			} else {
-				// clean
-				console.log('clean')
+				uni.$showModal({
+					concent: '确定要清空回收站吗?',
+					align: 'center'
+				}).then(async res => {
+					await del({all: 1, mode: true})
+					this.refresh()
+					uni.showToast({
+						title: '清空完成',
+						position: 'bottom'
+					})
+				}).catch((res) => {
+					this.$hide()
+				})
 			}
 		},
-		onReady() {
-			this.list = [{
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-01',
-					uuid: 233,
-					fileSize: 1000333
-				},
-				{
-					fileName: '教ani-app学图片',
-					type: 1,
-					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					date: '2020-12-04',
-					thumb: 'https://ss.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-					uuid: 2334,
-					fileSize: 100033
-				}
-			]
+		// computed: {
+		// 	...mapState('file', ['selectlist'])
+		// },
+		async onReady() {
+			await this.init()
+			return this.skeletonLoading = false
 		}
 	}
 </script>

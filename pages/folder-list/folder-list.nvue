@@ -1,10 +1,12 @@
 <template>
 	<view class="folder-list" :render-whole='true'>
-		<custom-list :isShowFabTop='false' :openBreadCrumb="true" :closeLongPress='true' @selectTask='select' :closeClick="true" :closeDownLoad="true"  :closeUpLoad='true'  customEvent @click='open' :path='path' :openActionSheet="false" @changeList='changeFileList'
-		 :list="list"></custom-list>
+		<custom-list :skeletonLoading='skeletonLoading' @breadClick='breadClick' :isShowFabTop='false'
+			:openBreadCrumb="true" :closeLongPress='true' :closeClick="true" closeDownLoad
+			closeUpLoad customEvent @click='open' :path='path' :openActionSheet="false" :list="list">
+		</custom-list>
 		<view class="folder-footer" elevation="10px">
-			<view class="btnBox-left"  @click="mkdir"><text class="left-text">新建文件夹</text></view>
-			<view class="btnBox-right" @click="confirm" v-if="!only_mkdir" ><text class="right-text">确定</text></view>
+			<view class="btnBox-left" @click="mkdir"><text class="left-text">新建文件夹</text></view>
+			<view class="btnBox-right" @click="confirm" v-if="!only_mkdir"><text class="right-text">确定</text></view>
 		</view>
 	</view>
 </template>
@@ -13,28 +15,25 @@
 	import {
 		selectIcon
 	} from '@/util/file.js'
+	import {
+		getlist
+	} from '@/api/file.js'
 	export default {
 		onLoad(args) {
 			if (args.from === 'move') {
 				uni.setNavigationBarTitle({
 					title: "选择移动位置"
 				})
-			} else if(args.from === 'mkdir') {
+			} else if (args.from === 'mkdir') {
 				uni.setNavigationBarTitle({
 					title: "选择路径"
 				})
 				this.only_mkdir = true
 			}
 			//request
-			this.$nextTick(function(){
-				this.list = [...new Array(20)].map(item => {
-					return {
-						fileName: 'uni-app教学视频',
-						type: 0,
-						date: '2020-12-04',
-						uuid: 233
-					}
-				})
+			this.$nextTick(async () => {
+				await this.getFolder()
+				this.skeletonLoading = false
 			})
 		},
 		onUnload() {
@@ -45,52 +44,75 @@
 			uni.navigateBack()
 		},
 		methods: {
-			open(item) {
-				console.log(item)
+			async breadClick({
+				uuid,
+				title
+			}) {
+				await this.getFolder(uuid, null, 400, 1, 0)
+				this.file_id = uuid
+				this.path = this.path.slice(0, this.path.findIndex(item => item.uuid === uuid) + 1)
 			},
-			changeFileList(res) {
-				this.list = res.list
-				this.path = res.path
+			async getFolder(parent, page = null, num, cache, type) {
+				const {
+					data: {
+						count,
+						filelist
+					}
+				} = (await getlist(parent, page, num, cache, +type)).data
+				this.list = filelist
 			},
-			select(item) {
-				if (item.type === 25 || !item) return
-				this.selectItem = item
+			async open(item) {
+				let {
+					uuid
+				} = item
+				await this.getFolder(uuid, null, 400, 1, 0)
+				this.file_id = uuid
+				this.path.push({
+					title: item.fileName,
+					uuid
+				})
 			},
 			mkdir() {
 				uni.$off('inputModal-success')
-				uni.$once('inputModal-success', () => {
-					console.log('reset')
+				uni.$once('inputModal-success', async () => {
+					await this.getFolder(this.file_id, null, 400, 1, 0)
 				})
 				uni.navigateTo({
-					url: "/pages/global/input-modal/input-modal?params="+ encodeURIComponent(JSON.stringify({title: '新建文件夹', placeholder: '请输入文件名'}))
+					url: "/pages/global/input-modal/input-modal?params=" + encodeURIComponent(JSON.stringify({
+						title: '新建文件夹',
+						placeholder: '请输入文件名',
+						file_id: this.file_id
+					}))
 				})
 			},
 			confirm() {
-				uni.$emit('returnData', this.selectItem)
+				uni.$emit('returnData', {uuid:this.file_id, title: this.path[this.path.length - 1].title})
 				this.isClose = true
 				uni.navigateBack({
 					delta: 1
 				})
 			}
 		},
-		onBackPress() {
-			if (this.isClose) {
-				return
-			}
+		 onBackPress() {
+			 if (this.isClose) return
 			if (this.path.length > 1) {
-				// this.list[0].parentId
+				 this.getFolder(this.path[Math.max(this.path.length - 2, 0)].uuid, null, 400, 1, 0).then(() => {
+					 this.path.pop()
+				 })
 				return true
 			}
+			return
 		},
 		data() {
 			return {
 				list: [],
 				path: [{
 					title: "全部文件",
-					uuid: 1
 				}],
 				// 强制返回
-				isClose: false
+				isClose: false,
+				file_id: null,
+				skeletonLoading: true
 			};
 		}
 	}
@@ -100,9 +122,6 @@
 	%common-btnBox {
 		@extend %flex;
 		@extend %f-ct;
-		&:active {
-			opacity: .7;
-		}
 	}
 
 	.folder-list {
@@ -121,8 +140,10 @@
 
 		.btnBox-left {
 			@extend %common-btnBox;
-			background-color: #fff;
-
+			background-color: white;
+			&:active {
+				background-color: $uni-bg-color-hover;
+			}
 			.left-text {
 				color: $uni-color-primary;
 			}
@@ -132,7 +153,9 @@
 		.btnBox-right {
 			@extend %common-btnBox;
 			background-color: $uni-color-primary;
-
+			&:active {
+				background-color: $uni-bg-color-hover2;
+			}
 		}
 	}
 </style>

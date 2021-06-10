@@ -1,9 +1,26 @@
 <template>
 	<view class="open-list" :render-whole='true'>
-		<custom-breadCrumb :path="path" v-if='type==="folder"' />
-		<custom-list isPageScroll multiple :filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus'
-			@loadmore='scrollHandler' :list="list" @clean='cleanList' @all='selectAll' :status='status'>
-		</custom-list>
+		<template v-if='type === "folder"'>
+			<custom-breadCrumb :path="path " @click='breadClickHandler' />
+			<custom-list @refreshList='refresh' :skeletonLoading="skeletonLoading" isPageScroll multiple
+				:filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus' @loadmore='scrollHandler'
+				:list="list" @clean='cleanList' @all='selectAll' :status='status'>
+			</custom-list>
+		</template>
+		<template v-else-if="type === 'collection'">
+			<custom-list @refreshList='refresh' :skeletonLoading="skeletonLoading" closeDownLoad closeUpLoad
+				isPageScroll multiple :filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus'
+				@loadmore='scrollHandler' :list="list" @clean='cleanList' @all='selectAll' :status='status'
+				:actionSheetLabels='collection_lables'>
+			</custom-list>
+		</template>
+		<template v-else-if="type === 'share' || type === 'share_folder'">
+			<custom-list @refreshList='refresh' :skeletonLoading="skeletonLoading" closeDownLoad closeUpLoad
+				isPageScroll multiple :filter="filter" ref='list' @refresh='refresh' :downStatus='downStatus'
+				@loadmore='scrollHandler' :list="list" @clean='cleanList' @all='selectAll' :status='status'
+				:actionSheetLabels='share_lables'>
+			</custom-list>
+		</template>
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 	</view>
 </template>
@@ -11,6 +28,13 @@
 <script>
 	import popups from '@/common/js/mixins/popups.js'
 	import customList from '@/common/js/mixins/custom-list.js'
+	import {
+		getlist
+	} from '@/api/file.js'
+	import {
+		getContent,
+		getChildContent
+	} from '@/api/share.js'
 	export default {
 		mixins: [popups, customList],
 		onNavigationBarButtonTap(e) {
@@ -18,85 +42,177 @@
 				this.openMenu = !this.openMenu
 			}
 		},
+		data() {
+			return {
+				collection_lables: [{
+						text: '下载',
+						method: 'download',
+						icon: '/static/icon/actionsheet/download.png'
+					},
+					{
+						text: '打开所在目录',
+						method: 'openDir',
+						icon: '/static/icon/actionsheet/to-dir.png',
+						once: true
+					}
+				],
+				share_lables: [{
+					text: '保存',
+					method: 'save',
+					icon: '/static/icon/actionsheet/move.png',
+				}]
+			}
+		},
 		methods: {
-			initCollection() {
+			async initCollection() {
 				uni.$once('open-list', (data) => {
 					let list = data.data.list
-					const title = list[0].fileName + `等${list.length}个文件`
+					const title = list[0].fileName + ` 等 ${list.length}个文件`
 					uni.setNavigationBarTitle({
 						title
 					})
 					this.list = list
+					this.skeletonLoading = false
 				})
 			},
-			initFolder(option) {
-				console.log(option.uuid)
-				this.$nextTick(function() {
-					this.list = [{
-						fileName: 'uni-app教学视频',
-						type: 0,
-						date: '2020-12-04'
-					}, {
-						fileName: 'uni-app教学视频',
-						type: 0,
-						date: '2020-12-04'
-					}, {
-						fileName: 'uni-app教学视频',
-						type: 0,
-						date: '2020-12-04'
-					}]
-					this.path = [{
-							title: "全部文件",
-							uuid: 1
-						},
-						{
-							title: "uni-app教学视频",
-							uuid: 2
+			async initFolder() {
+				await this.init()
+				this.skeletonLoading = false
+				uni.setNavigationBarTitle({
+					title: this.path[this.path.length - 1].title
+				})
+			},
+			async initShareFolder() {
+				const {
+					data
+				} = (await getChildContent(this.uuid, this.share_id)).data
+				this.list = data.map(item => {
+					return {
+						...item,
+						share_id: this.share_id
+					}
+				})
+				this.skeletonLoading = false
+				uni.setNavigationBarTitle({
+					title: this.list[0].user_id.replace(/(\d{3})(\d{4})(\d{4})/, "$1****$3" + '的分享')
+				})
+			},
+			async initShare() {
+				const reg = /(\d{3})(\d{4})(\d{4})/;
+				uni.$once('open-list', ({
+					data
+				}) => {
+					const url = data
+					getContent(data, uni.getStorageSync(url)).then(({
+						data: {
+							data
 						}
-					]
-					// this.parentId = xxx.parentId
-					const title = this.path[this.path.length - 1].title
-					uni.setNavigationBarTitle({
-						title
+					}) => {
+						uni.setNavigationBarTitle({
+							title: data.share_user.replace(reg,
+								"$1****$3") + '的分享'
+						})
+						this.list = data.filelist.map(item => {
+							return {
+								...item,
+								share_id: url
+							}
+						})
+						this.skeletonLoading = false
+					}).catch((err) => {
+						uni.removeStorageSync(url)
+						if (err.data.code === 406 || (err.data.code === 403 && err.data.message ===
+								'提取码错误')) {
+							uni.navigateTo({
+								url: '/pages/global/code/code?url=' + data,
+								success: () => {
+									uni.$once('code-check', (res) => {
+										if (!res) return uni.navigateBack({
+											delta: 1
+										})
+										this.list = res.filelist.map(item => {
+											return {
+												...item,
+												share_id: url
+											}
+										})
+										uni.setNavigationBarTitle({
+											title: res.share_user.replace(
+												reg,
+												"$1****$3") + '的分享'
+										})
+										this.skeletonLoading = false
+									})
+								}
+							})
+						} else if (err.data.code === 404 && err.data.message === '无效链接或该分享已被取消') {
+
+						}
 					})
-					this.type = option.type
 				})
 			},
-			refresh() {
-				this.downStatus = 'loading'
-				setTimeout(() => {
-					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
-					this.downStatus = "noMore"
-					if (this.$refs['list'].action) this.$refs['list'].exitAction()
-					setTimeout(() => {
-						this.downStatus = "more"
-					}, 1000)
-				}, 1000)
+			breadClickHandler(item) {
+				if (this.closeBreadCrumb) return
+				let index = this.path.reverse().findIndex(item2 => {
+					return item2.uuid === item.uuid
+				})
+				return uni.navigateBack({
+					delta: !index ? this.path.length : index
+				})
 			},
-			scrollHandler() {
-				if (this.status === 'loading' || this.status === 'noMore') return
-				this.status = 'loading'
-				setTimeout(() => {
-					this.list.push({
-						fileName: 'office',
-						type: 26,
-						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-						date: '2020-12-04',
-						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						uuid: 142
-					})
-					this.status = "noMore"
-				}, 2000)
+			async init(cache = 1) {
+				const {
+					data: {
+						filelist,
+						count,
+						path
+					}
+				} = (await getlist(this.uuid, this.page, this.num, cache)).data
+				this.list = filelist
+				this.count = count
+				this.path = [{
+					title: '我的文件'
+				}, ...path.map(item => {
+					return {
+						title: item.fileName,
+						uuid: item.uuid,
+						file_id: item.file_id
+					}
+				}).reverse()]
+				this.page_max = Math.floor(count / this.num)
+				if (count) setTimeout(() => {
+					this.scrolltolower()
+				}, 500)
+			},
+			async load() {
+				const {
+					data: {
+						filelist
+					}
+				} = (await getlist(this.uuid, this.page, this.num, 1)).data
+				if (!filelist.length) return this.page -= 1
+				this.list = this.list.concat(filelist)
 			}
 		},
-		onLoad(option) {
-			if (option.type === 'folder') {
-				// uuid request
-				this.initFolder(option)
-			} else if (option.type === 'collection') {
-				this.initCollection()
+		async onLoad(option) {
+			this.uuid = option.uuid
+			this.type = option.type
+			if (option.opendir) this.closeBreadCrumb = true
+			switch (option.type) {
+				case 'folder':
+					return await this.initFolder()
+					break;
+				case 'collection':
+					return await this.initCollection()
+					break;
+				case 'share':
+					return await this.initShare()
+					break;
+				case 'share_folder':
+					this.share_id = option.share_id
+					return await this.initShareFolder()
+					break;
 			}
-			this.scrollHandler()
 		},
 	}
 </script>

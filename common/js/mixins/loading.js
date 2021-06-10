@@ -24,13 +24,13 @@ export default {
 		loadMore() {
 			this.$emit('scrolltolower')
 		}
-	},
-	watch: {
-		status(newVal) {
-			if (newVal === 'noMore') uni.showToast({
-				position: 'bottom',
-				title: '已经到底了'
-			})
-		}
 	}
+	// watch: {
+	// 	status(newVal) {
+	// 		if (newVal === 'noMore') uni.showToast({
+	// 			position: 'bottom',
+	// 			title: '已经到底了'
+	// 		})
+	// 	}
+	// }
 }

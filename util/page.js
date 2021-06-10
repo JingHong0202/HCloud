@@ -51,9 +51,9 @@ export function createSelectNav() {
 		left: '0px',
 		height: `44px`,
 		width: '100%',
-		backgroundColor: '#e4c774',
+		backgroundColor: '#4070ff',
 		statusbar: {
-			background: '#e4c774'
+			background: '#4070ff'
 		}
 	});
 	nav.draw([{

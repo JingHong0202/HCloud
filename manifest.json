@@ -1,7 +1,7 @@
 {
     "name" : "HCloud",
     "appid" : "__UNI__6023E81",
-    "description" : "",
+    "description" : "HCloud 一个云端在线存储、分享、快速传输的云盘",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
@@ -22,8 +22,7 @@
         },
         /* 模块配置 */
         "modules" : {
-            "VideoPlayer" : {},
-            "OAuth" : {}
+            "VideoPlayer" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -41,7 +40,6 @@
                     "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
-                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
                     "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
                     "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
                     "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
@@ -51,7 +49,7 @@
                     "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ],
-                "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ]
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ]
             },
             /* ios打包配置 */
             "ios" : {
@@ -59,14 +57,13 @@
             },
             /* SDK配置 */
             "sdkConfigs" : {
-                "ad" : {
-                    "360" : {},
-                    "csj" : {},
-                    "gdt" : {},
-                    "ks" : {}
-                },
-                "oauth" : {
-                    "univerify" : {}
+                "ad" : {},
+                "oauth" : {},
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wx93ff7c80937cf5b4",
+                        "UniversalLinks" : ""
+                    }
                 }
             },
             "splashscreen" : {
@@ -105,9 +102,24 @@
                 }
             }
         },
-        "nativePlugins" : {},
+        "nativePlugins" : {
+            "Ikiw-NvueQrcode" : {
+                "__plugin_info__" : {
+                    "name" : "IkiwNvueQrcode",
+                    "description" : "IkiwNvueQrcode",
+                    "platforms" : "Android,iOS",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
+                }
+            }
+        },
         "renderer" : "native",
-        "nvueLaunchMode" : "fast"
+        "nvueLaunchMode" : ""
     },
     /* 快应用特有相关 */
     "quickapp" : {},

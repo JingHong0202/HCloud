@@ -1,62 +1,43 @@
-async function isCollection(Arg) {
+import {
+	getFileInfoSync,
+	getFileMimeType
+} from '@/util/file.js'
+import {
+	findchild
+} from '@/api/file.js'
+async function parse(Arg) {
 	let list = [...Arg],
 		Collection = [];
-
-	list.forEach((item, i) => {
+	for (let [i, item] of list.entries()) {
 		let insert;
-		switch (item.type) {
-			case 0:
-				//folder
-				insert = [{
-						fileName: 'uni-app教学图片',
-						type: 1,
-						url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						date: '2020-12-04',
-						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						uuid: 23442
-					},
-					{
-						fileName: 'uni-app教学视频',
-						type: 3,
-						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
-						date: '2020-12-04',
-						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						uuid: 230441
-					}
-				]
-				break;
-			case 20:
-				//dynamic
-				insert = item.list
-				break;
-			default:
-				return
+		if (!item.type) {
+			const {
+				data
+			} = (await findchild(item.uuid)).data
+			insert = data
+			Collection.push({
+				insert,
+				id: item.uuid
+			})
 		}
-
-		Collection.push({
-			insert,
-			i
-		})
-	});
+	}
 	Collection.forEach(item => {
-		let i = item.i,
+		let i = list.findIndex(item2 => item2.uuid === item.id),
 			insert = item.insert
 		let left = list.slice(0, i),
-			right = list.slice(i + 1, list.length)
+			right = list.slice(i + 1)
 
 		list = left.concat(insert).concat(right)
 	})
 	return list
 }
-
-
 export default {
 	namespaced: true,
 	state: {
 		selectlist: [],
 		action: false,
-		downlist: uni.getStorageSync('downlist') || [],
-		uplist: uni.getStorageSync('uplist') || []
+		downlist: [],
+		uplist: []
 	},
 	actions: {
 		async ADD_DOWN_LIST({
@@ -64,7 +45,7 @@ export default {
 			state
 		}) {
 			// 判断文件类型是否是 0文件夹  20集合，是的话根据uuid请求获取其所有的子文件或从缓存中读取
-			let selectlist = await isCollection(state.selectlist),
+			let selectlist = await parse(state.selectlist),
 				downlist = [...state.downlist]
 			// 过滤重复选项
 			selectlist = selectlist
@@ -74,13 +55,73 @@ export default {
 					})
 				})
 			let Val = [...downlist, ...selectlist].map(item => {
-				let obj = { ...item
+				let obj = {
+					...item
 				}
 				if (!obj.status) obj.status = 'LOADING'
 				if (obj.checked) delete obj.checked
 				return obj
 			})
 			commit('CHANGE_DOWN_LIST', Val)
+		},
+		async ADD_UP_LIST({
+			commit,
+			state
+		}, {
+			target,
+			selectlist
+		}) {
+
+			uni.showLoading({
+				mask: true,
+				title: '上传准备中...'
+			})
+			let format = await Promise.all([...selectlist].map(async item => {
+				const url = Object.prototype.toString.call(item) ===
+					'[object Object]' ?
+					'file:///' + item.path.toString() : item
+				let {
+					size,
+					digest
+				} = await getFileInfoSync(url)
+				let mimeType = await getFileMimeType(url)
+				let res = {
+					// ...item,
+					fileName: item.fileName ? item.fileName : item.split('/')[
+						item.split('/')
+						.length - 1],
+					size,
+					md5: digest,
+					file_id: target,
+					url,
+					type: mimeType,
+				}
+				if (mimeType === 1 || mimeType === 3) res.thumb = url
+				delete res.path
+				delete res.checked
+				return res
+			}));
+			// 根据md5过滤重复
+			let addlist = format.filter(item => {
+				return state.uplist.every(item2 => {
+					return item.md5 !== item2.md5
+				})
+			})
+
+			if (!addlist.length) {
+				uni.showToast({
+					title: '选择的文件已在传输列表中',
+					position: 'bottom'
+				})
+				return uni.hideLoading()
+			}
+			let marge = [...state.uplist, ...addlist.map(item => {
+				return {
+					...item,
+					status: 'LOADING'
+				}
+			})]
+			commit('CHANGE_UP_LIST', marge)
 		}
 	},
 	mutations: {
@@ -92,17 +133,46 @@ export default {
 		},
 		CHANGE_DOWN_LIST(state, newVal) {
 			state.downlist = newVal
+		},
+		CHANGE_UP_LIST(state, newVal) {
+			state.uplist = newVal
+			uni.hideLoading()
 		}
 	},
 	getters: {
 		RUNTIME(state) {
-			return [...state.downlist, ...state.uplist].length
+			return [...state.uplist.filter(item => item.status === 'RUNTIME' || item.status ===
+					'LOADING'), ...state
+				.downlist.filter(item => item.status === 'RUNTIME' || item.status === 'LOADING')
+			].length
 		},
-		GET_DOWNLIST_STATUS(state) {
-			return state.downlist.map(item => item.status)
+		// GET_UPLIST_RUNTIME(state) {
+		// 	return state.uplist.filter(item => item.status === 'RUNTIME')
+		// },
+		// GET_UPLIST_ERROR(state) {
+		// 	return state.uplist.filter(item => item.status === 'ERROR')
+		// },
+		// GET_UPLIST_STOP(state) {
+		// 	return state.uplist.filter(item => item.status === 'STOP')
+		// },
+		GET_UPLIST_LOADING(state) {
+			return state.uplist.filter(item => item.status === 'LOADING')
 		},
-		GET_UPLIST_STATUS(state) {
-			return state.uplist.map(item => item.status)
-		}
+		GET_DOWNLIST_LOADING(state) {
+			return state.downlist.filter(item => item.status === 'LOADING')
+		},
+		// GET_UPLIST_SUCCESS(state) {
+		// 	return state.uplist.filter(item => item.status === 'SUCCESS')
+		// },
+
+		GET_DOWNLIST_RUNTIME(state) {
+			return state.downlist.filter(item => item.status === 'RUNTIME')
+		},
+		// GET_DOWNLIST_STATUS(state) {
+		// 	return state.downlist.map(item => item.status)
+		// },
+		// GET_UPLIST_STATUS(state) {
+		// 	return state.uplist.map(item => item.status)
+		// }
 	}
 }

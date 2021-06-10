@@ -7,7 +7,7 @@
 				<slot name="header">
 					<view class="uni-list-item__header">
 						<view v-if="thumb" class="uni-list-item__icon">
-							<image @error='previewThumbError' :src="previewThumb" mode="aspectFit" class="uni-list-item__icon-img" :class="['uni-list--' + thumbSize]" />
+							<image @error='previewThumbError' :src="previewThumb" :mode="direction === 'column' ? 'aspectFit' : 'widthFix' " class="uni-list-item__icon-img" :class="['uni-list--' + thumbSize]" />
 						</view>
 						<view v-else-if="showExtraIcon" class="uni-list-item__icon">
 							<uni-icons :color="extraIcon.color" :size="extraIcon.size" :type="extraIcon.type" />
@@ -192,10 +192,10 @@
 		methods: {
 			previewThumbError() {
 				this.thumbState = 0
-				uni.showToast({
-					title: '预览图加载失败',
-					position: 'bottom'
-				})
+				// uni.showToast({
+				// 	title: '预览图加载失败',
+				// 	position: 'bottom'
+				// })
 			},
 			/**
 			 * 获取父元素实例
@@ -356,6 +356,7 @@
 		color: $uni-text-color-grey;
 		font-size: $uni-font-size-sm;
 		overflow: hidden;
+		margin-top: 10rpx;
 	}
 
 	.uni-list-item__extra {
@@ -384,9 +385,6 @@
 	}
 
 	.uni-list-item__icon-img {
-		/* #ifndef APP-NVUE */
-		display: block;
-		/* #endif */
 		height: $uni-img-size-base;
 		width: $uni-img-size-base;
 	}

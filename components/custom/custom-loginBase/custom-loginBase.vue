@@ -27,7 +27,7 @@
 				<text class="color-base font-28" @tap='$emit("tapRight")'>{{mode.rightText}}</text>
 			</slot>
 		</view>
-		<view class="other" style="flex-direction: column;" v-if="mode.more">
+	<!-- 	<view class="other" style="flex-direction: column;" v-if="mode.more">
 			<view class="vs-row vs-align-center margin-b40">
 				<view class="separator vs-flex-item"></view>
 				<text class="color-black-3 font-28">更多登录方式</text>
@@ -35,11 +35,11 @@
 			</view>
 
 			<view class="other-items vs-row vs-align-center vs-space-around">
-				<!-- <image class="other-icon" src="/static/wechat.png" mode=""></image> -->
+				<image class="other-icon" src="/static/wechat.png" mode=""></image>
 				<slot name='other' />
 					
 			</view>
-		</view>
+		</view> -->
 		<image class="tab-bg" src="/static/icon/page/login/banner-icon.png" style="position: absolute; right: 0px;top:0px"></image>
 	</view>
 </template>

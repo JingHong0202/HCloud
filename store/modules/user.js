@@ -1,16 +1,20 @@
 export default {
 	namespaced: true,
 	state: {
-		info: {
-			avatars: "/static/images/pic.jpg"
-		}
+		info: {},
+		// token: uni.getStorageSync('token')
 	},
 	// actions: {
 		
 	// },
-	// mutations: {
-		
-	// },
+	mutations: {
+		INIT_USER(state, val) {
+			state.info = val
+		},
+		CHANGE_TOKEN(state,val) {
+			state.token = val
+		}
+	},
 	// getters: {
 		
 	// }

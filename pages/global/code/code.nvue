@@ -1,0 +1,66 @@
+<template>
+	<custom-dragPanel ref='drag-panel' title="请输入提取码">
+		<input class="code" type="text" v-model="code" @confirm='submit' maxlength='8' confirm-type='send' focus />
+		<button type="primary" @click="submit" :disabled="!check" >提交</button>
+	</custom-dragPanel>
+</template>
+
+<script>
+	import {
+		getContent
+	} from '@/api/share.js'
+	export default {
+		onReady() {
+			this.$refs['drag-panel'].show();
+		},
+		onLoad(params) {
+			this.url = params.url
+		},
+		computed: {
+			check() {
+				return this.code.length >= 4 && this.code.length <= 8
+			}
+		},
+		onBackPress({
+			from
+		}) {
+			if (from === 'backbutton') {
+				this.$refs['drag-panel'].back();
+				return true
+			}
+		},
+		destroyed() {
+			uni.$emit('code-check', this.res)
+		},
+		methods: {
+			submit() {
+				if (this.check) {
+					getContent(this.url, this.code).then(({
+						data: {
+							data
+						}
+					}) => {
+						this.res = data
+						uni.setStorageSync(this.url, this.code)
+						uni.navigateBack({
+							delta: 1
+						})
+					})
+				}
+			}
+		},
+		data() {
+			return {
+				code: ''
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.code {
+		padding: 0 20rpx 0 20rpx;
+		flex: 1;
+		margin-bottom: 20rpx;
+	}
+</style>

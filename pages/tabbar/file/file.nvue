@@ -1,21 +1,23 @@
 <template>
-	<view class="file" :render-whole='true' >
-		<view style="flex-direction: column;" >
+	<view class="file" :render-whole='true'>
+		<view style="flex-direction: column;" elevation="1px">
 			<uni-status-bar />
-			<uni-nav-bar :border='false' color="#333333" background-color="#FFFFFF" rightIcon="more-filled"
+			<uni-nav-bar :border='false' color="#D3DBE7" background-color="#FFFFFF" rightIcon="more-filled"
 				@clickLeft='toAccount' @clickRight='openMenu = !openMenu'>
 				<view class="input-view" @click="toSearch">
-					<uni-icons class="input-uni-icon" type="search" size="24" color="#868686" />
+					<uni-icons class="input-uni-icon" type="search" size="26" color="#5E6165" />
 					<text class="input-placeholder">点击搜索</text>
 				</view>
 				<view slot="left">
-					<image src="/static/images/pic.jpg" mode="aspectFit" class="user-avatars" />
+					<image src="/static/images/avatar.png" mode="aspectFit" class="user-avatars" />
 				</view>
 			</uni-nav-bar>
 		</view>
 
-		<custom-list  isPageScroll multiple @loadmore='scrolltolower' ref='list' :filter="filter" :list="list" @refresh='refresh'
-			:downStatus='downStatus' @clean='cleanList' @all='selectAll' :status='status'></custom-list>
+		<custom-list :skeletonLoading='skeletonLoading' isPageScroll multiple @loadmore='scrolltolower' ref='list'
+			:filter="filter" :list="list" @refresh='refresh' :downStatus='downStatus' @clean='cleanList'
+			@all='selectAll' @refreshList='refresh' :status='status'>
+		</custom-list>
 		<custom-popups :afterTop='afterTop' :labels="labels" v-if='openMenu' @handleClick='handleClick'
 			@exit='openMenu = !openMenu' />
 	</view>
@@ -25,102 +27,50 @@
 	import popups from '@/common/js/mixins/popups.js'
 	import nav from '@/common/js/mixins/nav.js'
 	import customList from '@/common/js/mixins/custom-list.js'
-	import {
-		getEl
-	} from '@/util/bindingx.js'
-	const bindingx = uni.requireNativePlugin('bindingx'),
-		dom = uni.requireNativePlugin('dom')
-	let {
-		windowHeight,
-		statusBarHeight
-	} = uni.getSystemInfoSync()
-	export default {
 
+	import {
+		getlist
+	} from '@/api/file.js'
+
+	export default {
 		mixins: [popups, nav, customList],
 		data() {
 			return {
 				afterTop: 0,
+
 			}
 		},
-		onReady() {
-
-			// request
-			// uni.setStorage({
-			// 	key:
-			// })
-
-			setTimeout(() => {
-				this.list = [{
-						fileName: '11uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频uni-app教学视频',
-						type: 0,
-						date: '2020-12-01',
-						uuid: 233,
-						fileSize: 1000333
-					},
-					{
-						fileName: '教ani-app学图片',
-						type: 1,
-						url: 'https://t7.baidu.com/it/u=4036010509,3445021118&fm=193&f=GIF',
-						date: '2020-12-04',
-						thumb: 'https://t7.baidu.com/it/u=4036010509,3445021118&fm=193&f=GIF',
-						uuid: 2334,
-						fileSize: 100033
-					},
-					{
-						fileName: 'bni-app教学图片',
-						type: 1,
-						url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						date: '2010-12-04',
-						thumb: 'https://t7.baidu.com/it/u=1595072465,3644073269&fm=193&f=GIF',
-						uuid: 234.,
-						fileSize: 10002
-					},
-					{
-						fileName: 'uni-app教学视频',
-						type: 3,
-						url: 'https://img.cdn.aliyun.dcloud.net.cn/guide/uniapp/%E7%AC%AC1%E8%AE%B2%EF%BC%88uni-app%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D%EF%BC%89-%20DCloud%E5%AE%98%E6%96%B9%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B@20200317.mp4',
-						date: '2020-12-04',
-						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						uuid: 230,
-						fileSize: 1003
-					}
-				]
-			}, 1000)
-
-			this.afterTop = statusBarHeight + 44
-			this.scrolltolower()
+		async onReady() {
+			await this.init()
+			return this.skeletonLoading = false
 		},
 		methods: {
-			refresh() {
-				this.downStatus = 'loading'
-				setTimeout(() => {
-					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
-					this.downStatus = "noMore"
-					if (this.action) this.cleanList()
-					setTimeout(() => {
-						this.downStatus = "more"
-					}, 1000)
-				}, 1000)
+			async init(isCache = 1) {
+				const {
+					data: {
+						filelist,
+						count
+					}
+				} = (await getlist(null, this.page, this.num, isCache)).data
+				this.list = filelist
+				this.count = count
+				this.page_max = Math.floor(count / this.num)
+				let {
+					statusBarHeight
+				} = uni.getSystemInfoSync()
+				this.afterTop = statusBarHeight + 44
+				if (count) setTimeout(() => {
+					this.scrolltolower()
+				}, 500)
 			},
-			scrolltolower() {
-				this.status = 'loading'
-				if (this.list.length > 50) {
-					this.status = 'noMore'
-				} else {
-					setTimeout(() => {
-						for (let i = 0; i < 30; i++) {
-							this.list.push({
-								fileName: 'office',
-								type: 26,
-								url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-								date: '2020-12-04',
-								thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-								uuid: 157
-							})
-						}
-						this.status = 'more'
-					}, 2000)
-				}
+			async load() {
+				const {
+					data: {
+						filelist
+					}
+				} = (await getlist(null, this.page, this.num, 1)).data
+				if (!filelist.length) return this.page -= 1
+				this.list = this.list.concat(filelist)
 			}
 		}
 	}
@@ -137,7 +87,7 @@
 		background-color: #F7F7F7;
 		flex-direction: row;
 		border-radius: 70rpx;
-		height: 70rpx;
+		height: 65rpx;
 		@extend %f-ct;
 
 		.input-placeholder {

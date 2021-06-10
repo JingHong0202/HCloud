@@ -5,4 +5,20 @@ export default {
 				.test(this.mobile)
 		}
 	},
+	methods: {
+		logout() {
+			uni.$showModal({
+				concent: '确定要退出登录吗?',
+				align: 'center'
+			}).then(res => {
+				uni.removeStorageSync('token')
+				uni.removeStorageSync('userinfo')
+				uni.reLaunch({
+					url: '/pages/user/login/login'
+				})
+			}).catch((res) => {
+				this.$hide()
+			})
+		}
+	}
 }

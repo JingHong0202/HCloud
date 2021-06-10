@@ -1,7 +1,8 @@
 <template>
-	<scroll-view scroll-x="true" class="breadCrumb" show-scrollbar='false'  :scroll-left="left" >
-		<view v-for="(item,i) in path" class="breadCrumb-item" @click="toFolder(item)">
-			<text class="breadCrumb-item-text" ref='current'  :class="{'current-breadCrumb-item': i === path.length - 1}" >{{item.title}}</text>
+	<scroll-view scroll-x="true" class="breadCrumb" show-scrollbar='false' :scroll-left="left">
+		<view v-for="(item,i) in path" class="breadCrumb-item" @click="i !== path.length - 1 ? $emit('click',item) : null">
+			<text class="breadCrumb-item-text" ref='current'
+				:class="{'current-breadCrumb-item': i === path.length - 1}">{{item.title}}</text>
 			<text class="breadCrumb-item-text separator">{{path.length !== 1 && i !== path.length -1 ? '/' : ''}}</text>
 		</view>
 	</scroll-view>
@@ -19,19 +20,20 @@
 			}
 		},
 		watch: {
-			path () {
-				if (!this.$refs['current']) return
-				dom.getComponentRect(this.$refs['current'][this.$refs['current'].length - 1], ({size}) => {
-					this.left = size.left
-				})
+			path: {
+				handler() {
+					setTimeout(() => {
+						if (!this.$refs['current']) return
+						dom.getComponentRect(this.$refs['current'][this.$refs['current'].length - 1], ({
+							size
+						}) => {
+							this.left = size.left
+						})
+					}, 500)
+				},
+				immediate: true
 			}
 		},
-		methods: {
-			toFolder(item) {
-				// 根据item.uuid获取对应的列表
-			}
-		},
-		
 		data() {
 			return {
 				left: 0

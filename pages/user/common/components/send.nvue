@@ -1,21 +1,38 @@
 <template>
-	<custom-loginBase  :mode='init' @submit='submit' :disabled='isMobile'  @tapLeft='$emit("tapLeft")' @tapRight='$emit("tapRight")'  >
+	<custom-loginBase :mode='init' @submit='submit' :disabled='isMobile' @tapLeft='$emit("tapLeft")'
+		@tapRight='$emit("tapRight")'>
 		<template slot="from">
 			<view class="input vs-row vs-align-center margin-b40">
 				<image class="input-icon margin-r20" src="/static/icon/page/login/account.png" mode=""></image>
-				<input class="vs-flex-item color-base font-30" type="text" value="" @confirm='submit'   @input='(e) => {mobile = e.detail.value}' :maxlength="11"
-					placeholder="请输入您的手机号" placeholder-class="input-placeholder" />
+				<input class="vs-flex-item color-base font-30" ref='mobile' type="text" value="" @confirm='submit'
+					@input='(e) => {mobile = e.detail.value}' :maxlength="11" placeholder="请输入您的手机号"
+					placeholder-class="input-placeholder" />
 			</view>
-		</template> 
+		</template>
 	</custom-loginBase>
 </template>
 
 <script>
 	import userCommon from '@/common/js/mixins/user'
+	import {
+		send
+	} from '@/api/user.js'
 	export default {
-		mixins:[userCommon],
+		mixins: [userCommon],
 		props: {
-			init: Object
+			init: Object,
+			verifyMode: {
+				type: String,
+				default: 'login'
+			},
+			action: {
+				type: String,
+				default: ''
+			}
+		},
+		onHide() {
+			console.log(this.$refs)
+			this.$refs['mobile'].blur()
 		},
 		data() {
 			return {
@@ -23,24 +40,33 @@
 			}
 		},
 		methods: {
-			submit () {
-				const {mobile} = this
-				if (!this.isMobile)  return uni.showToast({
-						title: "无效的手机号码",
-						icon: "none",
-						position: "bottom"
-					})
-				uni.navigateTo({
-					url: '/pages/user/code/code?mobile='+mobile,
-					success: () => {
-						uni.$once('checkCode-success', () => {
-							
-							this.$emit('end')
-						})
-					}
+			async submit() {
+				const {
+					mobile
+				} = this
+				if (!this.isMobile) return uni.showToast({
+					title: "无效的手机号码",
+					icon: "none",
+					position: "bottom"
 				})
-				// send
-				// console.log(mobile)
+
+				const data = (await send({
+					mobile,
+					action: this.action
+				})).data
+				console.log(data)
+				// if (data.isUser)
+				if (data.code === 200) {
+					uni.navigateTo({
+						url: '/pages/user/code/code?mobile=' + mobile + '&verify=' + this.verifyMode,
+						success: () => {
+							uni.$once('checkCode-success', res => {
+
+								this.$emit('end', res)
+							})
+						}
+					})
+				}
 			}
 		}
 	}

@@ -44,7 +44,7 @@
 
 <style scoped lang='scss'>
 	.progress-box {
-		width: 400rpx;
+		width: 500rpx;
 		margin-top: 10px;
 		height: 5px;
 		border-radius: 10px;

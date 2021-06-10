@@ -1,0 +1,34 @@
+{
+    "name": "IkiwNvueQrcode",
+    "id": "Ikiw-NvueQrcode",
+    "version": "1.0.1",
+    "description": "IkiwNvueQrcode",
+    "_dp_type": "nativeplugin",
+    "_dp_nativeplugin": {
+         "android": {
+            "plugins": [
+                {
+                    "type": "module",
+                    "name": "Ikiw-NvueQrcode",
+                    "class": "cn.wzjun.ikiw_nvueqrcode.QrcodeModule"
+                }
+            ],
+            "integrateType": "aar"
+        },
+        "ios": {
+            "plugins": [{
+                "type": "module",
+                "name": "Ikiw-NvueQrcode",
+                "class": "QrcodeModule"
+            }],
+            "hooksClass": "",
+            "frameworks": [
+                "UIKit.framework"
+            ],
+            "embedFrameworks": [],
+            "privacies": [],  
+            "resources": [],
+            "integrateType": "framework"
+        }
+    }
+}

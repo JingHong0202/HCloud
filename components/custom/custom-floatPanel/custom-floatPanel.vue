@@ -1,22 +1,25 @@
 <template>
 	<view class="media-box" ref='photo-box' @touchend="toggle = false" @touchmove.stop.provent='move'>
 		<slot />
-		<view elevation="5px" class="drop-float" :style="{'transform': `translateY(${y}px)`}" @touchend="end"
-			@touchstart.stop="start">
-			<text class="iconfont c-iconfont">&#xe666;</text>
-			<text class="current-date" v-if="toggle">{{date}}</text>
-		</view>
-		<view v-if="toggle" class="tip">
-			<text class="tip-text">{{this.date}}</text>
-		</view>
-
+		<template v-if="list.length">
+			<view elevation="5px" class="drop-float" :style="{'transform': `translateY(${y}px)`}" @touchend="end"
+				@touchstart.stop="start">
+				<text class="iconfont c-iconfont">&#xe666;</text>
+				<text class="current-date" v-if="toggle">{{date}}</text>
+			</view>
+			<view v-if="toggle" class="tip">
+				<text class="tip-text">{{this.date}}</text>
+			</view>
+		</template>
 	</view>
 </template>
 
 <script>
 	const dom = uni.requireNativePlugin('dom'),
 		floatPanelHeight = 40
-	import {mapState} from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -42,7 +45,7 @@
 			...mapState('file', ['action']),
 		},
 		mounted() {
-			this.$nextTick(function(){
+			this.$nextTick(function() {
 				setTimeout(() => {
 					dom.getComponentRect(this.$refs['photo-box'], ({
 						size
@@ -70,7 +73,7 @@
 				let {
 					pageY
 				} = changedTouches[0]
-				if (pageY < 0 || pageY > (this.maxY - (floatPanelHeight + (this.action ? 50:0)))) return
+				if (pageY < 0 || pageY > (this.maxY - (floatPanelHeight + (this.action ? 50 : 0)))) return
 				this.date = this.indexList[~~((pageY + (pageY > floatPanelHeight ? floatPanelHeight : 0)) / this
 						.itemHeight)] ||
 					this.date
@@ -121,14 +124,11 @@
 	}
 
 	.drop-float {
-		// position: absolute;
-		// right: 0px;
 		@include position(absolute, false, 0);
 		height: 40px;
 		background-color: white;
 		border-top-left-radius: 25px;
 		border-bottom-left-radius: 25px;
-		// padding-left: 20rpx;
 	}
 
 	.current-date {

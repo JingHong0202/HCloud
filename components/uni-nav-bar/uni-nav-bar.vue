@@ -131,6 +131,7 @@
 
 	.uni-navbar {
 		width: 750rpx;
+		padding-bottom: 20rpx;
 	}
 
 	.uni-navbar__content {

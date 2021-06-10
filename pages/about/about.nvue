@@ -1,7 +1,7 @@
 <template>
 	<view class="about">
 		<view class="header">
-			<image class="logo" src="/static/icon/type/like.png" mode="aspectFit"></image>
+			<image class="logo" src="/static/images/logo.png" mode="aspectFit"></image>
 			<text class="version">v1.0.0</text>
 		</view>
 		<uni-list :border='false'>
@@ -32,8 +32,9 @@
 			height: 250px;
 
 			.logo {
-				width: 100px;
-				height: 100px;
+				width: 150rpx;
+				height: 150rpx;
+				margin-bottom: 15rpx;
 			}
 
 			.version {

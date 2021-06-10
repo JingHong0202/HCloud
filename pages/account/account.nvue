@@ -1,37 +1,43 @@
 <template>
-	<list class="account">
-		<uni-list-item title='头像' showArrow>
-			<template slot="footer">
-				<image class="avatar" :src="avatar" mode="aspectFit"></image>
-			</template>
-		</uni-list-item>
-		<uni-list-item :rightText="name" title="昵称"></uni-list-item>
-		<uni-list-item :rightText="phone" title="手机号"></uni-list-item>
-		<uni-list-item :rightText="wx" title="微信号"></uni-list-item>
-		<uni-list-item showArrow title="二维码">
-			<template slot="footer">
-				<image class="qs" src="/static/icon/page/account/qs.png" mode="aspectFit"></image>
-			</template>
-		</uni-list-item>
-		<cell>
-			<uni-section title="账号登录设置" type="line"></uni-section>
-		</cell>
-		<uni-list-item :show-switch="true" @switchChange="fingerprint" title="指纹密码"></uni-list-item>
-		<uni-list-item :show-switch="true" @switchChange="equipment" title="设备锁"></uni-list-item>
-		<cell>
-			<button class="logout-btn" type="warn">退出登录</button>
-		</cell>
-	</list>
+	<view>
+		<list class="account">
+			<uni-list-item title='头像' showArrow>
+				<template slot="footer">
+					<image class="avatar" :src="avatar" mode="aspectFit"></image>
+				</template>
+			</uni-list-item>
+			<!-- <uni-list-item :rightText="name" title="昵称"></uni-list-item> -->
+			<uni-list-item :rightText="user.mobile" title="手机号"></uni-list-item>
+			<!-- <uni-list-item :rightText="wx" title="微信号"></uni-list-item> -->
+			<uni-list-item showArrow title="二维码">
+				<template slot="footer">
+					<image class="qs" src="/static/icon/page/account/qs.png" mode="aspectFit"></image>
+				</template>
+			</uni-list-item>
+			<cell>
+				<uni-section title="账号登录设置" type="line"></uni-section>
+			</cell>
+			<uni-list-item :show-switch="true" @switchChange="fingerprint" title="指纹密码"></uni-list-item>
+			<uni-list-item :show-switch="true" @switchChange="equipment" title="设备锁"></uni-list-item>
+			<cell>
+				<button class="logout-btn" type="warn" @tap='logout'>退出登录</button>
+			</cell>
+		</list>
+	</view>
 </template>
 
 <script>
+	import userCommon from '@/common/js/mixins/user.js'
 	export default {
+		mixins: [userCommon],
 		data() {
+			const user = getApp().globalData.userinfo
 			return {
-				avatar: '/static/images/pic.jpg',
-				name: 'username',
-				phone: '未绑定手机号',
-				wx: '未绑定微信号'
+				avatar: '/static/images/avatar.png',
+				// name: 'username',
+				// phone: '未绑定手机号',
+				// wx: '未绑定微信号',
+				user
 			};
 		},
 		methods: {
@@ -51,11 +57,13 @@
 		height: 60rpx;
 		border-radius: 60rpx;
 	}
+
 	.account {
 		// @include position(absolute, 0,0,0,0);
 		flex-direction: column;
 		flex: 1;
 	}
+
 	.qs {
 		width: 60rpx;
 		height: 60rpx;

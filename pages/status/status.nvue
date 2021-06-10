@@ -3,12 +3,13 @@
 		<view class="tabs">
 			<custom-swiperTab :index='tabIndex' @change='tabIndexChange' :labels='TabLables'></custom-swiperTab>
 		</view>
-		<swiper  :current="tabIndex" class="status-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
+		<swiper :current="tabIndex" class="status-box" :skip-hidden-item-layout="true" @change='SwiperChange'>
 			<swiper-item class="status-swiper-item up-list">
-				<custom-statusList v-if="uplist.length" :list="uplist"></custom-statusList>
+				<custom-statusList :mode="false" :list="uplist"></custom-statusList>
 			</swiper-item>
-			<swiper-item class="status-swiper-item down-list" >
-				<custom-statusList v-if="downlist.length" :list="downlist"></custom-statusList>
+			<swiper-item class="status-swiper-item down-list">
+				<custom-statusList :list="downlist"></custom-statusList>
+				<text class="down-path">下载目录: {{down_target}}</text>
 			</swiper-item>
 		</swiper>
 		<custom-actionSheet :labels="labels" @continue='continues' @del='del' @pause='pause'></custom-actionSheet>
@@ -21,6 +22,9 @@
 		mapMutations,
 		mapGetters
 	} from 'vuex'
+	import {
+		enum_down_list
+	} from '@/util/file.js'
 	export default {
 		onBackPress() {
 			if (getApp().globalData.modal) {
@@ -80,17 +84,48 @@
 			}
 		},
 		methods: {
-			...mapMutations('file', ['CHANGE_SELECT_LIST', 'CHANGE_DOWN_LIST']),
+			...mapMutations('file', ['CHANGE_SELECT_LIST', 'CHANGE_DOWN_LIST', 'CHANGE_UP_LIST']),
+			// change_down_target() {
+			// 	if (this.action) return
+			// 	uni.navigateTo({
+			// 		url: '/pages/upload/upload?mode=dir',
+			// 		animationType: 'slide-in-bottom'
+			// 	})
+			// },
 			del() {
 				uni.$showModal({
 					concent: '确定要删除吗?',
 					align: 'center'
-				}).then(res => {
-					let newList = [...this.currentList],
-						selectlist = this.selectlist.map(item => item.uuid)
-					newList = newList.filter(item => !selectlist.some(item2 => item2 === item.uuid))
-					this.CHANGE_DOWN_LIST(newList)
-					this.downlist = newList
+				}).then(async res => {
+					if (this.tabIndex) {
+						//down
+						let newList = [...this.currentList],
+							selectlist = this.selectlist.map(item => item.uuid)
+						newList = newList.filter(item => !selectlist.some(item2 => item2 === item.uuid))
+						let down = await enum_down_list()
+						down.forEach((item) => {
+							if (selectlist.some(item2 => item2 === item.options.uuid)) {
+								item.abort()
+							}
+						})
+						this['CHANGE_DOWN_LIST'](newList)
+						this['downlist'] = newList
+
+					} else {
+						// up
+						let newList = [...this.currentList],
+							selectlist = this.selectlist.map(item => item.md5)
+						newList = newList.filter(item => !selectlist.some(item2 => item2 === item.md5))
+						// let down = await enum_down_list()
+						// down.forEach((item) => {
+						// 	if (selectlist.some(item2 => item2 === item.options.uuid)) {
+						// 		item.abort()
+						// 	}
+						// })
+						this['CHANGE_UP_LIST'](newList)
+						this['uplist'] = newList
+					}
+
 					this.cleanList()
 					this.$hide()
 				}).catch((res) => {
@@ -98,17 +133,40 @@
 				})
 			},
 			continues() {
-				this.selectlist.forEach((item) => {
-					let target = this.currentList.find((item2) => item.uuid === item2.uuid)
-					this.$set(target, 'status', 'LOADING')
-				})
+				let attr = [this.tabIndex ? 'uuid' : 'md5']
+				if (this.tabIndex) {
+					this.selectlist.forEach(item => {
+						let target = this.currentList.find((item2) => item[attr] === item2[attr])
+						if (target.status === 'SUCCESS') return
+						this.$set(target, 'status', 'LOADING')
+					})
+				} else {
+					this.selectlist.forEach((item) => {
+						let target = this.currentList.find((item2) => item[attr] === item2[attr])
+						if (target.status === 'SUCCESS') return
+						this.$set(target, 'status', 'LOADING')
+					})
+				}
 				this.cleanList()
 			},
 			pause() {
-				this.selectlist.forEach((item) => {
-					let target = this.currentList.find((item2) => item.uuid === item2.uuid)
-					this.$set(target, 'status', 'STOP')
-				})
+				let attr = [this.tabIndex ? 'uuid' : 'md5']
+				if (this.tabIndex) {
+					this.selectlist.forEach(item => {
+						let target = this.currentList.find((item2) => item[attr] === item2[attr])
+						if (target.status === 'SUCCESS') return
+						if (target.status === 'RUNTIME') {
+							target.task.pause()
+						}
+						this.$set(target, 'status', 'STOP')
+					})
+				} else {
+					this.selectlist.forEach((item) => {
+						let target = this.currentList.find((item2) => item[attr] === item2[attr])
+						if (target.status === 'SUCCESS') return
+						this.$set(target, 'status', 'STOP')
+					})
+				}
 				this.cleanList()
 			},
 
@@ -141,6 +199,7 @@
 		},
 		computed: {
 			...mapState('file', ['action', 'selectlist']),
+			...mapState('settings', ['down_target']),
 			...mapState('file', {
 				StatusDownList: 'downlist',
 				StatusUpList: 'uplist'
@@ -154,13 +213,22 @@
 </script>
 
 <style lang="scss" scoped>
+	.down-path {
+		font-size: $uni-font-size-sm;
+		color: $app-color-theme-main;
+		width: 750rpx;
+		padding: 0 0 20rpx 30rpx;
+	}
+
 	.status {
 		@extend %flex;
 		flex-direction: column;
 	}
+
 	.tabs {
 		height: 80rpx;
 	}
+
 	.status-box {
 		@extend %flex;
 	}

@@ -3,8 +3,8 @@
 		<template slot="from">
 			<view class="input vs-row vs-align-center margin-b40">
 				<image class="input-icon margin-r20" src="/static/icon/page/login/password.png" mode=""></image>
-				<input class="vs-flex-item color-base font-30" :password='!toggle' value="" confirm-type='next'
-					@input='(e) => {password = e.detail.value}'  placeholder="请设置你的账号密码"
+				<input class="vs-flex-item color-base font-30" :password='!toggle'  focus value="" confirm-type='next'
+					@input='(e) => {password = e.detail.value}' placeholder="请设置你的账号密码"
 					placeholder-class="input-placeholder" />
 				<text class="iconfont color-base" @tap='toggle = !toggle'>
 					{{toggle ? '&#xe79f;' : '&#xe64b;'}}
@@ -12,7 +12,7 @@
 			</view>
 			<view class="input vs-row vs-align-center margin-b40">
 				<input class="vs-flex-item color-base font-30" :password='!toggle_re' value=""
-					@input='(e) => {repassword = e.detail.value}' placeholder="再次确认你的密码"
+					@input='(e) => {repassword = e.detail.value}' confirm-hold	 @confirm='submit'  placeholder="再次确认你的密码"
 					placeholder-class="input-placeholder" />
 				<text class="iconfont color-base" @tap='toggle_re = !toggle_re'>
 					{{toggle_re ? '&#xe79f;' : '&#xe64b;'}}
@@ -23,7 +23,20 @@
 </template>
 
 <script>
+	import {
+		register,
+		update
+	} from '@/api/user.js'
+	import md5 from '@/util/js-md5/build/md5.min.js'
+	import {
+		Base64
+	} from '@/util/base64.js'
 	export default {
+		onLoad(params) {
+			this.sign = params.sign
+			this.mode = params.mode
+			this.mobile = params.mobile
+		},
 		data() {
 			return {
 				init: {
@@ -44,22 +57,74 @@
 			}
 		},
 		methods: {
-			submit() {
+			async request_update() {
+				const data = (await update({
+					sign: this.sign,
+					password: md5(this.password),
+					repassword: md5(this.repassword)
+				}, Base64.encode(this.mobile))).data
+
+				if (data.code === 200) {
+					uni.showToast({
+						position: 'bottom',
+						title: '修改成功,正在跳转到登录页...',
+						duration: 2000
+					})
+					setTimeout(() => {
+						uni.reLaunch({
+							url: '/pages/user/login/login'
+						})
+					}, 2100)
+				}
+			},
+			async request_register() {
+				const data = (await register({
+					mobile: this.mobile,
+					sign: this.sign,
+					password: md5(this.password),
+					repassword: md5(this.repassword)
+				})).data
+				if (data.code === 201) {
+					let {
+						token,
+						user
+					} = data.data
+					uni.setStorage({
+						data: token,
+						key: 'token',
+					})
+					uni.setStorage({
+						data: user,
+						key: 'userinfo',
+						success: () => {
+							uni.reLaunch({
+								url: '/pages/launch/launch'
+							})
+						}
+					})
+				}
+			},
+			async submit() {
 				if (!this.password || !this.repassword) return uni.showToast({
-						title: "不能为空",
-						icon: "none",
-						position: "bottom"
-					})
-				if (!this.checkPas) return  uni.showToast({
-						title: "两次密码不一致",
-						icon: "none",
-						position: "bottom"
-					})
-				
+					title: "不能为空",
+					icon: "none",
+					position: "bottom"
+				})
+				if (!this.checkPas) return uni.showToast({
+					title: "两次密码不一致",
+					icon: "none",
+					position: "bottom"
+				})
+				if (this.mode === 'register') {
+					await this.request_register()
+				} else {
+					await this.request_update()
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	@import "~../common/user.scss";</style>
+	@import "~../common/user.scss";
+</style>

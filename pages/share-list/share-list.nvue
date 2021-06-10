@@ -1,70 +1,101 @@
 <template>
 	<view class="share-list" :render-whole='true'>
-		<custom-list closeClick customEvent @click='toDetail' :actionSheetLabels='actionSheetLabels' :filter="filter" ref='list'
-		 @refresh='refresh' :downStatus='downStatus' :status='status' @scrolltolower='scrollHandler' :list="list" @clean='cleanList'
-		 @all='selectAll'></custom-list>
-		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
+		<custom-list closeClick customEvent @click='toDetail' :skeletonLoading="skeletonLoading"
+			:actionSheetLabels='actionSheetLabels' :filter="filter" ref='list' @refresh='refresh'
+			:downStatus='downStatus' :status='status' @refreshList='refresh' :list="list" @clean='cleanList'
+			@all='selectAll'></custom-list>
 	</view>
 </template>
-
 <script>
 	import customList from '@/common/js/mixins/custom-list.js'
 	import popups from '@/common/js/mixins/popups.js'
+	import {
+		preview
+	} from '@/api/file.js'
+	import {
+		getlist
+	} from '@/api/share.js'
 	export default {
-		mixins: [customList, popups],
+		mixins: [customList],
 		data() {
 			return {
+				skeletonLoading: true,
 				actionSheetLabels: [{
-						text: '取消分享',
-						method: 'cancelShare',
-						icon: '/static/icon/actionsheet/cancel.png'
-					},
-					{
-						text: '复制链接',
-						method: 'copyLink',
-						icon: '/static/icon/actionsheet/link.png'
-					}
-				]
+					text: '取消分享',
+					method: 'cancelShare',
+					icon: '/static/icon/actionsheet/cancel.png'
+				}, {
+					text: '复制链接',
+					method: 'copyLink',
+					icon: '/static/icon/actionsheet/link.png'
+				}]
 			};
 		},
 		methods: {
-			refresh() {
-				console.log(2)
+			async refresh() {
 				this.downStatus = 'loading'
-				setTimeout(() => {
-					// request 完成后显示刷新成功并初始化避免出错，隔段时间关闭下拉框
-					this.downStatus = "noMore"
-					if (this.$refs['list'].action) this.$refs['list'].exitAction()
-					setTimeout(() => {
-						this.downStatus = "more"
-					}, 1000)
-				}, 1000)
+				await this.init()
+				this.setDownStatus('more')
 			},
-			scrollHandler() {
-				console.log(1)
-				if (this.status === 'loading' || this.status === 'noMore') return
-				this.status = 'loading'
-				setTimeout(() => {
-					this.list.push({
-						fileName: 'office',
-						type: 26,
-						url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-						date: '2020-12-04',
-						thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-						uuid: 142
-					})
-					this.status = "noMore"
-				}, 2000)
-			},
+			// scrollHandler() {
+			// console.log(1)
+			// if (this.status === 'loading' || this.status === 'noMore') return
+			// this.status = 'loading'
+			// setTimeout(() => {
+			// 	this.list.push({
+			// 		fileName: 'office',
+			// 		type: 26,
+			// 		url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
+			// 		date: '2020-12-04',
+			// 		thumb: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
+			// 		uuid: 142
+			// 	})
+			// 	this.status = "noMore"
+			// }, 2000)
+			// },
 			toDetail(item) {
+				if (item.delete) return uni.showModal({
+					showCancel: false,
+					title: '该文件以被删除'
+				})
 				if (this.$refs['list'].action) return this.$refs['list'].addSelectList(item)
 				return uni.navigateTo({
-					url: '/pages/share-detail/share-detail?id=' + item.uuid,
+					url: '/pages/share-detail/share-detail',
 					success: () => {
 						uni.$emit('share-detail', item)
 					}
 				})
+			},
+			async init() {
+				const {
+					data
+				} = (await getlist()).data
+				this.list = data.map(item => {
+					if (item.delete) {
+						return Object.assign({
+							...item
+						}, {
+							date: item.created_at,
+							uuid: item.url,
+							first: {
+								type: 27,
+							},
+							fileName: '该文件已被删除',
+							type: 27
+						})
+					}
+					return {
+						type: item.isSingle ? item.first.type : 0,
+						fileName: item.isSingle ? item.first.fileName : item.first.fileName + '  ...',
+						date: item.created_at,
+						uuid: item.first.uuid,
+						...item
+					}
+				})
 			}
+		},
+		onShow() {
+			this.init()
 		},
 		onNavigationBarButtonTap(e) {
 			if (!e.index) {
@@ -74,28 +105,12 @@
 				console.log('clean')
 			}
 		},
-		onReady() {
-			this.list = [{
-					fileName: 'uni-app教学视频',
-					type: 0,
-					date: '2020-12-01',
-					uuid: 233,
-					fileSize: 1000333
-				},
-				{
-					fileName: '教ani-app学图片',
-					type: 1,
-					url: 'https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png',
-					date: '2020-12-04',
-					thumb: 'https://ss.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3386219982,1013699129&fm=11&gp=0.jpg',
-					uuid: 2334,
-					fileSize: 100033
-				}
-			]
+		async onReady() {
+			await this.init()
+			this.skeletonLoading = false
 		}
 	}
 </script>
-
 <style lang="scss" scoped>
 	.share-list {
 		@extend %flex;

@@ -6,8 +6,7 @@
 			class="uni-grid-item__box" @click="_onClick" @longpress='_onLongPress'>
 			<view class="grid-item-box">
 				<slot>
-					<image :src="data.thumb" @error='previewThumbError' class="image" mode="aspectFit"
-						v-if="mode === 'photo'" />
+					<image :src="thumb" @error='previewThumbError' class="image" mode="aspectFit" v-if="mode === 'photo'" />
 					<view class="video-thumb" v-else>
 						<image :src="data.thumb" @error='previewThumbError' class="image" mode="aspectFit" />
 						<text class="iconfont c-iconfont">&#xe637;</text>
@@ -21,6 +20,9 @@
 </template>
 
 <script>
+	import {
+		preview
+	} from '@/api/file.js'
 	export default {
 		name: 'UniGridItem',
 		inject: ['grid'],
@@ -76,10 +78,16 @@
 				}
 			})
 		},
+		computed: {
+			thumb () {
+				return !this.data.thumb ? this.preview(this.data.uuid) : this.data.thumb
+			}
+		},
 		methods: {
+			preview,
 			previewThumbError() {
-				this.data.thumb = '/static/images/diushi.png'
-				// this.$set(this.data, 'thumb', '/static/images/diushi.png')
+				// this.data.thumb = '/static/images/diushi.png'
+				this.$set(this.data, 'thumb', '/static/images/diushi.png')
 				uni.showToast({
 					title: '预览图加载失败',
 					position: 'bottom'

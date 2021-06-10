@@ -2,7 +2,7 @@
 	<view class="container" :render-whole='true'
 		style="flex: 1;flex-direction: column;align-items: center;justify-content: flex-end;">
 		<view style="flex-direction: row;justify-content: center; align-items: center;">
-			<image src="https://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png" mode="aspectFit" class="logo"
+			<image src="/static/images/logo.png" mode="aspectFit" class="logo"
 				style="width: 100rpx;height: 100rpx;"></image>
 			<view style="height: 50rpx; width: 1px;background-color: #000000;margin: 0 15rpx;"></view>
 			<text style="font-size: 36rpx;">HCloud</text>
@@ -14,6 +14,10 @@
 </template>
 
 <script>
+	import {
+		get_user_detail
+	} from '@/api/user.js'
+
 	function preloadPage(url) {
 		return new Promise((resolve, reject) => {
 			uni.preloadPage({
@@ -24,25 +28,64 @@
 			})
 		})
 	}
-	import {
-		mapState
-	} from 'vuex'
-	export default {
-		onShow() {
-			if (process.env.NODE_ENV === 'development') {
-				setTimeout(() => {
-					uni.reLaunch({
-						url: "/pages/tabbar/index/index"
-					})
-				}, 100)
-			} else {
-				// console.log('生产环境')
-				// 判断客户是否已经登录
-			
-			}
 
+	// function unPreloadPage(url) {
+	// 	return new Promise((resolve, reject) => {
+	// 		uni.un({
+	// 			url,
+	// 			complete() {
+	// 				resolve()
+	// 			}
+	// 		})
+	// 	})
+	// }
+	export default {
+		mounted() {
+			setTimeout(() => {
+				// 初始化
+				let token = uni.getStorageSync('token')
+				// 判断客户是否已经登录
+				if (token) {
+					// refresh user info && check token
+					get_user_detail()
+						.then(({
+							data: {
+								data
+							}
+						}) => {
+							this.init(data)
+							uni.switchTab({
+								url: "/pages/tabbar/index/index"
+							})
+						})
+						.catch(err => {
+							console.log(err)
+							this.toLogin()
+						})
+
+				} else {
+					this.toLogin()
+				}
+			}, 200)
 		},
 		methods: {
+			init(data) {
+				uni.setStorageSync('userinfo', data)
+				let up = uni.getStorageSync(`${data.mobile}-uplist`) || [],
+					down = uni.getStorageSync(`${data.mobile}-downlist`) || [],
+					// 检查是否已经有RUNTIME状态的选项
+					downs_runtime_status = down.filter(item => item.status === 'RUNTIME')
+				downs_runtime_status.length && downs_runtime_status.forEach((item => item.status = 'LOADING'))
+				// up_find = up.find(item => item.status === 'RUNTIME')
+				this.$store.commit('file/CHANGE_UP_LIST', up)
+				this.$store.commit('file/CHANGE_DOWN_LIST', down)
+				this.$store.commit('settings/CHANGE_DOWN_TARGET', plus.io.convertLocalFileSystemURL('_downloads/' + data
+					.mobile))
+				let globalData = getApp({
+					allowDefault: true
+				}).globalData
+				globalData.userinfo = data
+			},
 			toLogin() {
 				Promise.all(
 					[
@@ -52,14 +95,16 @@
 						preloadPage('/pages/user/sms-login/sms-login'),
 					]
 				).then(() => {
-					uni.redirectTo({
-						url: "/pages/user/login/login"
-					})
+					setTimeout(() => {
+						uni.reLaunch({
+							url: "/pages/user/login/login"
+						})
+					}, 500)
 				})
 			}
 		},
-		computed: {
-			...mapState('user', ['info'])
-		}
+		// computed: {
+		// 	...mapState('user', ['info'])
+		// }
 	}
 </script>

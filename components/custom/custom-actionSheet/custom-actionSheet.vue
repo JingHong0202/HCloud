@@ -1,5 +1,5 @@
 <template>
-	<view class="custom-tabbar action-sheet" v-if='action'>
+	<view class="custom-tabbar action-sheet" v-if='action' :render-whole='true'>
 		<template v-for="(item) in labels">
 			<view class="action" v-if="!item.once || (item.once && isOneAndFile)" @click="$emit(item.method)">
 				<image mode="aspectFit" class="action-icon" :src="item.icon"></image>
@@ -60,15 +60,9 @@
 <style lang="scss" scoped>
 	.action-sheet {
 		@include position(fixed, false, 0, 0, 0);
-		background-color: #e4c774;
-		/* #ifdef APP-NVUE */
-		border-top-style: solid;
-		border-top-width: 1;
-		border-color: rgba(0, 0, 0, .3);
-		/* #endif */
-		/* #ifndef APP-NVUE */
-		border-top: 1px solid rgba(0, 0, 0, .3);
-		/* #endif */
+		background-color: $app-color-theme-main;
+		padding-bottom: 10rpx;
+		padding-top: 10rpx;
 	}
 
 	.action {
@@ -99,10 +93,7 @@
 	}
 
 	.custom-tabbar {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
 		flex-direction: row;
-		height: 50px;
+		height: 90rpx;
 	}
 </style>

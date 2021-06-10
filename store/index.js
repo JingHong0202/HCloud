@@ -4,6 +4,7 @@ import Vuex from 'vuex';
 import file from './modules/file.js'
 import views from './modules/views.js'
 import user from './modules/user.js'
+import settings from './modules/settings.js'
 
 Vue.use(Vuex);
 
@@ -11,6 +12,7 @@ export default new Vuex.Store({
 	modules: {
 		file,
 		views,
-		user
+		user,
+		settings
 	}
 });

@@ -1,174 +1,223 @@
 <template>
-	<custom-dragPanel ref='drag-panel'  title="分享" >
+	<custom-dragPanel ref='drag-panel' title="分享">
 		<view class="share-box">
-			<swiper :indicator-dots="true" class='share-icons'>
+			<swiper :indicator-dots="false" class='share-icons'>
 				<swiper-item class="share-item">
 					<view class="row">
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<view class="item-box" elevation="2px" style="background-color:#4070FF"
+								@tap.stop="link">
+								<image src="/static/icon/actionsheet/link.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
+								<text class="item-name">链接</text>
 							</view>
 						</view>
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<view class="item-box" elevation="2px" style="background-color:#42CC8B"
+								@tap.stop="drawQr">
+								<image src="/static/icon/common/qr_code.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
+								<text class="item-name">二维码</text>
 							</view>
 						</view>
+
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<!-- 	<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
+								@tap.stop="qqFriend">
+								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
-							</view>
+								<text class="item-name">qq好友</text>
+							</view> -->
 						</view>
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<!-- <view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
+								@tap.stop="weiBo">
+								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-					</view>
-					<view class="row">
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
+								<text class="item-name">微博</text>
+							</view> -->
 						</view>
 					</view>
 				</swiper-item>
-				<swiper-item class="share-item">
+				<!-- <swiper-item class="share-item">
 					<view class="row">
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
+								@tap.stop="other">
+								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
+								<text class="item-name">更多</text>
 							</view>
 						</view>
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
+								@tap.stop="wxFriend">
+								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
+								<text class="item-name">微信好友</text>
 							</view>
 						</view>
 						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
+							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
+								@tap.stop="wxFriendGroup">
+								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit"
+									class="item-icon">
 								</image>
-								<text class="item-name">拍照</text>
+								<text class="item-name">微信朋友圈</text>
 							</view>
 						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
+						<view class="col"></view>
 					</view>
-					<view class="row">
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-						<view class="col">
-							<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)" @tap.stop="cameraImage">
-								<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-								</image>
-								<text class="item-name">拍照</text>
-							</view>
-						</view>
-					</view>
-				</swiper-item>
+				</swiper-item> -->
 			</swiper>
 			<list class="select-items">
-				<uni-list-item showArrow link @click="valid" title="有效期" :note="valid_list[current_valid]">
+				<uni-list-item showArrow link @click="valid" title="有效期" :note="valid_list[current_valid].desc">
 				</uni-list-item>
-				<uni-list-item showArrow link @click="pass" title="提取码" :note="pass_ctx">
+				<uni-list-item showArrow link @click="pass" title="提取码" :note="pass_ctx || '无'">
 				</uni-list-item>
 			</list>
 		</view>
+
 	</custom-dragPanel>
 </template>
 
 <script>
+	import {
+		create,
+		formatLink
+	} from '@/api/share.js'
+	
 	export default {
 		data() {
 			return {
-				valid_list: ['1天', '3天', '7天', '一个月', '永久'],
+				valid_list: [{
+					desc: '1天',
+					val: 86400
+				}, {
+					desc: '3天',
+					val: 86400 * 3
+				}, {
+					val: 86400 * 7,
+					desc: '7天'
+				}, {
+					desc: '一个月',
+					val: 86400 * 30
+				}, {
+					desc: '永久',
+					val: -1
+				}],
 				current_valid: 2,
-				pass_ctx: ''
+				pass_ctx: '',
+				qr: ''
 			}
 		},
 		methods: {
-			valid () {
+			valid() {
 				uni.showActionSheet({
-					itemList:this.valid_list,
-					success: ({tapIndex}) => {
+					itemList: this.valid_list.map(item => item.desc),
+					success: ({
+						tapIndex
+					}) => {
 						this.current_valid = tapIndex
 					}
 				})
 			},
-			pass () {
+			async link() {
+				const {
+					data
+				} = (await create({
+					file_ids: this.ids,
+					validity: this.valid_list[this.current_valid].val,
+					code: this.pass_ctx,
+					way: 'link'
+				})).data
+				if (data) {
+					uni.setClipboardData({
+						data: `
+链接：${formatLink(data)}
+该链接现在只能复制到HCloud APP中识别`,
+						success() {
+							uni.showToast({
+								title: '链接已复制',
+								icon: 'success'
+							})
+						}
+					})
+				}
+			},
+			async drawQr() {
+				const {
+					data
+				} = (await create({
+					file_ids: this.ids,
+					validity: this.valid_list[this.current_valid].val,
+					code: this.pass_ctx,
+					way: 'qr'
+				})).data
+				if (data) {
+					uni.redirectTo({
+						url: '/pages/global/qr/qr?text=' + data
+					})
+				}
+			},
+			wxFriend() {
+				uni.share({
+					provider: "weixin",
+					scene: "WXSceneSession",
+					type: 0,
+					href: "http://uniapp.dcloud.io/",
+					title: "uni-app分享",
+					summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
+					imageUrl: "https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/d8590190-4f28-11eb-b680-7980c8a877b8.png",
+					success: function(res) {
+						console.log("success:" + JSON.stringify(res));
+					},
+					fail: function(err) {
+						console.log("fail:" + JSON.stringify(err));
+					}
+				});
+			},
+			other() {
+				plus.share.sendWithSystem({
+					content: '分享内容',
+					href: 'https://www.dcloud.io/',
+					pictures: ['https://onedrive.jinghong.workers.dev?file=/图床/Wdvy.jpg']
+				}, function() {
+					console.log('分享成功');
+				}, function(e) {
+					console.log('分享失败：' + JSON.stringify(e));
+				});
+			},
+			pass() {
 				uni.navigateTo({
-					url: '/pages/global/input-modal/input-modal?params='+decodeURIComponent(JSON.stringify({title: '提取码', placeholder: '请输入4位提取码'})),
+					url: '/pages/global/input-modal/input-modal?params=' + decodeURIComponent(JSON.stringify({
+						title: '提取码',
+						placeholder: '请输入4-8位提取码'
+					})),
 					success: (e) => {
 						uni.$once('inputModal-success', (params) => {
+							if (!(params.length >= 4 && params.length <= 8)) return uni.showToast({
+								title: '请输入4-8位提取码',
+								position: 'bottom'
+							})
 							this.pass_ctx = params
 						})
-						
+
 					}
 				})
 			}
 		},
 		onReady() {
-			this.$refs['drag-panel'].show()
+			this.$refs['drag-panel'].show();
+		},
+		onLoad(params) {
+			this.ids = decodeURIComponent(params.ids)
 		},
 		onBackPress({
 			from
@@ -182,13 +231,24 @@
 </script>
 
 <style scoped lang="scss">
+	.canvas-hide {
+		/* 1 */
+		position: fixed;
+		right: 100vw;
+		bottom: 100vh;
+		/* 2 */
+		z-index: -9999;
+		/* 3 */
+		opacity: 0;
+	}
+
 	.share-box {
 		flex: 1;
 		flex-direction: column;
 
 		& .share-icons {
 			// width: 750rpx;
-			height: 400rpx;
+			height: 250rpx;
 			flex: 1;
 		}
 

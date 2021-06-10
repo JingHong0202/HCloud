@@ -2,6 +2,8 @@
 	<waterfall :column-count="multiple ? column : 1" column-gap='0'  column-width="auto" class="uni-list" ref='list' @scroll="scroll" :scrollable='scrollY'
 	 @loadmore='$emit("loadmore")' :class="{ 'uni-list--border': border }" :loadmoreoffset="15">
 		<slot />
+	<!-- 	<cell style='height: 300rpx;' v-if='isNull'>
+		</cell> -->
 	</waterfall>
 </template>
 
@@ -32,13 +34,12 @@
 				type: Boolean,
 				default: true
 			},
-			scrollHandler: {
-				type: Boolean,
-				default: true
-			},
 			multiple: {
 				type: Boolean
-			}
+			},
+			// isNull: {
+			// 	type: Boolean
+			// }
 		},
 		computed: {
 			...mapState('views', ['column'])

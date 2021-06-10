@@ -55,15 +55,20 @@
 	import {
 		animate
 	} from '@/util/animation.js'
+	import {
+		login,
+		verify
+	} from '@/api/user.js'
 	export default {
 		onLoad(params) {
 			this.mobile = params.mobile
+			this.mode = params.verify
 		},
 		onReady() {
 			this.$refs['drag-panel'].show()
 		},
 		onUnload() {
-			if (this.checkCode)uni.$emit('checkCode-success')
+			if (this.checkCode) uni.$emit('checkCode-success', this.res)
 		},
 		data() {
 			return {
@@ -125,11 +130,56 @@
 				this.code = value.split('').map(item => +item)
 				if (this.code.length === 4) return this.submit()
 			},
-			submit() {
-				console.log(this.code)
-				// request
-				this.checkCode = true
-				this.$refs['drag-panel'].back();
+			async verify_check(code) {
+				const {
+					data: {
+						sign
+					}
+				} = (await verify({
+					mobile: this.mobile,
+					code
+				})).data
+				
+				if (sign) {
+					this.checkCode = true
+					this.$refs['drag-panel'].back();
+					this.res = {sign,mobile:this.mobile}
+				}
+			},
+			async verify_login(code) {
+				const {
+					data: {
+						token,
+						user
+					}
+				} = (await login.verify({
+					mobile: this.mobile,
+					code
+				})).data
+
+				uni.setStorage({
+					data: token,
+					key: 'token',
+				})
+				uni.setStorage({
+					data: user,
+					key: 'userinfo',
+					success: () => {
+						this.checkCode = true
+						this.$refs['drag-panel'].back();
+					}
+				})
+			},
+			async submit() {
+				const code = this.code.join('')
+
+				if (this.mode === 'login') {
+					await this.verify_login(code)
+				} else {
+					await this.verify_check(code)
+				}
+
+
 			}
 		},
 		onBackPress({

@@ -7,7 +7,7 @@
 		</uni-list-item>
 		<uni-list-item title="清理缓存" :rightText="cache">
 		</uni-list-item>
-		<uni-list-item showArrow title="默认下载位置">
+		<uni-list-item showArrow link title="默认下载位置" :note="down_target">
 		</uni-list-item>
 		<uni-list-item title="相册备份设置" showArrow>
 		</uni-list-item>
@@ -20,13 +20,25 @@
 	import {
 		formatBytes
 	} from '@/util/file.js'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
 
 			};
 		},
+		methods: {
+			setDownTarget() {
+				// uni.navigateTo({
+				// 	url: '/pages/upload/upload?mode=dir'
+					
+				// })
+			}
+		},
 		computed: {
+			...mapState('settings', ['down_target']),
 			cache() {
 				return formatBytes(2555555555)
 			}

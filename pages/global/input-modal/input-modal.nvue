@@ -1,9 +1,9 @@
 <template>
 	<view class="mask" @click="cancel" ref='mask' :style="{height}" :render-whole='true'>
-		<view class="modal-content" ref='modal' elevation="5px" @click.stop="(e) => e.stopPropagation()" >
+		<view class="modal-content" ref='modal' elevation="5px" @click.stop="(e) => e.stopPropagation()">
 			<text class="modal-title">{{title}}</text>
-			<input ref='input' type="text" @keyboardheightchange='keyboardChange' @confirm='confirm' @input='change' :value='value' class="modal-input"
-			 :placeholder="placeholder" focus adjust-position>
+			<input ref='input' type="text" @keyboardheightchange='keyboardChange' @confirm='confirm' @input='change'
+				:value='value' class="modal-input" :placeholder="placeholder" focus adjust-position>
 			<view class="modal-footer">
 				<button type="default" class="btn-cancel" @click.stop="cancel">取消</button>
 				<button type="primary" class="btn-modal" @click.stop="confirm">确认</button>
@@ -16,6 +16,10 @@
 	import {
 		animates
 	} from '@/util/animation.js'
+	import {
+		mkdir,
+		edit
+	} from '@/api/file.js'
 	export default {
 		data() {
 			return {
@@ -30,10 +34,15 @@
 		}) {
 			let {
 				title,
-				placeholder
+				placeholder,
+				file_id,
+				selectItem
 			} = JSON.parse(decodeURIComponent(params))
+			this.mode = selectItem ? 'rename' : (title !== '提取码' ? 'mkdir' : '')
 			this.title = title
 			this.placeholder = placeholder
+			if (!selectItem) this.file_id = file_id
+			else this.select = selectItem
 		},
 		onReady() {
 			animates([{
@@ -42,9 +51,9 @@
 						styles: {
 							backgroundColor: "rgba(0,0,0,.4)"
 						},
-						duration: 200, 
+						duration: 200,
 						timingFunction: 'ease',
-						delay: 0 
+						delay: 0
 					}
 				},
 				{
@@ -54,9 +63,9 @@
 							transform: "scale(1)",
 							transformOrigin: "center center"
 						},
-						duration: 200, 
+						duration: 200,
 						timingFunction: 'ease',
-						delay: 0 
+						delay: 0
 					}
 				}
 			])
@@ -82,7 +91,7 @@
 					height
 				}
 			}) {
-				
+
 				this.height = uni.getSystemInfoSync().windowHeight - height
 			},
 			cancel() {
@@ -113,15 +122,31 @@
 					uni.navigateBack()
 				})
 			},
-			confirm(e) {
+			async mkdir() {
+				return (await mkdir({
+					name: this.value,
+					file_id: this.file_id
+				})).data
+			},
+			async rename() {
+				const {
+					uuid
+				} = this.select
+				return (await edit(uuid, this.value, 'rename')).data
+			},
+			async confirm(e) {
 				e.stopPropagation()
 				// filter
 				if (!this.value) return uni.showToast({
 					position: "bottom",
-					title: "请输入文件名"
+					title: "不能为空!"
 				})
 
 				// request
+				if (this.mode) {
+					const data = await this[this.mode]()
+					if (data.message !== 'success') return
+				}
 				uni.$emit('inputModal-success', this.value)
 				this.cancel()
 			}
@@ -132,6 +157,7 @@
 <style lang="scss" scoped>
 	.mask {
 		@extend %f-ct;
+
 		.modal-content {
 			width: 550rpx;
 			height: 300rpx;
@@ -153,6 +179,7 @@
 
 			.modal-footer {
 				flex-direction: row;
+
 				.btn-cancel,
 				.btn-modal {
 					@extend %flex;

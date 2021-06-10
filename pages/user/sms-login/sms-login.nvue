@@ -22,11 +22,8 @@
 		},
 		methods: {
 			handler() {
-				// uni.navigateTo({
-				// 	url: "/pages/user/common/resetpas-2"
-				// })
 				uni.reLaunch({
-					url: "/pages/tabbar/index/index"
+					url: "/pages/launch/launch"
 				})
 			},
 			handlerTapLeft() {

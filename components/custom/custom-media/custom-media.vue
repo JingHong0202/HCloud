@@ -1,12 +1,15 @@
 <template>
-	<skeleton :skeleton="skeletonList" :loading="!list.length" animate ref='skeleton'>
-		<list class="media-album" :scrollable='scrollY' :bounce='false' :show-scrollbar='false' :offset-accuracy='50'
-			@loadmore='loadMore'>
+	<skeleton :skeleton="skeletonList" :loading="skeletonLoading" animate ref='skeleton'>
+		<waterfall class="media-album" :column-count="4" column-gap='0' column-width="auto" :scrollable='scrollY'
+			:bounce='false' :show-scrollbar='false' @loadmore='loadMore'>
 			<uni-refresh @refresh='refresh' :display="downDisplay">
 				<uni-load-more :status="downStatus" :contentText='downText' />
 			</uni-refresh>
+			<header style='flex:1;' v-if='!list.length'>
+				<custom-null :params="{text: '暂无文件', mode: 'null'}"></custom-null>
+			</header>
 			<template v-if="list.length" v-for="(item,i) in afterList">
-				<header :ref="`media-${item.date}`">
+				<header   :key='item.date' insert-animation='none' delete-animation='none'>
 					<view class="date-box">
 						<text class="media-date" @longpress="selectBlock(item)">{{item.date}}</text>
 						<checkbox-group @change='toggleBlock(item,$event)'>
@@ -16,25 +19,13 @@
 						</checkbox-group>
 					</view>
 				</header>
-				<cell class="media-album">
-
-					<uni-grid :column="4" :highlight="true" @change="change" @longpress='showActionSheet'
-						:showBorder='false'>
-						<uni-grid-item v-for="(item2, index) in item.list" :mode='mode' :data='item2' :parentIndex='i'
-							:index="index" :key="index">
-						</uni-grid-item>
-					</uni-grid>
-				</cell>
+				<custom-media-item :ref="`media-${item.date}`" v-for="(item2, index) in item.list" :data='item2' :mode='mode'
+					@click='preview(item,item2)' :key='item.date' @longpress='showActionSheet(item2)' />
 			</template>
-			<cell>
+			<header v-if="list.length" style='flex:1;'>
 				<uni-load-more :status="status" :contentText='upText' />
-			</cell>
-			<cell v-if='action'>
-				<view style="height: 150rpx">
-
-				</view>
-			</cell>
-		</list>
+			</header>
+		</waterfall>
 	</skeleton>
 </template>
 
@@ -67,11 +58,15 @@
 			mode: {
 				type: String,
 				default: 'photo'
+			},
+			skeletonLoading: {
+				type: Boolean,
+				default: true
 			}
 		},
 		data() {
 			return {
-				skeletonList: ['images','images','images']
+				skeletonList: ['images', 'images', 'images']
 			}
 		},
 		computed: {
@@ -97,16 +92,12 @@
 			toItem(name) {
 				dom.scrollToElement(this.$refs['media-' + name][0], {
 					animated: false,
-					offset: 5
+					offset:0
 				})
 			},
-			showActionSheet(e) {
+			showActionSheet(item) {
 				if (this.action) return
-				let {
-					index,
-					parentIndex
-				} = e.detail
-				this.addSelectList(this.list[parentIndex].list[index])
+				return this.addSelectList(item)
 			},
 			addSelectList(item) {
 				if (this.selectlist.indexOf(item) >= 0) {
@@ -153,22 +144,12 @@
 				}
 				this.$forceUpdate()
 			},
-			change(e) {
-				let {
-					index,
-					parentIndex
-				} = e.detail
-				let parent = this.list[parentIndex],
-					current = parent.list[index]
-				if (this.action) return this.addSelectList(parent.list[index])
-				return this.preview(current, parent)
-			},
-			preview(
-				current, {
-					list
-				}) {
-				open({
-					current,
+			preview({
+				list
+			}, item) {
+				if (this.action) return this.addSelectList(item)
+				return open({
+					current: item,
 					list
 				})
 			}
@@ -179,6 +160,7 @@
 <style lang="scss" scoped>
 	.media-album {
 		@extend %f-cl;
+		flex: 1;
 	}
 
 	.date-box {
@@ -193,16 +175,7 @@
 		font-size: $uni-font-size-lg;
 		color: $uni-color-subtitle;
 		margin-right: 20rpx;
+		padding-top: 10rpx;
+		padding-bottom: 10rpx;
 	}
-
-	// .image {
-	// 	width: 150rpx;
-	// 	height: 150rpx;
-	// }
-
-	// .grid-item-box {
-	// 	@extend %flex;
-	// 	justify-content: center;
-	// 	align-items: center;
-	// }
 </style>

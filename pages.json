@@ -157,20 +157,14 @@
 		{
 			"path": "pages/preview/preview",
 			"style": {
+				"navigationBarTextStyle": "white",
 				"enablePullDownRefresh": false,
 				"backgroundColor": "#000000",
+				"navigationStyle": "custom",
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
-					"titleNView": {
-						"blurEffect": "extralight",
-						"buttons": [{
-							"type": "menu",
-							"float": "right"
-						}],
-						"titleOverflow": "ellipsis",
-						"backgroundColor": "white"
-					}
+					"titleNView": false
 				}
 			}
 
@@ -223,7 +217,7 @@
 							"type": "none",
 							"float": "right",
 							"text": "搜索",
-							"fontSize": "25rpx"
+							"fontSize": "23rpx"
 						}],
 						"titleOverflow": "ellipsis",
 						"backgroundColor": "white"
@@ -370,6 +364,34 @@
 			}
 		},
 		{
+			"path": "pages/global/qr/qr",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "transparent",
+				"app-plus": {
+					"animationType": "fade-in",
+					"background": "rgba(0,0,0,.5)",
+					"popGesture": "none",
+					"titleNView": false,
+					"softinputMode": "adjustResize"
+				}
+			}
+		},
+		{
+			"path": "pages/global/code/code",
+			"style": {
+				"navigationStyle": "custom",
+				"backgroundColor": "transparent",
+				"app-plus": {
+					"animationType": "fade-in",
+					"background": "rgba(0,0,0,.5)",
+					"popGesture": "none",
+					"titleNView": false,
+					"softinputMode": "adjustResize"
+				}
+			}
+		},
+		{
 			"path": "pages/global/views-drawer/views-drawer",
 			"style": {
 				"navigationStyle": "custom",
@@ -421,35 +443,35 @@
 	},
 	"tabBar": {
 		"position": "bottom",
-		"selectedColor": "#EBC03D",
-		"color": "#8F8F94",
+		"selectedColor": "#5E6165",
+		"color": "#D3DBE7",
 		"midButton": {
 			"iconPath": "static/icon/tabBar/add.png",
-			"iconWidth": "60px",
-			"height": "47px"
+			"iconWidth": "55px",
+			"height":"50px"
 		},
 		"list": [{
 				"pagePath": "pages/tabbar/index/index",
-				"iconPath": "static/icon/tabBar/index.png",
-				"selectedIconPath": "static/icon/tabBar/index-active.png",
+				"iconPath": "static/icon/tabBar/home.png",
+				"selectedIconPath": "static/icon/tabBar/home-a.png",
 				"text": "首页"
 			},
 			{
 				"pagePath": "pages/tabbar/file/file",
 				"iconPath": "static/icon/tabBar/file.png",
-				"selectedIconPath": "static/icon/tabBar/file-active.png",
+				"selectedIconPath": "static/icon/tabBar/file-a.png",
 				"text": "文件"
 			},
 			{
 				"pagePath": "pages/tabbar/images/images",
-				"iconPath": "static/icon/tabBar/chat.png",
-				"selectedIconPath": "static/icon/tabBar/chat-active.png",
+				"iconPath": "static/icon/tabBar/album.png",
+				"selectedIconPath": "static/icon/tabBar/album-a.png",
 				"text": "图片"
 			},
 			{
 				"pagePath": "pages/tabbar/personal/personal",
 				"iconPath": "static/icon/tabBar/geren.png",
-				"selectedIconPath": "static/icon/tabBar/geren-active.png",
+				"selectedIconPath": "static/icon/tabBar/geren-a.png",
 				"text": "个人"
 			}
 		]

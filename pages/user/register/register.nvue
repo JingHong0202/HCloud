@@ -1,5 +1,5 @@
 <template>
-	<send :init='init' @end='handler' />
+	<send :init='init' @end='handler' verifyMode="check" action='register' />
 </template>
 
 <script>
@@ -19,10 +19,12 @@
 			}
 		},
 		methods: {
-			handler() {
-				uni.navigateTo({
-					url: "/pages/user/common/resetpas-2"
-				})
+			handler(res) {
+				if (res) {
+					uni.reLaunch({
+						url: "/pages/user/common/resetpas-2?mode=register&sign=" + res.sign + '&mobile=' + res.mobile
+					})
+				}
 			}
 		}
 	}

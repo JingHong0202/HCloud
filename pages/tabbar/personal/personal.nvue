@@ -5,33 +5,37 @@
 		<list ref='personal' class="list" :style="{'margin-top': navHeight}" show-scrollbar="false">
 			<cell :style="{height: `${300}rpx`}">
 			</cell>
-			<uni-list-item :border='true' link to="/pages/share-list/share-list" title="分享"
+			<cell class="vip-banner" ref='vip'>
+				<view class="vip-desc" elevation="5px">
+					<view class="vip-desc-box">
+						<image class="vip-icon" src="/static/images/vip-1.png" mode="widthFix"></image>
+						<text class="vip-text">VIP会员</text>
+					</view>
+				</view>
+			</cell>
+			<uni-list-item :border='false' link to="/pages/share-list/share-list" title="分享"
 				thumb="/static/icon/page/personal/share-line.png" thumbSize="sm"></uni-list-item>
-			<uni-list-item :border='true' link to="/pages/recycle/recycle" title="回收站"
+			<uni-list-item :border='false' link to="/pages/recycle/recycle" title="回收站"
 				thumb="/static/icon/page/personal/recycle.png" thumbSize="sm"></uni-list-item>
-			<cell>
-				<ad adpid="1111111111" style="width: 750rpx;"></ad>
-			</cell>
-			<uni-list-item :border='true' to="/pages/setting/setting" link title="设置"
+			<uni-list-item :border='false' to="/pages/setting/setting" link title="设置"
 				thumb="/static/icon/page/personal/shezhi.png" thumbSize="sm"></uni-list-item>
-			<uni-list-item :border='true' to="/pages/about/about" link title="关于"
+			<uni-list-item :border='false' to="/pages/about/about" link title="关于"
 				thumb="/static/icon/page/personal/info.png" thumbSize="sm"></uni-list-item>
-			<cell>
-				<ad adpid="1111111111" style="width: 750rpx;"></ad>
+			<uni-list-item :border='false' link title="退出登录" thumb="/static/icon/page/personal/user-exit.png"
+				thumbSize="sm" @click="logout"></uni-list-item>
+			<cell :style="{height: placeholder}">
 			</cell>
-			<uni-list-item :border='true' link title="退出登录" thumb="/static/icon/page/personal/user-exit.png"
-				thumbSize="sm" @click="exit"></uni-list-item>
 		</list>
 		<view class="nav" :style="{height: navHeight}" ref='nav' />
 
 		<view class="user-box2" :style="{height: `${400+navHeight}rpx`}">
-			<image class="avatars" ref='circle' src="/static/images/pic.jpg" mode="aspectFit"
+			<image elevation="5px" class="avatars" ref='circle' src="/static/images/avatar.png" mode="aspectFit"
 				@click="toPage('account')"></image>
 			<view class="info" ref='user'>
-				<text class="name">未登录</text>
+				<text class="name">{{user.mobile}}</text>
 				<progress class="percent" active border-radius='15' stroke-width="5" :percent="percent"
-					activeColor="#f2cf6d" />
-				<text class="used">空间使用情况: {{`${formatBytes(usedSize)}/${formatBytes(totalSize)}`}}</text>
+					activeColor="#4070ff" />
+				<text class="used">空间情况: {{space_info}}</text>
 			</view>
 			<image class="qs" ref='qs' src="/static/icon/common/check.png" mode="aspectFit" @click="scanCode"></image>
 		</view>
@@ -43,8 +47,12 @@
 		formatBytes
 	} from '@/util/file.js'
 	import {
+		get_user_detail
+	} from '@/api/user.js'
+	import {
 		getEl
 	} from '@/util/bindingx.js'
+	import userCommon from '@/common/js/mixins/user.js'
 	uni.showLoading({
 		mask: true,
 		title: '初始化中...'
@@ -52,16 +60,26 @@
 	const bindingx = uni.requireNativePlugin('bindingx'),
 		dom = uni.requireNativePlugin('dom')
 	export default {
+		mixins: [userCommon],
 		data() {
 			return {
-				totalSize: 1024 * 50000,
-				usedSize: 1024 * 20000,
-				navHeight: 0
+				navHeight: 0,
+				user: getApp().globalData.userinfo,
+				placeholder: 0
 			}
 		},
 		computed: {
+			totalSize() {
+				return this.user.total_space ? formatBytes(this.user.total_space) : '0.00GB'
+			},
+			usedSize() {
+				return this.user.used_space ? formatBytes(this.user.used_space) : '0.00GB'
+			},
 			percent() {
-				return 100 * (this.usedSize / this.totalSize)
+				return 100 * (this.user.used_space / this.user.total_space)
+			},
+			space_info() {
+				return `${this.totalSize} / ${this.usedSize}`
 			}
 		},
 		mounted() {
@@ -76,6 +94,11 @@
 			init(statusBarHeight) {
 				setTimeout(() => {
 					this.$nextTick(() => {
+						dom.getComponentRect(this.$refs['vip'], ({
+							size
+						}) => {
+							this.placeholder = size.top + 'px'
+						})
 						dom.getComponentRect(this.$refs['circle'], (({
 							size
 						}) => {
@@ -169,8 +192,25 @@
 			},
 			scanCode() {
 				uni.scanCode({
-					complete: (res) => {
-						console.log(res)
+					success: (res) => {
+						try {
+							let {
+								link,
+								desc
+							} = JSON.parse(res.result)
+							let split = link.split('/'),
+								parse = split[split.length - 1]
+							uni.navigateTo({
+								url: '/pages/open-list/open-list?type=share',
+								complete: () => {
+									uni.$emit('open-list', {
+										data: parse
+									});
+								}
+							})
+						} catch (e) {
+							//TODO handle the exception
+						}
 					}
 				})
 			},
@@ -184,6 +224,22 @@
 					this.$hide()
 				})
 			}
+		},
+		onShow() {
+			get_user_detail()
+				.then(({
+					data: {
+						data
+					}
+				}) => {
+					uni.setStorageSync('userinfo', data)
+					getApp().globalData.userinfo = data
+					this.user = data
+				})
+				.catch(err => {
+					console.log(err)
+					this.toLogin()
+				})
 		},
 		onBackPress() {
 			if (getApp().globalData.modal) {
@@ -211,6 +267,37 @@
 		flex: 1;
 	}
 
+	.vip-banner {
+		height: 350rpx;
+		background-color: white;
+
+		.vip-desc {
+			flex: 1;
+			background-color: $app-color-theme-main;
+			border-radius: 25rpx;
+			margin: 70rpx;
+			@extend %f-ct;
+			flex-direction: column;
+
+			& .vip-desc-box {
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+
+				& .vip-icon {
+					height: 80rpx;
+					width: 80rpx;
+					transform: scale(1.5);
+				}
+
+				& .vip-text {
+					color: white;
+					font-weight: bold;
+					margin-top: 40rpx;
+				}
+			}
+		}
+	}
 
 
 	.user-box {
@@ -219,8 +306,7 @@
 		padding: 0 100rpx;
 		@include position(absolute, 0, 0, false, 0);
 		@extend %f-ct;
-		background-image: linear-gradient(to left, #f9d423, #ff4e50);
-		opacity: .9;
+		background-color: $app-color-theme-vice;
 	}
 
 	.user-box2 {
@@ -239,8 +325,8 @@
 		}
 
 		.qs {
-			width: 60rpx;
-			height: 60rpx;
+			width: 45rpx;
+			height: 45rpx;
 			margin-left: 15px;
 
 			&:active {
@@ -254,12 +340,12 @@
 			@extend %flex;
 
 			.name {
-				font-size: $uni-font-size-subtitle;
+				font-size: 30rpx;
 			}
 
 			.used {
-				font-size: 20rpx;
-				color: $uni-color-subtitle;
+				font-size: 21rpx;
+				color: #333;
 			}
 
 			.percent {
