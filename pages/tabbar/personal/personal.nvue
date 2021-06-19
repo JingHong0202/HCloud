@@ -27,21 +27,22 @@
 			</cell>
 		</list>
 		<view class="nav" :style="{height: navHeight}" ref='nav' />
-
 		<view class="user-box2" :style="{height: `${400+navHeight}rpx`}">
 			<image elevation="5px" class="avatars" ref='circle' src="/static/images/avatar.png" mode="aspectFit"
 				@click="toPage('account')"></image>
 			<view class="info" ref='user'>
 				<text class="name">{{user.mobile}}</text>
-				<progress class="percent" active border-radius='15' stroke-width="5" :percent="percent"
-					activeColor="#4070ff" />
+				<!-- <progress class="percent" active border-radius='15' stroke-width="5" :percent="33"
+					activeColor="#4070ff" /> -->
+				<view class="percent">
+					<custom-progress   :PropPercent='percent'  />
+				</view>
 				<text class="used">空间情况: {{space_info}}</text>
 			</view>
 			<image class="qs" ref='qs' src="/static/icon/common/check.png" mode="aspectFit" @click="scanCode"></image>
 		</view>
 	</view>
 </template>
-
 <script>
 	import {
 		formatBytes
@@ -75,7 +76,7 @@
 			usedSize() {
 				return this.user.used_space ? formatBytes(this.user.used_space) : '0.00GB'
 			},
-			percent() {
+			33() {
 				return 100 * (this.user.used_space / this.user.total_space)
 			},
 			space_info() {
@@ -85,7 +86,6 @@
 		mounted() {
 			let {
 				statusBarHeight
-
 			} = uni.getSystemInfoSync()
 			this.navHeight = statusBarHeight + 44
 			this.init(statusBarHeight)
@@ -133,56 +133,47 @@
 									transformOrigin: 'center'
 								},
 								props: [{
-										element: getEl(this.$refs['nav']),
-										property: 'opacity',
-										expression: navOpacity,
-									},
-									{
-										element: getEl(this.$refs['user']),
-										property: 'opacity',
-										expression: userOpacity,
-									},
-									{
-										element: getEl(this.$refs['user']),
-										property: 'transform.translateY',
-										expression: userY,
-									},
-									{
-										element: getEl(this.$refs['qs']),
-										property: 'transform.translateY',
-										expression: qsY
-									},
-									{
-										element: getEl(this.$refs['qs']),
-										property: 'transform.scale',
-										expression: qsScale
-									},
-									{
-										element: getEl(this.$refs['qs']),
-										property: 'transform.translateX',
-										expression: qsX
-									},
-									{
-										element: getEl(this.$refs['circle']),
-										property: 'transform.translateY',
-										expression: circleY
-									},
-									{
-										element: getEl(this.$refs['circle']),
-										property: 'transform.translateX',
-										expression: circleX
-									},
-									{
-										element: getEl(this.$refs['circle']),
-										property: 'transform.scale',
-										expression: circleScale
-									}
-								]
+									element: getEl(this.$refs['nav']),
+									property: 'opacity',
+									expression: navOpacity,
+								}, {
+									element: getEl(this.$refs['user']),
+									property: 'opacity',
+									expression: userOpacity,
+								}, {
+									element: getEl(this.$refs['user']),
+									property: 'transform.translateY',
+									expression: userY,
+								}, {
+									element: getEl(this.$refs['qs']),
+									property: 'transform.translateY',
+									expression: qsY
+								}, {
+									element: getEl(this.$refs['qs']),
+									property: 'transform.scale',
+									expression: qsScale
+								}, {
+									element: getEl(this.$refs['qs']),
+									property: 'transform.translateX',
+									expression: qsX
+								}, {
+									element: getEl(this.$refs['circle']),
+									property: 'transform.translateY',
+									expression: circleY
+								}, {
+									element: getEl(this.$refs['circle']),
+									property: 'transform.translateX',
+									expression: circleX
+								}, {
+									element: getEl(this.$refs['circle']),
+									property: 'transform.scale',
+									expression: circleScale
+								}]
 							})
 							uni.hideLoading()
 						}))
 					})
-				}, 200)
+				}, 500)
 			},
 			formatBytes,
 			toPage(pageName) {
@@ -193,24 +184,15 @@
 			scanCode() {
 				uni.scanCode({
 					success: (res) => {
-						try {
-							let {
-								link,
-								desc
-							} = JSON.parse(res.result)
-							let split = link.split('/'),
-								parse = split[split.length - 1]
-							uni.navigateTo({
-								url: '/pages/open-list/open-list?type=share',
-								complete: () => {
-									uni.$emit('open-list', {
-										data: parse
-									});
-								}
-							})
-						} catch (e) {
-							//TODO handle the exception
-						}
+						let {
+							link,
+							desc
+						} = JSON.parse(res.result)
+						let split = link.split('/'),
+							parse = split[split.length - 1]
+						uni.navigateTo({
+							url: '/pages/open-list/open-list?type=share&shareUrl=' + parse,
+						})
 					}
 				})
 			},
@@ -226,20 +208,18 @@
 			}
 		},
 		onShow() {
-			get_user_detail()
-				.then(({
-					data: {
-						data
-					}
-				}) => {
-					uni.setStorageSync('userinfo', data)
-					getApp().globalData.userinfo = data
-					this.user = data
-				})
-				.catch(err => {
-					console.log(err)
-					this.toLogin()
-				})
+			get_user_detail().then(({
+				data: {
+					data
+				}
+			}) => {
+				uni.setStorageSync('userinfo', data)
+				getApp().globalData.userinfo = data
+				this.user = data
+			}).catch(err => {
+				console.log(err)
+				this.toLogin()
+			})
 		},
 		onBackPress() {
 			if (getApp().globalData.modal) {
@@ -249,7 +229,6 @@
 		}
 	}
 </script>
-
 <style scoped lang='scss'>
 	.list {
 		flex: 1;
@@ -299,7 +278,6 @@
 		}
 	}
 
-
 	.user-box {
 		height: 400rpx;
 		flex-direction: row;
@@ -315,7 +293,6 @@
 		padding: 0 100rpx;
 		@include position(absolute, 0, 0, false, 0);
 		@extend %f-ct;
-
 
 		.avatars {
 			border-radius: 60rpx;
@@ -336,7 +313,6 @@
 
 		.info {
 			flex-direction: column;
-			height: 100rpx;
 			@extend %flex;
 
 			.name {
@@ -346,6 +322,7 @@
 			.used {
 				font-size: 21rpx;
 				color: #333;
+				margin-top: 20rpx;
 			}
 
 			.percent {

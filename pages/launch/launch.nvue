@@ -2,8 +2,8 @@
 	<view class="container" :render-whole='true'
 		style="flex: 1;flex-direction: column;align-items: center;justify-content: flex-end;">
 		<view style="flex-direction: row;justify-content: center; align-items: center;">
-			<image src="/static/images/logo.png" mode="aspectFit" class="logo"
-				style="width: 100rpx;height: 100rpx;"></image>
+			<image src="/static/images/logo.png" mode="aspectFit" class="logo" style="width: 100rpx;height: 100rpx;">
+			</image>
 			<view style="height: 50rpx; width: 1px;background-color: #000000;margin: 0 15rpx;"></view>
 			<text style="font-size: 36rpx;">HCloud</text>
 		</view>
@@ -12,7 +12,6 @@
 		</view>
 	</view>
 </template>
-
 <script>
 	import {
 		get_user_detail
@@ -28,17 +27,7 @@
 			})
 		})
 	}
-
-	// function unPreloadPage(url) {
-	// 	return new Promise((resolve, reject) => {
-	// 		uni.un({
-	// 			url,
-	// 			complete() {
-	// 				resolve()
-	// 			}
-	// 		})
-	// 	})
-	// }
+	
 	export default {
 		mounted() {
 			setTimeout(() => {
@@ -47,26 +36,23 @@
 				// 判断客户是否已经登录
 				if (token) {
 					// refresh user info && check token
-					get_user_detail()
-						.then(({
-							data: {
-								data
-							}
-						}) => {
-							this.init(data)
-							uni.switchTab({
-								url: "/pages/tabbar/index/index"
-							})
+					get_user_detail().then(({
+						data: {
+							data
+						}
+					}) => {
+						this.init(data)
+						uni.switchTab({
+							url: "/pages/tabbar/index/index"
 						})
-						.catch(err => {
-							console.log(err)
-							this.toLogin()
-						})
-
+					}).catch(err => {
+						console.log(err)
+						this.toLogin()
+					})
 				} else {
 					this.toLogin()
 				}
-			}, 200)
+			}, 1000)
 		},
 		methods: {
 			init(data) {
@@ -93,8 +79,7 @@
 						preloadPage('/pages/user/register/register'),
 						preloadPage('/pages/user/resetpas/resetpas'),
 						preloadPage('/pages/user/sms-login/sms-login'),
-					]
-				).then(() => {
+					]).then(() => {
 					setTimeout(() => {
 						uni.reLaunch({
 							url: "/pages/user/login/login"
@@ -103,8 +88,5 @@
 				})
 			}
 		},
-		// computed: {
-		// 	...mapState('user', ['info'])
-		// }
 	}
 </script>

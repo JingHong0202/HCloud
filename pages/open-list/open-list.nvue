@@ -24,7 +24,6 @@
 		<custom-popups :labels="labels" v-if='openMenu' @handleClick='handleClick' @exit='openMenu = !openMenu' />
 	</view>
 </template>
-
 <script>
 	import popups from '@/common/js/mixins/popups.js'
 	import customList from '@/common/js/mixins/custom-list.js'
@@ -45,17 +44,15 @@
 		data() {
 			return {
 				collection_lables: [{
-						text: '下载',
-						method: 'download',
-						icon: '/static/icon/actionsheet/download.png'
-					},
-					{
-						text: '打开所在目录',
-						method: 'openDir',
-						icon: '/static/icon/actionsheet/to-dir.png',
-						once: true
-					}
-				],
+					text: '下载',
+					method: 'download',
+					icon: '/static/icon/actionsheet/download.png'
+				}, {
+					text: '打开所在目录',
+					method: 'openDir',
+					icon: '/static/icon/actionsheet/to-dir.png',
+					once: true
+				}],
 				share_lables: [{
 					text: '保存',
 					method: 'save',
@@ -97,58 +94,49 @@
 					title: this.list[0].user_id.replace(/(\d{3})(\d{4})(\d{4})/, "$1****$3" + '的分享')
 				})
 			},
-			async initShare() {
-				const reg = /(\d{3})(\d{4})(\d{4})/;
-				uni.$once('open-list', ({
-					data
+			async initShare(data) {
+				const reg = /(\d{3})(\d{4})(\d{4})/,
+					url = data
+				getContent(data, uni.getStorageSync(url)).then(({
+					data: {
+						data
+					}
 				}) => {
-					const url = data
-					getContent(data, uni.getStorageSync(url)).then(({
-						data: {
-							data
-						}
-					}) => {
-						uni.setNavigationBarTitle({
-							title: data.share_user.replace(reg,
-								"$1****$3") + '的分享'
-						})
-						this.list = data.filelist.map(item => {
-							return {
-								...item,
-								share_id: url
-							}
-						})
-						this.skeletonLoading = false
-					}).catch((err) => {
-						uni.removeStorageSync(url)
-						if (err.data.code === 406 || (err.data.code === 403 && err.data.message ===
-								'提取码错误')) {
-							uni.navigateTo({
-								url: '/pages/global/code/code?url=' + data,
-								success: () => {
-									uni.$once('code-check', (res) => {
-										if (!res) return uni.navigateBack({
-											delta: 1
-										})
-										this.list = res.filelist.map(item => {
-											return {
-												...item,
-												share_id: url
-											}
-										})
-										uni.setNavigationBarTitle({
-											title: res.share_user.replace(
-												reg,
-												"$1****$3") + '的分享'
-										})
-										this.skeletonLoading = false
-									})
-								}
-							})
-						} else if (err.data.code === 404 && err.data.message === '无效链接或该分享已被取消') {
-
+					uni.setNavigationBarTitle({
+						title: data.share_user.replace(reg, "$1****$3") + '的分享'
+					})
+					this.list = data.filelist.map(item => {
+						return {
+							...item,
+							share_id: url
 						}
 					})
+					this.skeletonLoading = false
+				}).catch((err) => {
+					uni.removeStorageSync(url)
+					if (err.data.code === 406 || (err.data.code === 403 && err.data.message === '提取码错误')) {
+						uni.navigateTo({
+							url: '/pages/global/code/code?url=' + data,
+							success: () => {
+								uni.$once('code-check', (res) => {
+									if (!res) return uni.navigateBack({
+										delta: 1
+									})
+									this.list = res.filelist.map(item => {
+										return {
+											...item,
+											share_id: url
+										}
+									})
+									uni.setNavigationBarTitle({
+										title: res.share_user.replace(reg,
+											"$1****$3") + '的分享'
+									})
+									this.skeletonLoading = false
+								})
+							}
+						})
+					}
 				})
 			},
 			breadClickHandler(item) {
@@ -206,7 +194,7 @@
 					return await this.initCollection()
 					break;
 				case 'share':
-					return await this.initShare()
+					return await this.initShare(option.shareUrl)
 					break;
 				case 'share_folder':
 					this.share_id = option.share_id
@@ -216,7 +204,6 @@
 		},
 	}
 </script>
-
 <style lang="scss">
 	.open-list {
 		@extend %flex;

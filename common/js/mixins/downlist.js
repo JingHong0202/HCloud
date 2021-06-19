@@ -47,38 +47,39 @@ export default {
 				find.task = item
 				let closure = throttle()
 				find.task.addEventListener('statechanged', (download, status) => closure(() => {
-					let totalSize = download.totalSize || find.file_size,
-						downloadedSize = download.downloadedSize,
-						state = download && download.state
-					if (find.status === 'SUCCESS' || !totalSize || !downloadedSize)
-						return
-					if (state === 4) {
-						if (totalSize === downloadedSize) {
-							let tempPath = plus.io.convertLocalFileSystemURL(find.task
-								.filename);
-							find.downPath = tempPath
-							this.$set(find, 'status', 'SUCCESS')
-						}
-					}
-					if (status >= 400 ) {
-						if (status !== 416) {
-							this.$set(find, 'status', 'ERROR')
-							find.task.abort()
+					try {
+						let totalSize = download.totalSize || find.file_size
+						if (find.status === 'SUCCESS' || !totalSize || !download.downloadedSize)
 							return
+						if (download.state === 4) {
+							if (totalSize === download.downloadedSize) {
+								let tempPath = plus.io.convertLocalFileSystemURL(find.task
+									.filename);
+								find.downPath = tempPath
+								this.$set(find, 'status', 'SUCCESS')
+							}
 						}
+						if (status >= 400) {
+							if (status !== 416) {
+								this.$set(find, 'status', 'ERROR')
+								find.task.abort()
+								return
+							}
+						}
+						if (!find.totalSize) this.$set(find, 'totalSize', formatBytes(
+							totalSize))
+						this.$set(find, 'percent', 100 * (download.downloadedSize / totalSize))
+						this.$set(find, 'currentSize', formatBytes(download.downloadedSize))
+					} catch (err) {
+						this.$set(find, 'status', 'ERROR')
+						find.task.abort()
 					}
-					if (!find.totalSize) this.$set(find, 'totalSize', formatBytes(
-						totalSize))
-					this.$set(find, 'percent', 100 * (downloadedSize / totalSize))
-					this.$set(find, 'currentSize', formatBytes(downloadedSize))
 				}, 1000), false)
 			})
 		}
 	},
 	data() {
 		return {
-			// down_move_queue: [],
-			// down_moved: [],
 			down_handler_timer: null
 		}
 	},
@@ -92,35 +93,6 @@ export default {
 				key: `${this.globalData.userinfo.mobile}-downlist`
 			})
 		},
-		// down_move_queue(newVal, oldVal) {
-		// 	if (!newVal.length) return
-		// 	let current = newVal[0]
-		// 	if (this.down_moved.some(item => item.path === current.path && item.name === current.name && item.uuid ===
-		// 			current.uuid)) {
-		// 		return this.down_move_queue.shift()
-		// 	} else {
-		// 		this.moveFile(current.path, current.name)
-		// 			.then((res) => {
-		// 				if (res.msg === 'success') {
-		// 					this.down_moved.push({
-		// 						path: current.path,
-		// 						name: current.name,
-		// 						uuid: current.uuid
-		// 					})
-		// 					let find = this.downlist.find(item => item.uuid === current.uuid)
-		// 					find.status = "SUCCESS"
-		// 					find.downPath = res.path
-		// 					find.task && find.task.abort()
-		// 				} else {
-		// 					console.log(res.msg)
-		// 				}
-		// 			})
-		// 			.catch(err => {
-		// 				console.log(err)
-		// 				find.status = "ERROR"
-		// 			})
-		// 	}
-		// },
 		GET_DOWNLIST_RUNTIME(newVal, oldVal) {
 			if (newVal.length) {
 				newVal.forEach((item) => {
@@ -128,7 +100,6 @@ export default {
 						state = item.task && item.task.state
 					task.pause()
 					task.resume()
-
 				})
 			}
 		},

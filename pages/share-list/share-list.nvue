@@ -54,11 +54,11 @@
 			// }, 2000)
 			// },
 			toDetail(item) {
+				if (this.$refs['list'].action) return this.$refs['list'].addSelectList(item)
 				if (item.delete) return uni.showModal({
 					showCancel: false,
 					title: '该文件以被删除'
 				})
-				if (this.$refs['list'].action) return this.$refs['list'].addSelectList(item)
 				return uni.navigateTo({
 					url: '/pages/share-detail/share-detail',
 					success: () => {

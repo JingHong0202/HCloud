@@ -1,0 +1,53 @@
+<!-- <template>
+        <web-view  style="flex: 1;" :webview-styles="webviewStyles" src="https://uniapp.dcloud.io/static/web-view.html"></web-view>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                webviewStyles: {
+                    progress: {
+                        color: '#FF3333'
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+
+</style> -->
+
+
+<template>
+    <view class="content">
+        <textarea class="textarea" v-model="txt"></textarea>
+    </view>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                txt:"txt"
+            }
+        },
+        watch: {
+            txt(txt) {
+                if( txt.indexOf('\n') != -1 ){ //敲了回车键了
+                   uni.hideKeyboard() //收起软键盘
+                }
+            }
+        },
+        methods: {
+        }
+    }
+</script>
+
+<style>
+.textarea{
+    border: solid 1px red;
+}
+</style>

@@ -3,63 +3,54 @@
 		<view class="mid-page">
 			<view class="row">
 				<view class="col">
-					<view class="item-box" elevation="2px" style="background-color:#4070FF"
-						@tap.stop="scanCode">
+					<view class="item-box" elevation="2px" style="background-color:#4070FF" @tap.stop="scanCode">
 						<view style="height: 75rpx;justify-content: center;align-items: center;">
 							<uni-icons :hover='false' type="scan" size="65" color="white"></uni-icons>
 						</view>
 					</view>
-						<text class="item-name">扫一扫</text>
+					<text class="item-name">扫一扫</text>
 				</view>
 				<view class="col">
-					<view class="item-box" elevation="2px" style="background-color:#42CC8B"
-						@tap.stop='toFolderlist'>
+					<view class="item-box" elevation="2px" style="background-color:#42CC8B" @tap.stop='toFolderlist'>
 						<image src="/static/icon/page/midButtomMenu/Add-Folder.png" mode="aspectFit" class="item-icon">
 						</image>
 					</view>
-						<text class="item-name">新建文件夹</text>
+					<text class="item-name">新建文件夹</text>
 				</view>
 				<view class="col">
-					<view class="item-box" elevation="2px" style="background-color:#FF8040"
-						@tap.stop='toUpload'>
+					<view class="item-box" elevation="2px" style="background-color:#FF8040" @tap.stop='toUpload'>
 						<image src="/static/icon/page/midButtomMenu/Uploadtocloud.png" mode="aspectFit"
 							class="item-icon"></image>
 					</view>
-						<text class="item-name">本地文件</text>
+					<text class="item-name">本地文件</text>
 				</view>
 				<view class="col">
-
-					<view class="item-box" elevation="2px" style="background-color:#FE5A5A"
-						@tap.stop='toPhoto'>
+					<view class="item-box" elevation="2px" style="background-color:#FE5A5A" @tap.stop='toPhoto'>
 						<view style="height: 75rpx;justify-content: center;align-items: center;">
 							<uni-icons :hover='false' type="images-filled" size="50" color="white"></uni-icons>
 						</view>
 					</view>
-						<text class="item-name">相册</text>
+					<text class="item-name">相册</text>
 				</view>
 			</view>
-			<!-- <view class='section'>
+			<view class='section'>
 			</view>
 			<view class="row">
 				<view class="col">
-					<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
-						@tap.stop="cameraImage">
-						<image src="/static/icon/page/midButtomMenu/paizhao.png" mode="aspectFit" class="item-icon">
-						</image>
-						<text class="item-name">拍照</text>
+					<view class="item-box" elevation="2px" style="background-color:#4070FF" @tap.stop="parseLink">
+						<view style="height: 75rpx;justify-content: center;align-items: center;">
+							<uni-icons :hover='false' type="paperclip" size="65" color="white"></uni-icons>
+						</view>
 					</view>
+					<text class="item-name">解析链接</text>
 				</view>
 				<view class="col">
-					<view class="item-box" elevation="2px" style="background-color:	rgba(83, 82, 237,1.0)"
-						@tap.stop="cameraVideoCapture">
-						<view style="height: 75rpx;justify-content: center;align-items: center;">
-							<uni-icons :hover='false' type="videocam-filled" size="50" color="white"></uni-icons>
-						</view>
-						<text class="item-name">摄像</text>
-					</view>
 				</view>
-				
-			</view> -->
+				<view class="col">
+				</view>
+				<view class="col">
+				</view>
+			</view>
 			<!-- <view class='section'>
 
 			</view>
@@ -85,13 +76,17 @@
 		</view>
 	</custom-dragPanel>
 </template>
-
 <script>
 	import {
 		getMedia,
 		// getOneAnyFile
 	} from '@/util/file.js'
-	import {mapActions} from 'vuex'
+	import {
+		handlerClipboard
+	} from '@/util/index.js'
+	import {
+		mapActions
+	} from 'vuex'
 	export default {
 		onReady() {
 			this.$refs['drag-panel'].show()
@@ -102,26 +97,20 @@
 				e.stopPropagation()
 				uni.scanCode({
 					success: (res) => {
-						try {
-							let {
-								link,
-								desc
-							} = JSON.parse(res.result)
-							let split = link.split('/'),
-								parse = split[split.length - 1]
-							uni.navigateTo({
-								url: '/pages/open-list/open-list?type=share',
-								complete: () => {
-									uni.$emit('open-list', {
-										data: parse
-									});
-								}
-							})
-						} catch (e) {
-							//TODO handle the exception
-						}
+						let {
+							link,
+							desc
+						} = JSON.parse(res.result)
+						let split = link.split('/'),
+							parse = split[split.length - 1]
+						uni.redirectTo({
+							url: '/pages/open-list/open-list?type=share&shareUrl=' + parse,
+						})
 					}
 				})
+			},
+			parseLink() {
+				return handlerClipboard(true)
 			},
 			cameraImage() {
 				let camera = plus.camera.getCamera();
@@ -143,7 +132,6 @@
 			toFolderlist() {
 				return uni.redirectTo({
 					url: '/pages/folder-list/folder-list?from=mkdir'
-
 				})
 			},
 			// toOther() {
@@ -163,15 +151,12 @@
 					uni.navigateTo({
 						url: '/pages/folder-list/folder-list',
 						success: () => {
-							uni.$on('returnData', async (
-								folderPath) => {
-								await this
-									.ADD_UP_LIST({
-										target: folderPath
-											.uuid,
-										selectlist: res
-									})
-								uni.navigateTo({
+							uni.$on('returnData', async (folderPath) => {
+								await this.ADD_UP_LIST({
+									target: folderPath.uuid,
+									selectlist: res
+								})
+								uni.redirectTo({
 									url: '/pages/status/status'
 								})
 							})
@@ -190,28 +175,28 @@
 		}
 	}
 </script>
-
 <style lang="scss" scoped>
 	.section {
 		margin-bottom: 15rpx;
 		margin-top: 15rpx;
 	}
 
-
-
 	.mid-page {
 		flex: 1;
 		flex-direction: column;
+
 		& .col {
 			flex-direction: column;
 			transform: scale(.9);
 		}
+
 		& .item-name {
 			font-size: $uni-font-size-sm;
 			color: $app-custom-color-vice;
 			margin-top: 20rpx;
 			font-weight: bold;
 		}
+
 		& .item-box {
 			background-color: #808080;
 			height: 135rpx;
@@ -224,8 +209,6 @@
 			&:active {
 				opacity: .7;
 			}
-
-			
 
 			& .item-icon {
 				width: 90rpx;

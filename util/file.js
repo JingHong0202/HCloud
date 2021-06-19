@@ -264,6 +264,11 @@ function single(file) {
 				}
 			});
 			break;
+		// case 5:
+		// 	uni.navigateTo({
+		// 		url: "/pages/file/text"
+		// 	})
+		// 	break;
 		case 20:
 			//collection
 			uni.navigateTo({

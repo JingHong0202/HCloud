@@ -23,8 +23,7 @@
 					}
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/user/sms-login/sms-login",
 			"style": {
 				"navigationBarTitleText": " ",
@@ -35,8 +34,7 @@
 					}
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/user/register/register",
 			"style": {
 				"navigationBarTitleText": " ",
@@ -47,8 +45,7 @@
 					}
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/user/resetpas/resetpas",
 			"style": {
 				"navigationBarTitleText": " ",
@@ -59,8 +56,7 @@
 					}
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/user/common/resetpas-2",
 			"style": {
 				"navigationBarTitleText": " ",
@@ -71,8 +67,7 @@
 					}
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/user/code/code",
 			"style": {
 				"navigationStyle": "custom",
@@ -84,7 +79,6 @@
 					"titleNView": false
 				}
 			}
-
 		},
 		// tabbar page
 		{
@@ -97,11 +91,9 @@
 					"bounce": "none",
 					"scrollIndicator": "none",
 					"titleNView": false
-
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/tabbar/file/file",
 			"style": {
 				"navigationBarTitleText": "我的文件",
@@ -110,11 +102,9 @@
 					"bounce": "none",
 					"scrollIndicator": "none",
 					"titleNView": false
-
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/tabbar/personal/personal",
 			"style": {
 				"navigationBarTitleText": "个人中心",
@@ -125,9 +115,7 @@
 					"titleNView": false
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/tabbar/images/images",
 			"style": {
 				"navigationBarTitleText": "",
@@ -138,8 +126,7 @@
 					"titleNView": false
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/tabbar/midButtomMenu/midButtomMenu",
 			"style": {
 				"navigationStyle": "custom",
@@ -151,10 +138,26 @@
 					"titleNView": false
 				}
 			}
-		},
-
-
-		{
+		}, {
+			"path": "pages/file/text",
+			"style": {
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"titleSize": "28rpx",
+						"titleAlign": "left",
+						"buttons": [{
+							"type": "menu",
+							"float": "right"
+						}],
+						"titleOverflow": "ellipsis",
+						"backgroundColor": "white"
+					}
+				}
+			}
+		}, {
 			"path": "pages/preview/preview",
 			"style": {
 				"navigationBarTextStyle": "white",
@@ -167,9 +170,7 @@
 					"titleNView": false
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/open-list/open-list",
 			"style": {
 				"enablePullDownRefresh": false,
@@ -186,12 +187,9 @@
 						"titleOverflow": "ellipsis",
 						"backgroundColor": "white"
 					}
-
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/search/search",
 			"style": {
 				"navigationBarTitleText": "",
@@ -224,9 +222,7 @@
 					}
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/status/status",
 			"style": {
 				"enablePullDownRefresh": false,
@@ -246,9 +242,7 @@
 					}
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/upload/upload",
 			"style": {
 				"enablePullDownRefresh": false,
@@ -271,9 +265,7 @@
 					}
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/folder-list/folder-list",
 			"style": {
 				"navigationBarTitleText": "选择上传位置",
@@ -289,22 +281,18 @@
 					}
 				}
 			}
-
-		},
-		{
+		}, {
 			"path": "pages/account/account",
 			"style": {
 				"navigationBarTitleText": "账号与安全",
 				"enablePullDownRefresh": false
 			}
-
 		}, {
 			"path": "pages/setting/setting",
 			"style": {
 				"navigationBarTitleText": "设置",
 				"enablePullDownRefresh": false
 			}
-
 		}, {
 			"path": "pages/recycle/recycle",
 			"style": {
@@ -323,32 +311,26 @@
 							"fontSize": "16px"
 						}]
 					}
-
 				}
-
 			}
-
 		}, {
 			"path": "pages/about/about",
 			"style": {
 				"navigationBarTitleText": "关于",
 				"enablePullDownRefresh": false
 			}
-
 		}, {
 			"path": "pages/share-list/share-list",
 			"style": {
 				"navigationBarTitleText": "我的分享",
 				"enablePullDownRefresh": false
 			}
-
 		}, {
 			"path": "pages/share-detail/share-detail",
 			"style": {
 				"navigationBarTitleText": "分享详情",
 				"enablePullDownRefresh": false
 			}
-
 		}, {
 			"path": "pages/global/input-modal/input-modal",
 			"style": {
@@ -362,8 +344,7 @@
 					"softinputMode": "adjustResize"
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/global/qr/qr",
 			"style": {
 				"navigationStyle": "custom",
@@ -376,8 +357,7 @@
 					"softinputMode": "adjustResize"
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/global/code/code",
 			"style": {
 				"navigationStyle": "custom",
@@ -390,8 +370,7 @@
 					"softinputMode": "adjustResize"
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/global/views-drawer/views-drawer",
 			"style": {
 				"navigationStyle": "custom",
@@ -403,8 +382,7 @@
 					"titleNView": false
 				}
 			}
-		},
-		{
+		}, {
 			"path": "pages/global/popups/popups",
 			"style": {
 				"navigationStyle": "custom",
@@ -428,10 +406,7 @@
 					"titleNView": false
 				}
 			}
-
 		}
-
-
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -448,33 +423,29 @@
 		"midButton": {
 			"iconPath": "static/icon/tabBar/add.png",
 			"iconWidth": "55px",
-			"height":"50px"
+			"height": "50px"
 		},
 		"list": [{
-				"pagePath": "pages/tabbar/index/index",
-				"iconPath": "static/icon/tabBar/home.png",
-				"selectedIconPath": "static/icon/tabBar/home-a.png",
-				"text": "首页"
-			},
-			{
-				"pagePath": "pages/tabbar/file/file",
-				"iconPath": "static/icon/tabBar/file.png",
-				"selectedIconPath": "static/icon/tabBar/file-a.png",
-				"text": "文件"
-			},
-			{
-				"pagePath": "pages/tabbar/images/images",
-				"iconPath": "static/icon/tabBar/album.png",
-				"selectedIconPath": "static/icon/tabBar/album-a.png",
-				"text": "图片"
-			},
-			{
-				"pagePath": "pages/tabbar/personal/personal",
-				"iconPath": "static/icon/tabBar/geren.png",
-				"selectedIconPath": "static/icon/tabBar/geren-a.png",
-				"text": "个人"
-			}
-		]
+			"pagePath": "pages/tabbar/index/index",
+			"iconPath": "static/icon/tabBar/home.png",
+			"selectedIconPath": "static/icon/tabBar/home-a.png",
+			"text": "首页"
+		}, {
+			"pagePath": "pages/tabbar/file/file",
+			"iconPath": "static/icon/tabBar/file.png",
+			"selectedIconPath": "static/icon/tabBar/file-a.png",
+			"text": "文件"
+		}, {
+			"pagePath": "pages/tabbar/images/images",
+			"iconPath": "static/icon/tabBar/album.png",
+			"selectedIconPath": "static/icon/tabBar/album-a.png",
+			"text": "图片"
+		}, {
+			"pagePath": "pages/tabbar/personal/personal",
+			"iconPath": "static/icon/tabBar/geren.png",
+			"selectedIconPath": "static/icon/tabBar/geren-a.png",
+			"text": "个人"
+		}]
 	},
 	"easycom": {
 		"autoscan": true,

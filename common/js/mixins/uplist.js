@@ -2,25 +2,20 @@ import {
 	mapState,
 	mapGetters
 } from 'vuex'
-
 import {
 	formatBytes,
 	randomString
 } from '@/util/file.js'
-
 import {
 	getoss,
 	check
 } from '@/api/file.js'
-
 import {
 	Base64
 } from '@/util/base64.js';
-
 import {
 	throttle
 } from '@/util/index.js'
-
 import oss_config from '@/config/oss.js'
 export default {
 	computed: {
@@ -84,11 +79,8 @@ export default {
 		},
 		async handlerUp() {
 			for (let item of this.uplist) {
-
-
 				// 只有状态是LOADING才进行上传
 				if (item.status !== "LOADING") continue;
-
 				const {
 					signature,
 					policy,
@@ -100,7 +92,6 @@ export default {
 					sign,
 					repeat
 				} = await this.beforeUpload(item)
-
 				if (repeat) {
 					uni.showToast({
 						title: item.fileName + '文件重复',
@@ -109,7 +100,6 @@ export default {
 					item.uploading = false
 					return this.$set(item, 'status', 'ERROR')
 				}
-
 				// 秒传
 				if (exist && !sign) {
 					this.$set(item, 'percent', 100)
@@ -117,10 +107,9 @@ export default {
 					item.uploading = false
 					return this.$set(item, 'status', 'SUCCESS')
 				}
-
+				if (this.uplist.filter(item => item.status === 'RUNTIME').length) return
+				this.$set(item, 'status', 'RUNTIME')
 				try {
-					if (this.uplist.filter(item => item.status === 'RUNTIME').length) return
-					this.$set(item, 'status', 'RUNTIME')
 					let res = await this.upload(item, {
 						signature,
 						policy,
@@ -160,12 +149,10 @@ export default {
 						'OSSAccessKeyId': OSSAccessKeyId,
 						'success_action_status': '200', //让服务端返回200,不然，默认会返回204
 						'Signature': signature,
-						'callback': Base64.encode(
-							JSON.stringify({
-								callbackUrl: oss_config.OSS_CALLBACK_HOST,
-								callbackBody: "bucket=${bucket}&object=${object}&etag=${etag}&size=${size}&mimeType=${mimeType}&mobile=${x:mobile}&file_id=${x:file_id}&file_name=${x:file_name}&sign=${x:sign}"
-							})
-						),
+						'callback': Base64.encode(JSON.stringify({
+							callbackUrl: oss_config.OSS_CALLBACK_HOST,
+							callbackBody: "bucket=${bucket}&object=${object}&etag=${etag}&size=${size}&mimeType=${mimeType}&mobile=${x:mobile}&file_id=${x:file_id}&file_name=${x:file_name}&sign=${x:sign}"
+						})),
 						'x:mobile': user.mobile,
 						'x:file_id': item.file_id || '',
 						'x:file_name': item.fileName,
@@ -178,23 +165,38 @@ export default {
 								this.$set(item, 'status', "SUCCESS")
 								resolve(data)
 							} else {
-								return reject(res)
+								return reject({
+									res,
+									message: '服务器通信失败02'
+								})
 							}
 						} else {
-							return reject(res)
+							return reject({
+								res,
+								message: '服务器通信失败'
+							})
 						}
 					},
 					fail: (res) => {
-						if (item.status !== 'STOP') return reject(res)
+						if (item.status !== 'STOP') return reject({
+							res,
+							message: '文件上传失败'
+						})
 					}
 				})
 				let closure = throttle()
 				item.task.onProgressUpdate((res) => closure(() => {
-					if (!item.totalSize) this.$set(item, 'totalSize', formatBytes(res
-						.totalBytesExpectedToSend))
-					if (item.status === 'STOP') item.task.abort();
-					this.$set(item, 'percent', res.progress)
-					this.$set(item, 'currentSize', formatBytes(res.totalBytesSent))
+					try {
+						if (!item.totalSize) this.$set(item, 'totalSize', formatBytes(res
+							.totalBytesExpectedToSend))
+						if (item.status === 'STOP') item.task.abort();
+						this.$set(item, 'percent', res.progress)
+						this.$set(item, 'currentSize', formatBytes(res.totalBytesSent))
+					} catch (e) {
+						console.log(e)
+						item.uploading = false
+						this.$set(item, 'status', 'ERROR')
+					}
 				}, 1000));
 			})
 		},

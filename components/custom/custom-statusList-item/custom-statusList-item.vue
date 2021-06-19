@@ -127,30 +127,32 @@
 							})
 							let closure = throttle()
 							item.task.addEventListener('statechanged', (download, status) => closure(() => {
-								let totalSize = download.totalSize,
-									downloadedSize = download.downloadedSize,
-									state = download.state
-								if (item.status === 'SUCCESS' || !totalSize || !downloadedSize)
-									return
-								if (state === 4) {
-									if (totalSize === downloadedSize) {
-										let tempPath = plus.io.convertLocalFileSystemURL(item.task
-											.filename);
-										item.downPath = tempPath
-										this.$set(item, 'status', 'SUCCESS')
+								try{
+									let totalSize = download.totalSize || find.file_size
+									if (item.status === 'SUCCESS' || !totalSize || !download.downloadedSize) return
+									if (download.state === 4) {
+										if (totalSize === download.downloadedSize) {
+											let tempPath = plus.io.convertLocalFileSystemURL(item.task
+												.filename);
+											item.downPath = tempPath
+											this.$set(item, 'status', 'SUCCESS')
+										}
 									}
-								}
-								if (status >= 400) {
-									if (status !== 416) {
-										this.$set(item, 'status', 'ERROR')
-										item.task.abort()
-										return
+									if (status >= 400) {
+										if (status !== 416) {
+											this.$set(item, 'status', 'ERROR')
+											item.task.abort()
+											return
+										}
 									}
+									if (!item.totalSize) this.$set(item, 'totalSize', formatBytes(
+										totalSize))
+									this.$set(item, 'percent', 100 * (download.downloadedSize / totalSize))
+									this.$set(item, 'currentSize', formatBytes(download.downloadedSize))
+								}catch(e){
+									this.$set(item, 'status', 'ERROR')
+									item.task.abort()
 								}
-								if (!item.totalSize) this.$set(item, 'totalSize', formatBytes(
-									totalSize))
-								this.$set(item, 'percent', 100 * (downloadedSize / totalSize))
-								this.$set(item, 'currentSize', formatBytes(downloadedSize))
 							}, 1000), false)
 							this.$set(item, 'status', 'LOADING')
 							break

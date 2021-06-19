@@ -452,7 +452,7 @@
 	.fab {
 		@include position(fixed, false, 0, 15px);
 		border-radius: 100rpx;
-		background-image: linear-gradient(top right, #ecaf59, #ffed20);
+		background-image: linear-gradient(top right, #699eff, #4070ff);
 		width: 100rpx;
 		height: 100rpx;
 		@extend %f-ct;
