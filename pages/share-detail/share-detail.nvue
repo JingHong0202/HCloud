@@ -54,12 +54,7 @@
 		methods: {
 			toPage() {
 				uni.navigateTo({
-					url: '/pages/open-list/open-list?type=share',
-					complete:() => {
-						uni.$emit('open-list', {
-							data: this.item.url
-						});
-					}
+					url: '/pages/open-list/open-list?type=share&shareUrl='+this.item.url
 				});
 			},
 			cancel() {
